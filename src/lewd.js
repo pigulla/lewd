@@ -40,10 +40,15 @@ function assertParameterCount(args, min, max) {
     }
 }
 
-var Lewd = function (spec) {
-    assertParameterCount(arguments, 1);
-    
-    return utils.customMessageWrapper(utils.wrap(spec));
+var Lewd = function () {
+    if (arguments.length === 1) {
+        return utils.customMessageWrapper(utils.wrap(arguments[0]));
+    } else if (arguments.length === 0) {
+        throw new InvalidSchemaException('at least one parameter must be given');
+    } else {
+        var args = Array.prototype.slice.call(arguments);
+        return utils.customMessageWrapper(condition.some(args));
+    }
 };
 
 Lewd.range = function (options) {
