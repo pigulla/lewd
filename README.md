@@ -12,10 +12,10 @@ You can think of lewd as a less powerful but much more concise and simpler to us
 #### What does it *not* do?
 lewd is not meant to validate your data semantically, so non-local validations that require cross-referencing other parts of the input data are not supported. For instance, validations like "the value of property x must be larger than the value of property y" are beyond the scope of lewd.
 
-Also, we only validate primitive types, arrays and plain objects. If you feed lewd anything else (for example date objects, regular expressions, or Objects with a non-empty prototype) it will probably behave unexpectedly or just break (although we do try to throw error messages that are actually helpful).
+Also, only primitive types, arrays and plain objects are validated. If you feed lewd anything else (for example date objects, regular expressions, or Objects with a non-empty prototype) it will probably behave unexpectedly or just break (although lewd tries its best to provide error messages that are actually helpful).
 
 
-##### Examples
+#### What does it look like?
 
 Let's assume you want to make sure an object contains the properties `x` (which must be a number) and `y` (which must be an array of strings). With lewd you can simply write:
 ```javascript
@@ -50,7 +50,7 @@ validator(42); // fails because 42 is not a boolean value
 ```
 
 ## Getting Started
-Validation is done in two steps. First, a condition is generated. That scheme can then be used to validate values against.
+Validation is done in two steps. First, a condition is generated. Values can then be validated against that condition.
 
 ```javascript
 var condition = lewd.Boolean();
@@ -240,6 +240,9 @@ Remember that setting if either the `keys` or `values` option (or their shortcut
 function (value:*[, path:Array.<string>]) throws ConditionViolationException
 ```
 
+# Contributions
+You found a bug, fixed a typo or implemented a cool new feature? Feel free to send pull requests and I'll merge them. Please make sure you add tets as needed and reference the issue number in your commit (please open one if necessary). Bonus points are awareded for not breaking any jshint rules.
+
 
 # FAQ
 
@@ -247,10 +250,10 @@ function (value:*[, path:Array.<string>]) throws ConditionViolationException
 [node-validator](https://github.com/chriso/validator.js) is a great library but it scratches a different itch. It only works with strings, which is great for URLs and query parameters but doesn't really help you validating the JSON payload of your run-of-the-mill AJAX request.
 
 ##### How can I do asynchronous validation?
-You can't. lewd is meant to do syntactic validation of your data, which can practically always be done synchronously. Support of asynchronous conditions is something we would like to support at some point, but there are no concrete plans as of now.
+You can't. lewd is meant to do syntactic validation of your data, which can practically always be done synchronously. Support of asynchronous conditions is something I would like to add at some point, but there are no concrete plans as of now.
 
 ##### Can conditions coerce values?
-No, they can not. Yet. This certainly is a useful feature and we are hoping to add it in one of the next releases. 
+No, they can not - yet. This certainly is a useful feature and I am hoping to add it in one of the next releases. 
 
 ##### Can I use lewd in a browser environment?
-No, lewd is currently only available as a Node.JS module. We are not aware of any technical limitation that prevents it from running in a browser, we simply haven't gotten around to implementing it yet.
+No, lewd is currently only available as a Node.JS module. I'm not aware of any technical limitation that prevents it from running in a browser, I simply haven't gotten around to implementing it yet.
