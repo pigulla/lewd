@@ -54,27 +54,27 @@ function validateOptions(options, definedKeys, allowExtraDefault) {
     return opts;
 }
 
-module.exports = function (dict, options) {
+module.exports = function (object, options) {
     // TODO: this could definitely use some refactoring
     
     var utils = require('../utils');
     
     var opts = options || {};
     
-    if (!_.isPlainObject(dict)) {
+    if (!_.isPlainObject(object)) {
         throw new UnexpectedParameterException('Parameter must be a plain object');
     }
     
     var keysCondition,
         valuesCondition,
         allowExtraDefault = false,
-        definedKeys = Object.keys(dict);
+        definedKeys = Object.keys(object);
 
     if (opts.hasOwnProperty('keys')) {
         keysCondition = utils.wrap(opts.keys);
         allowExtraDefault = true;
-    } else if (dict.hasOwnProperty(KEYS_PROPERTY)) {
-        keysCondition = utils.wrap(dict[KEYS_PROPERTY]);
+    } else if (object.hasOwnProperty(KEYS_PROPERTY)) {
+        keysCondition = utils.wrap(object[KEYS_PROPERTY]);
         definedKeys = _.without(definedKeys, KEYS_PROPERTY);
         allowExtraDefault = true;
     } else {
@@ -84,21 +84,21 @@ module.exports = function (dict, options) {
     if (opts.hasOwnProperty('values')) {
         valuesCondition = utils.wrap(opts.values);
         allowExtraDefault = true;
-    } else if (dict.hasOwnProperty(VALUES_PROPERTY)) {
-        valuesCondition = utils.wrap(dict[VALUES_PROPERTY]);
+    } else if (object.hasOwnProperty(VALUES_PROPERTY)) {
+        valuesCondition = utils.wrap(object[VALUES_PROPERTY]);
         definedKeys = _.without(definedKeys, VALUES_PROPERTY);
         allowExtraDefault = true;
     } else {
         valuesCondition = anyCondition();
     }
     
-    opts = validateOptions(opts, Object.keys(dict), allowExtraDefault);
+    opts = validateOptions(opts, Object.keys(object), allowExtraDefault);
 
     definedKeys.forEach(function (key) {
-        dict[key] = utils.wrap(dict[key]);
+        object[key] = utils.wrap(object[key]);
     });
     
-    return function (value, path) {
+    return function objectCondition(value, path) {
         path = path || [];
         
         if (!_.isPlainObject(value)) {
@@ -124,7 +124,7 @@ module.exports = function (dict, options) {
         });
         
         keysToValidate.forEach(function (key) {
-            dict[key](value[key], path.concat(key));
+            object[key](value[key], path.concat(key));
         });
     };
 };

@@ -7,9 +7,9 @@ var refuteValues = helper.refuteValues,
     acceptValues = helper.acceptValues,
     refuteSchemaOptions = helper.refuteSchemaOptions;
 
-var condition = lewd.dict;
+var condition = lewd.object;
 
-buster.testCase('"dict" condition', {
+buster.testCase('"object" condition', {
     'simple': {
         '{ b: Boolean }': function () {
             var args = [

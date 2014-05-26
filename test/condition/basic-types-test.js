@@ -27,6 +27,10 @@ buster.testCase('basic types', {
         refuteValues(lewd.null, [], ['', 'blub', 0, 42, 17.3, [], ['19'], true, false, {}]);
         acceptValues(lewd.null, [], [null]);
     },
+    'Array': function () {
+        refuteValues(lewd.Array, [], ['', 'blub', 0, 42, 17.3, true, false, {}]);
+        acceptValues(lewd.Array, [], [[], [null], [1, 2, 3]]);
+    },
     'undefined': function () {
         acceptValues(lewd.undefined, [], ['', 'blub', 0, 42, 17.3, [], ['19'], null, true, false, {}]);
     }

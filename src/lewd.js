@@ -10,20 +10,19 @@ var ConditionViolationException = require('./exception/ConditionViolationExcepti
         all: require('./condition/All'),
         any: require('./condition/Any'),
         array: require('./condition/Array'),
-        dict: require('./condition/Dict'),
         integer: require('./condition/composite/Integer'),
         isoDateTime: require('./condition/composite/IsoDateTime'),
         len: require('./condition/Len'),
         literal: require('./condition/Literal'),
         none: require('./condition/None'),
         not: require('./condition/Not'),
+        object: require('./condition/Object'),
         range: require('./condition/Range'),
         regex: require('./condition/Regex'),
         set: require('./condition/Set'),
         some: require('./condition/Some')
     };
 
-// TODO: show source
 function assertParameterCount(args, min, max) {
     max = arguments.length === 2 ? min : max;
     
@@ -45,20 +44,6 @@ var Lewd = function (spec) {
     assertParameterCount(arguments, 1);
     
     return utils.customMessageWrapper(utils.wrap(spec));
-};
-
-Lewd.expose = function (prefix) {
-    var p = prefix || '$',
-        exposedFunctions = [
-            'specify', 'range', 'len', 'regex', 'all', 'set', 'some', 'none', 'literal', 'dict', 'not', 'isoDateTime',
-            'integer'
-        ];
-    
-    (function () {
-        for (var i = 0; i < exposedFunctions.length; ++i) {
-            this[p + exposedFunctions[i]] = Lewd[exposedFunctions[i]];
-        }
-    }).call(null);
 };
 
 Lewd.range = function (options) {
@@ -97,6 +82,11 @@ Lewd.all = function () {
 };
 
 Lewd.Array = function () {
+    assertParameterCount(arguments, 0);
+    return utils.customMessageWrapper(utils.wrap(Array));
+};
+
+Lewd.array = function () {
     var args = Array.prototype.slice.call(arguments);
     return utils.customMessageWrapper(condition.array(args));
 };
@@ -151,9 +141,9 @@ Lewd.some = function () {
     return utils.customMessageWrapper(condition.some(args));
 };
 
-Lewd.dict = function (spec, options) {
+Lewd.object = function (spec, options) {
     assertParameterCount(arguments, 1, 2);
-    return utils.customMessageWrapper(condition.dict(spec, options));
+    return utils.customMessageWrapper(condition.object(spec, options));
 };
 
 module.exports = Lewd;

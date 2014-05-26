@@ -6,7 +6,7 @@ var ConditionViolationException = require('./exception/ConditionViolationExcepti
     anyCondition = require('./condition/Any'),
     arrayCondition = require('./condition/Array'),
     literalCondition = require('./condition/Literal'),
-    dictCondition = require('./condition/Dict'),
+    objectCondition = require('./condition/Object'),
     regexCondition = require('./condition/Regex'),
     setCondition = require('./condition/Set'),
     typeCondition = require('./condition/Type');
@@ -68,7 +68,7 @@ var utils = {
         }
         
         if (_.isPlainObject(spec)) {
-            return dictCondition(spec);
+            return objectCondition(spec);
         }
     
         if (typeof spec === 'function') {

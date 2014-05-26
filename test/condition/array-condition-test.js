@@ -6,7 +6,7 @@ var lewd = require('../../src/lewd'),
 var refuteValues = helper.refuteValues,
     acceptValues = helper.acceptValues;
 
-var condition = lewd.Array;
+var condition = lewd.array;
 
 buster.testCase('arrays', {
     'simple': {
