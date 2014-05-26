@@ -1,0 +1,22 @@
+{
+  "name": "lewd",
+  "version": "0.0.1",
+  "private": true,
+  "description": "An intuitive and easy to use validator for JSON data.",
+  "main": "lewd.js",
+  "scripts": {
+    "test": "grunt buster"
+  },
+  "author": "Raphael Pigulla <raphael@pigulla.net>",
+  "license": "BSD",
+  "dependencies": {
+    "harmony-collections": "git://github.com/Benvie/harmony-collections",
+    "lodash": "2.4.1"
+  },
+  "devDependencies": {
+    "buster": "0.7.13",
+    "grunt": "0.4.5",
+    "grunt-contrib-jshint": "0.10.0",
+    "grunt-buster": "0.3.1"
+  }
+}
