@@ -42,5 +42,16 @@ module.exports = {
         }
 
         buster.referee.assert(false, 'An exception should should have been thrown');
+    },
+    assertViolationAt: function (fn, path) {
+        try {
+            fn();
+        } catch (e) {
+            buster.referee.assert.equals(e.name, 'ConditionViolationException');
+            buster.referee.assert.equals(e.path, path);
+            return;
+        }
+    
+        buster.referee.assert(false, 'Condition should have failed');
     }
 };

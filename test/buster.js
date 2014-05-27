@@ -1,6 +1,13 @@
-var config = module.exports;
-
-config['lewd'] = {
+module.exports.lewd = {
+    rootPath: '..',
     environment: 'node',
-    tests: ['**/*-test.js']
+    sources: ['src/**/*.js'],
+    tests: ['test/**/*-test.js'],
+    'buster-istanbul': {
+        outputDirectory: 'test/coverage',
+        format: 'lcov'
+    },
+    extensions: [
+        require('buster-istanbul')
+    ]
 };
