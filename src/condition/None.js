@@ -1,10 +1,11 @@
 var ConditionViolationException = require('../exception/ConditionViolationException');
 
 module.exports = function (conditions) {
-    var utils = require('../utils'),
+    var lewd = require('../lewd'),
+        utils = require('../utils'),
         message = require('../messages').None;
 
-    conditions = conditions.map(utils.wrap);
+    conditions = conditions.map(lewd._wrap);
     
     return utils.customMessageWrapper(function noneCondition(value, path) {
         if (conditions.length === 0) {

@@ -1,7 +1,8 @@
 module.exports = function (conditions) {
-    var utils = require('../utils');
+    var lewd = require('../lewd'),
+        utils = require('../utils');
     
-    conditions = conditions.map(utils.wrap);
+    conditions = conditions.map(lewd._wrap);
     
     return utils.customMessageWrapper(function allCondition(value, path) {
         conditions.forEach(function (condition) {

@@ -57,7 +57,8 @@ function validateOptions(options, definedKeys, allowExtraDefault) {
 module.exports = function (object, options) {
     // TODO: this could definitely use some refactoring
     
-    var utils = require('../utils'),
+    var lewd = require('../lewd'),
+        utils = require('../utils'),
         messages = require('../messages').Object;
     
     var opts = options || {};
@@ -68,10 +69,10 @@ module.exports = function (object, options) {
         definedKeys = Object.keys(object);
 
     if (opts.hasOwnProperty('keys')) {
-        keysCondition = utils.wrap(opts.keys);
+        keysCondition = lewd._wrap(opts.keys);
         allowExtraDefault = true;
     } else if (object.hasOwnProperty(KEYS_PROPERTY)) {
-        keysCondition = utils.wrap(object[KEYS_PROPERTY]);
+        keysCondition = lewd._wrap(object[KEYS_PROPERTY]);
         definedKeys = _.without(definedKeys, KEYS_PROPERTY);
         allowExtraDefault = true;
     } else {
@@ -79,10 +80,10 @@ module.exports = function (object, options) {
     }
     
     if (opts.hasOwnProperty('values')) {
-        valuesCondition = utils.wrap(opts.values);
+        valuesCondition = lewd._wrap(opts.values);
         allowExtraDefault = true;
     } else if (object.hasOwnProperty(VALUES_PROPERTY)) {
-        valuesCondition = utils.wrap(object[VALUES_PROPERTY]);
+        valuesCondition = lewd._wrap(object[VALUES_PROPERTY]);
         definedKeys = _.without(definedKeys, VALUES_PROPERTY);
         allowExtraDefault = true;
     } else {
@@ -92,7 +93,7 @@ module.exports = function (object, options) {
     opts = validateOptions(opts, Object.keys(object), allowExtraDefault);
 
     definedKeys.forEach(function (key) {
-        object[key] = utils.wrap(object[key]);
+        object[key] = lewd._wrap(object[key]);
     });
     
     return utils.customMessageWrapper(function objectCondition(value, path) {

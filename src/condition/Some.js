@@ -2,7 +2,8 @@ var ConditionViolationException = require('../exception/ConditionViolationExcept
     InvalidSchemaException = require('../exception/InvalidSchemaException');
 
 module.exports = function (spec) {
-    var utils = require('../utils'),
+    var lewd = require('../lewd'),
+        utils = require('../utils'),
         message = require('../messages').Some;
 
     /* istanbul ignore if */
@@ -11,7 +12,7 @@ module.exports = function (spec) {
     }
 
     return utils.customMessageWrapper(function someCondition(value, path) {
-        var conditions = spec.map(utils.wrap);
+        var conditions = spec.map(lewd._wrap);
 
         if (conditions.length === 0) {
             return;

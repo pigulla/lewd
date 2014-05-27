@@ -4,16 +4,11 @@ var _ = require('lodash'),
     Set = require('harmony-collections').Set;
 
 var ConditionViolationException = require('./exception/ConditionViolationException'),
-    InvalidSchemaException = require('./exception/InvalidSchemaException'),
-    arrayCondition = require('./condition/Array'),
-    literalCondition = require('./condition/Literal'),
-    objectCondition = require('./condition/Object'),
-    regexCondition = require('./condition/Regex'),
-    setCondition = require('./condition/Set'),
-    typeCondition = require('./condition/Type');
+    InvalidSchemaException = require('./exception/InvalidSchemaException');
 
 var utils = {
     smartFormat: function (value) {
+        /*jshint maxcomplexity:false */
         if (value === null) {
             return 'null';
         } else if (value === undefined) {
@@ -73,50 +68,6 @@ var utils = {
     isLiteral: function (value) {
         return typeof value === 'string' || typeof value === 'boolean' || value === null ||
             (typeof value === 'number' && isFinite(value));
-    },
-
-    /**
-     * Wraps an arbitrary value in its appropriate condition wrapper.
-     * 
-     * @param {*} spec
-     * @return {function}
-     */
-    wrap: function (spec) {
-        if (utils.isJsonType(spec) || spec === undefined) {
-            return typeCondition(spec);
-        }
-        
-        if (utils.isLiteral(spec)) {
-            return literalCondition(spec);
-        }
-    
-        if (spec instanceof RegExp) {
-            return regexCondition(spec);
-        }
-    
-        if (Array.isArray(spec)) {
-            return arrayCondition(spec.map(utils.wrap));
-        }
-    
-        if (spec instanceof Set) {
-            return setCondition(spec);
-        }
-        
-        if (_.isPlainObject(spec)) {
-            return objectCondition(spec);
-        }
-    
-        if (typeof spec === 'function') {
-            if (spec.hasOwnProperty('because')) {
-                return spec;
-            } else {
-                // custom condition
-                return utils.customMessageWrapper(spec);
-            }
-        }
-        
-        /* istanbul ignore next */
-        throw new InvalidSchemaException('Invalid specification');
     },
 
     /**

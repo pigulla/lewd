@@ -1,5 +1,6 @@
 var _ = require('lodash'),
-    buster = require('buster');
+    buster = require('buster'),
+    Set = require('harmony-collections').Set;
 
 var helper = require('./../helper'),
     errorMessages = require('../../src/messages'),
@@ -132,7 +133,7 @@ buster.testCase('"object" condition', {
         },        
         '{ $k: some(/^\\d$/, Set("a", "b")) }': function () {
             var args = [{
-                $k: lewd.some(/^\d$/, lewd.set('a', 'b'))
+                $k: lewd.some(/^\d$/, Set(['a', 'b']))
             }, { allowExtra: true }];
             
             refuteValues(condition, args, [

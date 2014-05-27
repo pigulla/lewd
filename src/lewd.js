@@ -1,6 +1,7 @@
-var util = require('util');
+var _ = require('lodash'),
+    Set = require('harmony-collections').Set;
 
-var Set = require('harmony-collections').Set;
+var util = require('util');
 
 var ConditionViolationException = require('./exception/ConditionViolationException'),
     WrongParameterException = require('./exception/WrongParameterException'),
@@ -19,13 +20,13 @@ var ConditionViolationException = require('./exception/ConditionViolationExcepti
         object: require('./condition/Object'),
         range: require('./condition/Range'),
         regex: require('./condition/Regex'),
-        set: require('./condition/Set'),
-        some: require('./condition/Some')
+        some: require('./condition/Some'),
+        type: require('./condition/Type')
     };
 
 function assertParameterCount(args, min, max) {
     max = arguments.length === 2 ? min : max;
-    
+
     if (args.length > max) {
         throw new WrongParameterException(util.format(
             'Function expected at most %d parameters but was called with %d',
@@ -40,9 +41,9 @@ function assertParameterCount(args, min, max) {
     }
 }
 
-var Lewd = function () {
+var lewd = function () {
     if (arguments.length === 1) {
-        return utils.wrap(arguments[0]);
+        return lewd._wrap(arguments[0]);
     } else if (arguments.length === 0) {
         throw new WrongParameterException('at least one parameter must be given');
     } else {
@@ -51,104 +52,178 @@ var Lewd = function () {
     }
 };
 
-Lewd.range = function (options) {
+/**
+ * Wraps an arbitrary value in its appropriate condition wrapper.
+ *
+ * @param {*} spec
+ * @return {function}
+ */
+lewd._wrap = function (spec) {
+    if (utils.isJsonType(spec) || spec === undefined) {
+        return condition.type(spec);
+    }
+
+    if (utils.isLiteral(spec)) {
+        return condition.literal(spec);
+    }
+    
+    if (spec instanceof Set) {
+        var values = [];
+        spec.forEach(function (item) {
+            if (!utils.isLiteral(item)) {
+                throw new InvalidSchemaException('Set must only contain literals'); 
+            }
+            values.push(condition.literal(item));
+        });
+        return condition.some(values);
+    }
+
+    if (spec instanceof RegExp) {
+        return condition.regex(spec);
+    }
+
+    if (Array.isArray(spec)) {
+        return condition.array(spec.map(lewd._wrap));
+    }
+
+    if (_.isPlainObject(spec)) {
+        return condition.object(spec);
+    }
+
+    if (typeof spec === 'function') {
+        if (spec.hasOwnProperty('because')) {
+            return spec;
+        } else {
+            // custom condition
+            return utils.customMessageWrapper(spec);
+        }
+    }
+
+    /* istanbul ignore next */
+    throw new InvalidSchemaException('Invalid specification');
+};
+
+/* istanbul ignore next */
+lewd.expose = function (prefix) {
+    var p = prefix || '',
+        exposedFunctions = [
+            'range', 'len', 'literal', 'isoDateTime', 'integer', 'regex', 'all', 'array', 'none', 'not',
+            'some', 'object'
+        ],
+        additionalFunctions = ['Boolean', 'Number', 'Object', 'null', 'undefined', 'String', 'Array'];
+    
+    var expose = function (name) {
+        var exposedName = p + name;
+
+        if (this[exposedName] !== undefined) {
+            throw new Error(util.format(
+                'Cannot expose function "%s" because "%s" is already defined in the global scope',
+                name, exposedName
+            ));
+        }
+        this[exposedName] = lewd[name];
+    }.bind(this);
+    
+    exposedFunctions.forEach(expose);
+
+    if (p.length > 0) {
+        additionalFunctions.forEach(expose);
+    }
+};
+
+lewd.range = function (options) {
     assertParameterCount(arguments, 1);
     return condition.range(options);
 };
 
-Lewd.len = function (options) {
+lewd.len = function (options) {
     assertParameterCount(arguments, 1);
     return condition.len(options);
 };
 
-Lewd.literal = function (literal) {
+lewd.literal = function (literal) {
     assertParameterCount(arguments, 1);
     return condition.literal(literal);
 };
 
-Lewd.isoDateTime = function () {
+lewd.isoDateTime = function () {
     assertParameterCount(arguments, 0);
     return condition.isoDateTime();
 };
 
-Lewd.integer = function () {
+lewd.integer = function () {
     assertParameterCount(arguments, 0);
     return condition.integer();
 };
 
-Lewd.regex = function (regex) {
+lewd.regex = function (regex) {
     assertParameterCount(arguments, 1);
     return condition.regex(regex);
 };
 
-Lewd.all = function () {
+lewd.all = function () {
     var args = Array.prototype.slice.call(arguments);
     return condition.all(args);
 };
 
-Lewd.Array = function () {
+lewd.Array = function () {
     assertParameterCount(arguments, 0);
-    return utils.wrap(Array);
+    return lewd._wrap(Array);
 };
 
-Lewd.array = function () {
+lewd.array = function () {
     var args = Array.prototype.slice.call(arguments);
     return condition.array(args);
 };
 
-Lewd.none = function () {
+lewd.none = function () {
     var args = Array.prototype.slice.call(arguments);
     return condition.none(args);
 };
 
-Lewd.Object = function () {
+lewd.Object = function () {
     assertParameterCount(arguments, 0);
-    return utils.wrap(Object);
+    return lewd._wrap(Object);
 };
 
-Lewd.String = function () {
+lewd.String = function () {
     assertParameterCount(arguments, 0);
-    return utils.wrap(String);
+    return lewd._wrap(String);
 };
 
-Lewd.Number = function () {
+lewd.Number = function () {
     assertParameterCount(arguments, 0);
-    return utils.wrap(Number);
+    return lewd._wrap(Number);
 };
 
-Lewd.Boolean = function () {
+lewd.Boolean = function () {
     assertParameterCount(arguments, 0);
-    return utils.wrap(Boolean);
+    return lewd._wrap(Boolean);
 };
 
-Lewd.null = function () {
+lewd.null = function () {
     assertParameterCount(arguments, 0);
-    return utils.wrap(null);
+    return lewd._wrap(null);
 };
 
-Lewd.undefined = function () {
+lewd.undefined = function () {
     assertParameterCount(arguments, 0);
-    return utils.wrap(undefined);
+    return lewd._wrap(undefined);
 };
 
-Lewd.set = function () {
-    var args = Array.prototype.slice.call(arguments);
-    return condition.set(new Set(args));
-};
-
-Lewd.not = function (value) {
+lewd.not = function (value) {
     assertParameterCount(arguments, 1);
     return condition.not(value);
 };
 
-Lewd.some = function () {
+lewd.some = function () {
     var args = Array.prototype.slice.call(arguments);
     return condition.some(args);
 };
 
-Lewd.object = function (spec, options) {
+lewd.object = function (spec, options) {
     assertParameterCount(arguments, 1, 2);
     return condition.object(spec, options);
 };
 
-module.exports = Lewd;
+module.exports = lewd;
