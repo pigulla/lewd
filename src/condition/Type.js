@@ -67,6 +67,7 @@ module.exports = function (type) {
         case undefined:
             fn = anyCondition();
             break;
+        /* istanbul ignore next */
         default:
             throw new InvalidSchemaException('Invalid type constructor');
     }

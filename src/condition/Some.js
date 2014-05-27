@@ -5,6 +5,7 @@ module.exports = function (spec) {
     var utils = require('../utils'),
         message = require('../messages').Some;
 
+    /* istanbul ignore if */
     if (!Array.isArray(spec)) {
         throw new InvalidSchemaException('Parameter must be an array');
     }

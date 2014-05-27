@@ -61,11 +61,7 @@ module.exports = function (object, options) {
         messages = require('../messages').Object;
     
     var opts = options || {};
-    
-    if (!_.isPlainObject(object)) {
-        throw new WrongParameterException('Parameter must be a plain object');
-    }
-    
+        
     var keysCondition,
         valuesCondition,
         allowExtraDefault = false,

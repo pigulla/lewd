@@ -314,6 +314,7 @@ buster.testCase('"object" condition', {
         refuteSchemaOptions(condition, [{}, { allowExtra: 42 }]);
         refuteSchemaOptions(condition, [{}, { required: ['w00t'] }]);
         refuteSchemaOptions(condition, [{}, { optional: 'w00t' }]);
+        refuteSchemaOptions(condition, [{}, { byDefault: 'optional', required: 'w00t' }]);
         refuteSchemaOptions(condition, [{}, { byDefault: 'whatever' }]);
         refuteSchemaOptions(condition, [{}, { byDefault: 'required', required: [] }]);
         refuteSchemaOptions(condition, [{}, { byDefault: 'optional', optional: [] }]);

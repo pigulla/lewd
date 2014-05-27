@@ -6,6 +6,7 @@ module.exports = function (spec) {
         lewd = require('../lewd'),
         message = require('../messages').Array;
 
+    /* istanbul ignore if */
     if (!Array.isArray(spec)) {
         throw new InvalidSchemaException('Parameter must be an array');
     }

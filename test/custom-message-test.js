@@ -26,10 +26,10 @@ buster.testCase('custom messages', {
     'with params': function () {
         var condition;
         
-        condition = lewd.Boolean().because('${ path }');
-        assertFailedWithMessage(condition, 'x', '.');
+        condition = lewd.Boolean().because('The problem was at ${pathStr}');
+        assertFailedWithMessage(condition, 'x', 'The problem was at .');
 
-        condition = lewd.array(String).because('at: ${ path }');
+        condition = lewd.array(String).because('at: ${pathStr}');
         assertFailedWithMessage(condition, ['x', 42], 'at: #1');
     },
     'for some condition': function () {

@@ -16,21 +16,38 @@ var utils = {
     smartFormat: function (value) {
         if (value === null) {
             return 'null';
+        } else if (value === undefined) {
+            return 'undefined';
         } else if (typeof value === 'string') {
             return util.format(
                 '<string:%d>"%s"',
                 value.length, value.length > 10 ? (value.substr(0, 7) + '...') : value
             );
+        } else if (_.isNaN(value)) {
+            return 'NaN';
+        } else if (_.isArguments(value)) {
+            return util.format('<arguments:%d>', value.length);
+        } else if (_.isDate(value)) {
+            return '<date>' + value.toISOString();
+        } else if (value === Infinity) {
+            return 'PositiveInfinity';
+        } else if (value === -Infinity) {
+            return 'NegativeInfinity';
         } else if (typeof value === 'number') {
             return '<number>' + value;
-        } else if (_.isPlainObject(value)) {
-            return '<object>';
+        } else if (_.isRegExp(value)) {
+            return '<regexp>' + value;
+        } else if (typeof value === 'function') {
+            return '<function>' + (value.name ? value.name : 'anonymous');
         } else if (typeof value === 'boolean') {
             return '<boolean>' + (value ? 'true' : 'false');
         } else if (Array.isArray(value)) {
             return util.format('<array:%d>', value.length);
+        } else if (typeof value === 'object') {
+            return 'object';
         } else {
-            throw new Error('Only native JSON types are supported');
+            /* istanbul ignore next */
+            return '<unknown>' + value;
         }
     },
     
@@ -97,7 +114,8 @@ var utils = {
                 return utils.customMessageWrapper(spec);
             }
         }
-    
+        
+        /* istanbul ignore next */
         throw new InvalidSchemaException('Invalid specification');
     },
 
@@ -116,10 +134,11 @@ var utils = {
                 fn.apply(null, arguments);
             } catch (e) {
                 if (message && e instanceof ConditionViolationException) {
-                    e.message = _.template(message, {
-                        originalMessage: e.message,
-                        path: e.path.length === 0 ? '.' : e.path.join('.')
+                    var variables = _.assign(e.getTemplateVariables(), {
+                        originalMessage: e.message
                     });
+                    
+                    e.message = _.template(message, variables);
                 }
 
                 throw e;
