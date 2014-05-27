@@ -2,7 +2,7 @@ var _ = require('lodash');
 
 var ConditionViolationException = require('../exception/ConditionViolationException'),
     InvalidSchemaException = require('../exception/InvalidSchemaException'),
-    UnexpectedParameterException = require('../exception/UnexpectedParameterException'),
+    WrongParameterException = require('../exception/WrongParameterException'),
     anyCondition = require('./Any');
 
 var KEYS_PROPERTY = '$k',
@@ -63,7 +63,7 @@ module.exports = function (object, options) {
     var opts = options || {};
     
     if (!_.isPlainObject(object)) {
-        throw new UnexpectedParameterException('Parameter must be a plain object');
+        throw new WrongParameterException('Parameter must be a plain object');
     }
     
     var keysCondition,

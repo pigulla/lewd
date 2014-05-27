@@ -3,7 +3,7 @@ var util = require('util');
 var Set = require('harmony-collections').Set;
 
 var ConditionViolationException = require('./exception/ConditionViolationException'),
-    UnexpectedParameterException = require('./exception/UnexpectedParameterException'),
+    WrongParameterException = require('./exception/WrongParameterException'),
     InvalidSchemaException = require('./exception/InvalidSchemaException'),
     utils = require('./utils'),
     condition = {
@@ -27,13 +27,13 @@ function assertParameterCount(args, min, max) {
     max = arguments.length === 2 ? min : max;
     
     if (args.length > max) {
-        throw new UnexpectedParameterException(util.format(
+        throw new WrongParameterException(util.format(
             'Function expected at most %d parameters but was called with %d',
             max, args.length
         ));
     }
     if (args.length < min) {
-        throw new UnexpectedParameterException(util.format(
+        throw new WrongParameterException(util.format(
             'Function expected no more than %d parameters but was called with %d',
             min, args.length
         ));
@@ -44,7 +44,7 @@ var Lewd = function () {
     if (arguments.length === 1) {
         return utils.wrap(arguments[0]);
     } else if (arguments.length === 0) {
-        throw new InvalidSchemaException('at least one parameter must be given');
+        throw new WrongParameterException('at least one parameter must be given');
     } else {
         var args = Array.prototype.slice.call(arguments);
         return condition.some(args);

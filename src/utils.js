@@ -5,7 +5,6 @@ var _ = require('lodash'),
 
 var ConditionViolationException = require('./exception/ConditionViolationException'),
     InvalidSchemaException = require('./exception/InvalidSchemaException'),
-    anyCondition = require('./condition/Any'),
     arrayCondition = require('./condition/Array'),
     literalCondition = require('./condition/Literal'),
     objectCondition = require('./condition/Object'),
@@ -66,7 +65,7 @@ var utils = {
      * @return {function}
      */
     wrap: function (spec) {
-        if (utils.isJsonType(spec)) {
+        if (utils.isJsonType(spec) || spec === undefined) {
             return typeCondition(spec);
         }
         
@@ -76,10 +75,6 @@ var utils = {
     
         if (spec instanceof RegExp) {
             return regexCondition(spec);
-        }
-    
-        if (spec === undefined) {
-            return anyCondition();
         }
     
         if (Array.isArray(spec)) {
@@ -135,6 +130,8 @@ var utils = {
             message = customMessage;
             return wrap;
         };
+        
+        wrap._wrapped = fn.name || fn._wrapped;
         
         return wrap; 
     }

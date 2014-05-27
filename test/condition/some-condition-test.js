@@ -29,6 +29,15 @@ buster.testCase('"some" condition', {
         refuteValues(condition, args, [false, null, {}, [], -3.1415]);
         acceptValues(condition, args, ['1', '0815', 'awesomesauce', 42, -1.99]);
     },
+    'exceptions are passed through': function () {
+        buster.referee.assert.exception(function () {
+            var custom = function (value, path) {
+                ''.foo();
+            };
+            
+            condition(lewd(custom))();
+        }, 'TypeError');
+    },
     'error message': function () {
         assertViolationWithMessage(function () {
             condition(Number, String, Boolean)(null);

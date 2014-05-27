@@ -65,7 +65,7 @@ module.exports = function (type) {
             fn = nullTypeCondition;
             break;
         case undefined:
-            fn = anyCondition;
+            fn = anyCondition();
             break;
         default:
             throw new InvalidSchemaException('Invalid type constructor');
