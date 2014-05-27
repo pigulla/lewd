@@ -82,13 +82,6 @@ var condition = lewd.String();
 A list of available schemas can be found in the corresponding section.
 
 
-### Custom Error Messages
-    
-### Custom Conditions
-```javascript
-function (value:*[, path:Array.<string>]) throws ConditionViolationException
-```
-
 # Contributing
 You found a bug, fixed a typo or came up with a cool new feature? Feel free to open issues or send pull requests and I'll merge them. Please make sure you add tests as needed and reference the issue number in your commit (please open one if necessary). Bonus points are awarded for not breaking any jshint rules.
 

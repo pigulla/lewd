@@ -19,7 +19,7 @@ buster.testCase('complex validations', {
             author: { firstName: String, lastName: String },
             chapters: lewd.all([{
                 name: String,
-                pages: lewd.all(lewd.Integer, lewd.range({ min: 1 }))
+                pages: lewd.all(lewd.integer(), lewd.range({ min: 1 }))
             }], lewd.len({ min: 3 }).because('a book needs at least three chapters (where: ${path})'))
         }, { optional: ['author']});
         
