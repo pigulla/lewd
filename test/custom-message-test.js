@@ -29,8 +29,8 @@ buster.testCase('custom messages', {
         condition = lewd.Boolean().because('${ path }');
         assertFailedWithMessage(condition, 'x', '.');
 
-        condition = lewd.array(String).because('${ path }');
-        assertFailedWithMessage(condition, ['x', 42], '#1');
+        condition = lewd.array(String).because('at: ${ path }');
+        assertFailedWithMessage(condition, ['x', 42], 'at: #1');
     },
     'for some condition': function () {
         var condition;

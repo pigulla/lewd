@@ -1,10 +1,13 @@
-var buster = require('buster');
+var _ = require('lodash'),
+    buster = require('buster');
 
 var lewd = require('../../src/lewd'),
+    errorMessages = require('../../src/messages'),
     helper = require('./../helper');
 
 var refuteValues = helper.refuteValues,
-    acceptValues = helper.acceptValues;
+    acceptValues = helper.acceptValues,
+    assertViolationWithMessage = helper.assertViolationWithMessage;
 
 var condition = lewd.not;
 
@@ -13,12 +16,17 @@ buster.testCase('"not" condition', {
         var args = [String];
 
         refuteValues(condition, args, ['foo', 'X']);
-        acceptValues(condition, args, [0, -17.3, false, null, [], {}, ['blub']]);
+        acceptValues(condition, args, [0, -17.3, false, null, [], {}, ['foo']]);
     },
     'null': function () {
         var args = [null];
 
         refuteValues(condition, args, [null]);
-        acceptValues(condition, args, [0, -17.3, 'foo', 'X', false, [], {}, ['blub']]);
+        acceptValues(condition, args, [0, -17.3, 'foo', 'X', false, [], {}, ['foo']]);
+    },
+    'error message': function () {
+        assertViolationWithMessage(function () {
+            condition(Number)(42);
+        }, _.template(errorMessages.Not, {}));
     }
 });

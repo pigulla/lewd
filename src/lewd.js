@@ -42,113 +42,113 @@ function assertParameterCount(args, min, max) {
 
 var Lewd = function () {
     if (arguments.length === 1) {
-        return utils.customMessageWrapper(utils.wrap(arguments[0]));
+        return utils.wrap(arguments[0]);
     } else if (arguments.length === 0) {
         throw new InvalidSchemaException('at least one parameter must be given');
     } else {
         var args = Array.prototype.slice.call(arguments);
-        return utils.customMessageWrapper(condition.some(args));
+        return condition.some(args);
     }
 };
 
 Lewd.range = function (options) {
     assertParameterCount(arguments, 1);
-    return utils.customMessageWrapper(condition.range(options));
+    return condition.range(options);
 };
 
 Lewd.len = function (options) {
     assertParameterCount(arguments, 1);
-    return utils.customMessageWrapper(condition.len(options));
+    return condition.len(options);
 };
 
 Lewd.literal = function (literal) {
     assertParameterCount(arguments, 1);
-    return utils.customMessageWrapper(condition.literal(literal));
+    return condition.literal(literal);
 };
 
 Lewd.isoDateTime = function () {
     assertParameterCount(arguments, 0);
-    return utils.customMessageWrapper(condition.isoDateTime());
+    return condition.isoDateTime();
 };
 
 Lewd.integer = function () {
     assertParameterCount(arguments, 0);
-    return utils.customMessageWrapper(condition.integer());
+    return condition.integer();
 };
 
 Lewd.regex = function (regex) {
     assertParameterCount(arguments, 1);
-    return utils.customMessageWrapper(condition.regex(regex));
+    return condition.regex(regex);
 };
 
 Lewd.all = function () {
     var args = Array.prototype.slice.call(arguments);
-    return utils.customMessageWrapper(condition.all(args));
+    return condition.all(args);
 };
 
 Lewd.Array = function () {
     assertParameterCount(arguments, 0);
-    return utils.customMessageWrapper(utils.wrap(Array));
+    return utils.wrap(Array);
 };
 
 Lewd.array = function () {
     var args = Array.prototype.slice.call(arguments);
-    return utils.customMessageWrapper(condition.array(args));
+    return condition.array(args);
 };
 
 Lewd.none = function () {
     var args = Array.prototype.slice.call(arguments);
-    return utils.customMessageWrapper(condition.none(args));
+    return condition.none(args);
 };
 
 Lewd.Object = function () {
     assertParameterCount(arguments, 0);
-    return utils.customMessageWrapper(utils.wrap(Object));
+    return utils.wrap(Object);
 };
 
 Lewd.String = function () {
     assertParameterCount(arguments, 0);
-    return utils.customMessageWrapper(utils.wrap(String));
+    return utils.wrap(String);
 };
 
 Lewd.Number = function () {
     assertParameterCount(arguments, 0);
-    return utils.customMessageWrapper(utils.wrap(Number));
+    return utils.wrap(Number);
 };
 
 Lewd.Boolean = function () {
     assertParameterCount(arguments, 0);
-    return utils.customMessageWrapper(utils.wrap(Boolean));
+    return utils.wrap(Boolean);
 };
 
 Lewd.null = function () {
     assertParameterCount(arguments, 0);
-    return utils.customMessageWrapper(utils.wrap(null));
+    return utils.wrap(null);
 };
 
 Lewd.undefined = function () {
     assertParameterCount(arguments, 0);
-    return utils.customMessageWrapper(utils.wrap(undefined));
+    return utils.wrap(undefined);
 };
 
 Lewd.set = function () {
     var args = Array.prototype.slice.call(arguments);
-    return utils.customMessageWrapper(condition.set(new Set(args)));
+    return condition.set(new Set(args));
 };
 
 Lewd.not = function (value) {
     assertParameterCount(arguments, 1);
-    return utils.customMessageWrapper(condition.not(value));
+    return condition.not(value);
 };
 
 Lewd.some = function () {
     var args = Array.prototype.slice.call(arguments);
-    return utils.customMessageWrapper(condition.some(args));
+    return condition.some(args);
 };
 
 Lewd.object = function (spec, options) {
     assertParameterCount(arguments, 1, 2);
-    return utils.customMessageWrapper(condition.object(spec, options));
+    return condition.object(spec, options);
 };
 
 module.exports = Lewd;

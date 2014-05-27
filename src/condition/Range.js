@@ -3,19 +3,21 @@ var _ = require('lodash');
 var ConditionViolationException = require('../exception/ConditionViolationException');
 
 module.exports = function (options) {
-    var opts = _.defaults({}, options, {
-        min: -Infinity,
-        max: Infinity,
-        minInclusive: true,
-        maxInclusive: true
-    });
+    var utils = require('../utils'),
+        messages = require('../messages').Range,
+        opts = _.defaults({}, options, {
+            min: -Infinity,
+            max: Infinity,
+            minInclusive: true,
+            maxInclusive: true
+        });
 
-    return function rangeCondition(value, path) {
+    return utils.customMessageWrapper(function rangeCondition(value, path) {
         if (value > opts.max || (value === opts.max && !opts.maxInclusive)) {
-            throw new ConditionViolationException(value, path, 'greater than ' + opts.max);
+            throw new ConditionViolationException(value, path, messages.max, opts);
         }
         if (value < opts.min || (value === opts.min && !opts.minInclusive)) {
-            throw new ConditionViolationException(value, path, 'greater than ' + opts.min);
+            throw new ConditionViolationException(value, path, messages.min, opts);
         }
-    };
+    });
 };

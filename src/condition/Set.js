@@ -4,7 +4,6 @@ var InvalidSchemaException = require('../exception/InvalidSchemaException'),
     ConditionViolationException = require('../exception/ConditionViolationException');
 
 module.exports = function (spec) {
-    // break circular dependency
     var utils = require('../utils');
     
     if (!(spec instanceof Set)) {
@@ -17,9 +16,9 @@ module.exports = function (spec) {
         }
     });
 
-    return function setCondition(value, path) {
+    return utils.customMessageWrapper(function setCondition(value, path) {
         if (!spec.has(value)) {
             throw new ConditionViolationException(value, path, 'not in set of allowed values');
         }
-    };
+    });
 };

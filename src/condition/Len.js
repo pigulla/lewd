@@ -3,23 +3,25 @@ var _ = require('lodash');
 var ConditionViolationException = require('../exception/ConditionViolationException');
 
 module.exports = function (options) {
-    var opts = _.defaults({}, options, {
-        min: 0,
-        max: Math.POSITIVE_INFINITY,
-        minInclusive: true,
-        maxInclusive: true
-    });
+    var utils = require('../utils'),
+        messages = require('../messages').Len,
+        opts = _.defaults({}, options, {
+            min: 0,
+            max: Math.POSITIVE_INFINITY,
+            minInclusive: true,
+            maxInclusive: true
+        });
 
-    return function lengthCondition(value, path) {
+    return utils.customMessageWrapper(function lengthCondition(value, path) {
         if (typeof value !== 'string' && !Array.isArray(value)) {
-            throw new ConditionViolationException(value, path, 'has no length to check');
+            throw new ConditionViolationException(value, path, messages.type, opts);
         }
         
         if (value.length > opts.max || (value.length === opts.max && !opts.maxInclusive)) {
-            throw new ConditionViolationException(value, path, 'longer than ' + opts.max);
+            throw new ConditionViolationException(value, path, messages.max, opts);
         }
         if (value.length < opts.min || (value.length === opts.min && !opts.minInclusive)) {
-            throw new ConditionViolationException(value, path, 'shorter than ' + opts.min);
+            throw new ConditionViolationException(value, path, messages.min, opts);
         }
-    };
+    });
 };

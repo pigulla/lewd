@@ -89,8 +89,8 @@ A list of available schemas can be found in the corresponding section.
 function (value:*[, path:Array.<string>]) throws ConditionViolationException
 ```
 
-# Contributions
-You found a bug, fixed a typo or implemented a cool new feature? Feel free to send pull requests and I'll merge them. Please make sure you add tets as needed and reference the issue number in your commit (please open one if necessary). Bonus points are awareded for not breaking any jshint rules.
+# Contributing
+You found a bug, fixed a typo or came up with a cool new feature? Feel free to open issues or send pull requests and I'll merge them. Please make sure you add tests as needed and reference the issue number in your commit (please open one if necessary). Bonus points are awarded for not breaking any jshint rules.
 
 
 # FAQ
@@ -106,3 +106,6 @@ No, they can not - yet. This certainly is a useful feature and I am hoping to ad
 
 ##### Can I use lewd in a browser environment?
 No, lewd is currently only available as a Node.JS module. I'm not aware of any technical limitation that prevents it from running in a browser, I simply haven't gotten around to implementing it yet.
+
+##### Are recursive definitions supported?
+No, they probably never will be. If you have documents of that complexity you should probably take a look at [json-schema](http://json-schema.org/).

@@ -31,5 +31,16 @@ module.exports = {
         buster.referee.assert.exception(function () {
             condition.apply(lewd, args);
         }, 'InvalidSchemaException');
+    },
+    assertViolationWithMessage: function (fn, message) {
+        try {
+            fn();
+        } catch (e) {
+            buster.referee.assert.equals(e.name, 'ConditionViolationException');
+            buster.referee.assert.equals(e.message, message);
+            return;
+        }
+
+        buster.referee.assert(false, 'An exception should should have been thrown');
     }
 };

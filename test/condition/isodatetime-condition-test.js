@@ -1,10 +1,13 @@
-var buster = require('buster');
+var _ = require('lodash'),
+    buster = require('buster');
 
 var lewd = require('../../src/lewd'),
+    errorMessages = require('../../src/messages'),
     helper = require('./../helper');
 
 var refuteValues = helper.refuteValues,
-    acceptValues = helper.acceptValues;
+    acceptValues = helper.acceptValues,
+    assertViolationWithMessage = helper.assertViolationWithMessage;
 
 var condition = lewd.isoDateTime;
 
@@ -24,5 +27,10 @@ buster.testCase('"isoDateTime" condition', {
             '2014-05-22T07:15:26.692Z',
             '2014-02-01T00:15:26.000Z',
         ]);
+    },
+    'error message': function () {
+        assertViolationWithMessage(function () {
+            condition()('foo');
+        }, _.template(errorMessages.IsoDateTime, {}));
     }
 });

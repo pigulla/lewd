@@ -1,29 +1,30 @@
-var someCondition = require('./Some'),
-    ConditionViolationException = require('../exception/ConditionViolationException'),
+var ConditionViolationException = require('../exception/ConditionViolationException'),
     InvalidSchemaException = require('../exception/InvalidSchemaException');
 
 module.exports = function (spec) {
-    var utils = require('../utils');
-    
+    var utils = require('../utils'),
+        lewd = require('../lewd'),
+        message = require('../messages').Array;
+
     if (!Array.isArray(spec)) {
         throw new InvalidSchemaException('Parameter must be an array');
     }
     
-    return function arrayCondition(values, path) {
+    return utils.customMessageWrapper(function arrayCondition(values, path) {
         path = path || [];
         
         if (!Array.isArray(values)) {
-            throw new ConditionViolationException(values, path, 'not an array');
+            throw new ConditionViolationException(values, path, message);
         }
         
         if (spec.length === 0) {
             return;
         }
 
-        var condition = someCondition(spec.map(utils.wrap));
+        var condition = lewd.some.apply(null, spec);
 
         values.forEach(function (value, index) {
             condition(value, path.concat('#' + index));
         });
-    };
+    });
 };

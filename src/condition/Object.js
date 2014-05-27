@@ -57,7 +57,8 @@ function validateOptions(options, definedKeys, allowExtraDefault) {
 module.exports = function (object, options) {
     // TODO: this could definitely use some refactoring
     
-    var utils = require('../utils');
+    var utils = require('../utils'),
+        messages = require('../messages').Object;
     
     var opts = options || {};
     
@@ -98,11 +99,11 @@ module.exports = function (object, options) {
         object[key] = utils.wrap(object[key]);
     });
     
-    return function objectCondition(value, path) {
+    return utils.customMessageWrapper(function objectCondition(value, path) {
         path = path || [];
         
         if (!_.isPlainObject(value)) {
-            throw new ConditionViolationException(value, path, 'not an object');
+            throw new ConditionViolationException(value, path, messages.type);
         }
 
         var actualKeys = Object.keys(value),
@@ -112,10 +113,10 @@ module.exports = function (object, options) {
             keysToValidate = _.intersection(definedKeys, actualKeys);
 
         if (extraKeys.length > 0 && !opts.allowExtra) {
-            throw new ConditionViolationException(extraKeys[0], path, 'key was not expected');
+            throw new ConditionViolationException(value, path, messages.unexpectedKey, { key: extraKeys[0] });
         }
         if (missingKeys.length > 0) {
-            throw new ConditionViolationException(missingKeys[0], path, 'key is required');
+            throw new ConditionViolationException(value, path, messages.missingKey, { key: missingKeys[0] });
         }
 
         extraKeys.forEach(function (key) {
@@ -126,5 +127,5 @@ module.exports = function (object, options) {
         keysToValidate.forEach(function (key) {
             object[key](value[key], path.concat(key));
         });
-    };
+    });
 };

@@ -1,29 +1,32 @@
-var buster = require('buster');
+var _ = require('lodash'),
+    buster = require('buster');
 
 var lewd = require('../../src/lewd'),
+    errorMessages = require('../../src/messages'),
     helper = require('./../helper');
 
 var refuteValues = helper.refuteValues,
-    acceptValues = helper.acceptValues;
+    acceptValues = helper.acceptValues,
+    assertViolationWithMessage = helper.assertViolationWithMessage;
 
 var condition = lewd.array;
 
-buster.testCase('arrays', {
+buster.testCase('"array" condition', {
     'simple': {
         '[]': function () {
             var args = [];
 
-            refuteValues(condition, args, ['', 'blub', 0, 42, 17.3, null, true, false, {}]);
+            refuteValues(condition, args, ['', 'foo', 0, 42, 17.3, null, true, false, {}]);
             acceptValues(condition, args, [
-                [], [''], ['blub'], [0], [42], [17.3], [[]], [['19']], [null], [true], [false], [{}]
+                [], [''], ['foo'], [0], [42], [17.3], [[]], [['19']], [null], [true], [false], [{}]
             ]);
         },
         '[undefined]': function () {
             var args = [undefined];
 
-            refuteValues(condition, args, ['', 'blub', 0, 42, 17.3, null, true, false, {}]);
+            refuteValues(condition, args, ['', 'foo', 0, 42, 17.3, null, true, false, {}]);
             acceptValues(condition, args, [
-                [], [''], ['blub'], [0], [42], [17.3], [[]], [['19']], [null], [true], [false], [{}]
+                [], [''], ['foo'], [0], [42], [17.3], [[]], [['19']], [null], [true], [false], [{}]
             ]);
         },
         '[String]': function () {
@@ -73,7 +76,7 @@ buster.testCase('arrays', {
         '[[]]': function () {
             var args = [[]];
 
-            refuteValues(condition, args, [42, null, 'blub', {}, [42], [null], ['blub'], [{}]]);
+            refuteValues(condition, args, [42, null, 'foo', {}, [42], [null], ['foo'], [{}]]);
             acceptValues(condition, args, [
                 [], [[]], [['42'], [false]], [[], []], [[true, false]], [[42, {}]], [['1xx'], [2, true]]
             ]);
@@ -81,7 +84,7 @@ buster.testCase('arrays', {
         '[Array]': function () {
             var args = [Array];
 
-            refuteValues(condition, args, [42, null, 'blub', {}, [42], [null], ['blub'], [{}]]);
+            refuteValues(condition, args, [42, null, 'foo', {}, [42], [null], ['foo'], [{}]]);
             acceptValues(condition, args, [
                 [], [[]], [['42'], [false]], [[], []], [[true, false]], [[42, {}]], [['1xx'], [2, true]]
             ]);
@@ -89,10 +92,15 @@ buster.testCase('arrays', {
         '[[undefined]]': function () {
             var args = [[undefined]];
 
-            refuteValues(condition, args, [42, null, 'blub', {}, [42], [null], ['blub'], [{}]]);
+            refuteValues(condition, args, [42, null, 'foo', {}, [42], [null], ['foo'], [{}]]);
             acceptValues(condition, args, [
                 [], [[]], [['42'], [false]], [[], []], [[true, false]], [[42, {}]], [['1xx'], [2, true]]
             ]);
         }
+    },
+    'error message': function () {
+        assertViolationWithMessage(function () {
+            condition()('foo');
+        }, _.template(errorMessages.Array, {}));
     }
 });

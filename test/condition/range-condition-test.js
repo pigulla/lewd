@@ -1,10 +1,13 @@
-var buster = require('buster');
+var _ = require('lodash'),
+    buster = require('buster');
 
 var lewd = require('../../src/lewd'),
+    errorMessages = require('../../src/messages'),
     helper = require('./../helper');
 
 var refuteValues = helper.refuteValues,
-    acceptValues = helper.acceptValues;
+    acceptValues = helper.acceptValues,
+    assertViolationWithMessage = helper.assertViolationWithMessage;
 
 var condition = lewd.range;
 
@@ -43,5 +46,17 @@ buster.testCase('"range" condition', {
 
         refuteValues(condition, args, [-5, 13, 100]);
         acceptValues(condition, args, [13.1, 49, 99]);
+    },
+    'error message': {
+        'minimum': function () {
+            assertViolationWithMessage(function () {
+                condition({ min: 5 })(4);
+            }, _.template(errorMessages.Range.min, { min: 5 }));
+        },
+        'maximum': function () {
+            assertViolationWithMessage(function () {
+                condition({ max: 3 })(4);
+            }, _.template(errorMessages.Range.max, { max: 3 }));
+        }
     }
 });

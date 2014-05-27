@@ -1,5 +1,6 @@
-var allCondition = require('../All');
-
 module.exports = function () {
-    return allCondition([Number, /^-?\d+$/]);
+    var lewd = require('../../lewd'),
+        message = require('../../messages').Integer;
+    
+    return lewd.all(Number, /^-?\d+$/).because(message);
 };

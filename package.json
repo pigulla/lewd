@@ -7,7 +7,7 @@
   "scripts": {
     "test": "grunt buster"
   },
-  "author": "Raphael Pigulla <raphael@pigulla.net>",
+  "author": "Raphael Pigulla <pigulla@four66.com>",
   "license": "BSD",
   "dependencies": {
     "harmony-collections": "git://github.com/Benvie/harmony-collections",

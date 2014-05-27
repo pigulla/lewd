@@ -1,10 +1,12 @@
-var ConditionViolationException = require('../exception/ConditionViolationException'),
-    utils = require('../utils');
+var ConditionViolationException = require('../exception/ConditionViolationException');
 
 module.exports = function (conditions) {
+    var utils = require('../utils'),
+        message = require('../messages').None;
+
     conditions = conditions.map(utils.wrap);
     
-    return function noneCondition(value, path) {
+    return utils.customMessageWrapper(function noneCondition(value, path) {
         if (conditions.length === 0) {
             return;
         }
@@ -17,7 +19,7 @@ module.exports = function (conditions) {
                 return true;
             }
         })) {
-            throw new ConditionViolationException(value, path, 'satisfied at least one condition');
+            throw new ConditionViolationException(value, path, message);
         }
-    };
+    });
 };

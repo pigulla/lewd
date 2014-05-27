@@ -2,13 +2,14 @@ var ConditionViolationException = require('../exception/ConditionViolationExcept
     InvalidSchemaException = require('../exception/InvalidSchemaException');
 
 module.exports = function (spec) {
-    var utils = require('../utils');
+    var utils = require('../utils'),
+        message = require('../messages').Some;
 
     if (!Array.isArray(spec)) {
         throw new InvalidSchemaException('Parameter must be an array');
     }
 
-    return function someCondition(value, path) {
+    return utils.customMessageWrapper(function someCondition(value, path) {
         var conditions = spec.map(utils.wrap);
 
         if (conditions.length === 0) {
@@ -34,8 +35,8 @@ module.exports = function (spec) {
         if (!satisfied) {
             throw new ConditionViolationException(
                 value, violatedConditions[0].path,
-                'Satisfies none of the valid conditions'
+                message
             );
         }
-    };
+    });
 };

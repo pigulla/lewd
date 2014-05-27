@@ -1,13 +1,22 @@
+var _ = require('lodash');
 var util = require('util');
 
-function ConditionViolationException(value, path, reason) {
+function ConditionViolationException(value, path, template, data) {
+    var smartFormat = require('../utils').smartFormat;
+    
     Error.call(this);
+    
     this.name = 'ConditionViolationException';
     this.path = path || [];
-    this.message = util.format(
-        'Value <%s>%s at %s is invalid: %s',
-        typeof value, value, this.path.length ? this.path.join('.') : 'top level', reason
-    );
+    this.data = data || {};
+    this.value = value;
+    this.valueStr = smartFormat(value);
+    
+    this.message = _.template(template, _.assign({}, this.data, {
+        path: this.path,
+        value: this.value,
+        valueStr: this.valueStr
+    }));
 }
 
 util.inherits(ConditionViolationException, Error);

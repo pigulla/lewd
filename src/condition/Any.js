@@ -1,4 +1,6 @@
 module.exports = function () {
-    return function anyCondition(value, path) {
-    };
+    var utils = require('../utils');
+    
+    return utils.customMessageWrapper(function anyCondition(value, path) {
+    });
 };

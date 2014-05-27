@@ -1,10 +1,13 @@
-var buster = require('buster');
+var _ = require('lodash'),
+    buster = require('buster');
 
 var helper = require('./../helper'),
+    errorMessages = require('../../src/messages'),
     lewd = require('../../src/lewd');
 
 var refuteValues = helper.refuteValues,
     acceptValues = helper.acceptValues,
+    assertViolationWithMessage = helper.assertViolationWithMessage,
     refuteSchemaOptions = helper.refuteSchemaOptions;
 
 var condition = lewd.object;
@@ -283,6 +286,30 @@ buster.testCase('"object" condition', {
             ]);
         }
     },
+    'error message': {
+        'type': function () {
+            assertViolationWithMessage(function () {
+                condition({})(42);
+            }, _.template(errorMessages.Object.type, {}));
+        },
+        'unexpectedKey': function () {
+            assertViolationWithMessage(function () {
+                condition({})({ x: null });
+            }, _.template(errorMessages.Object.unexpectedKey, { key: 'x' }));
+        },
+        'missingKey': function () {
+            assertViolationWithMessage(function () {
+                condition({ x: undefined })({});
+            }, _.template(errorMessages.Object.missingKey, { key: 'x' }));
+        }
+    },
+    'custom error message': {
+        'type': function () {
+            assertViolationWithMessage(function () {
+                condition({}).because('reason: ${originalMessage}')(42);
+            }, 'reason: ' + _.template(errorMessages.Object.type, {}));
+        }
+    },
     'invalid schema options': function () {
         refuteSchemaOptions(condition, [{}, { allowExtra: 42 }]);
         refuteSchemaOptions(condition, [{}, { required: ['w00t'] }]);
@@ -294,5 +321,3 @@ buster.testCase('"object" condition', {
         refuteSchemaOptions(condition, [{}, { byDefault: 'required', optional: ['x'] }]);
     }
 });
-
-// TODO: test custom error messages in dicts

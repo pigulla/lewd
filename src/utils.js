@@ -1,3 +1,5 @@
+var util = require('util');
+
 var _ = require('lodash'),
     Set = require('harmony-collections').Set;
 
@@ -12,6 +14,27 @@ var ConditionViolationException = require('./exception/ConditionViolationExcepti
     typeCondition = require('./condition/Type');
 
 var utils = {
+    smartFormat: function (value) {
+        if (value === null) {
+            return 'null';
+        } else if (typeof value === 'string') {
+            return util.format(
+                '<string:%d>"%s"',
+                value.length, value.length > 10 ? (value.substr(0, 7) + '...') : value
+            );
+        } else if (typeof value === 'number') {
+            return '<number>' + value;
+        } else if (_.isPlainObject(value)) {
+            return '<object>';
+        } else if (typeof value === 'boolean') {
+            return '<boolean>' + (value ? 'true' : 'false');
+        } else if (Array.isArray(value)) {
+            return util.format('<array:%d>', value.length);
+        } else {
+            throw new Error('Only native JSON types are supported');
+        }
+    },
+    
     /**
      * Checks if the given value is a constructor for a native JSON type (i.e. Number, String, Boolean, Object,
      * Array or null). 
@@ -72,13 +95,23 @@ var utils = {
         }
     
         if (typeof spec === 'function') {
-            // TODO: test if spec really is a lewd function
-            return spec;
+            if (spec.hasOwnProperty('because')) {
+                return spec;
+            } else {
+                // custom condition
+                return utils.customMessageWrapper(spec);
+            }
         }
     
         throw new InvalidSchemaException('Invalid specification');
     },
-    
+
+    /**
+     * Wraps a function so that its error message can be overridden.
+     * 
+     * @param {function} fn
+     * @return {function}
+     */
     customMessageWrapper: function (fn) {
         var message,
             wrap;
