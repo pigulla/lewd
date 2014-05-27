@@ -4,13 +4,17 @@ var ConditionViolationException = require('../exception/ConditionViolationExcept
 module.exports = function (spec) {
     var utils = require('../utils'),
         lewd = require('../lewd'),
-        message = require('../messages').Array;
+        message = require('../messages').Array,
+        condition;
 
     /* istanbul ignore if */
     if (!Array.isArray(spec)) {
         throw new InvalidSchemaException('Parameter must be an array');
     }
-    
+
+    // avoid the "some" condition if possible to get better error reporting 
+    condition = spec.length === 1 ? lewd._wrap(spec[0]) : lewd.some.apply(null, spec);
+
     return utils.customMessageWrapper(function arrayCondition(values, path) {
         path = path || [];
         
@@ -18,14 +22,10 @@ module.exports = function (spec) {
             throw new ConditionViolationException(values, path, message);
         }
         
-        if (spec.length === 0) {
-            return;
+        if (spec.length > 0) {
+            values.forEach(function (value, index) {
+                condition(value, path.concat('#' + index));
+            });
         }
-
-        var condition = lewd.some.apply(null, spec);
-
-        values.forEach(function (value, index) {
-            condition(value, path.concat('#' + index));
-        });
     });
 };

@@ -19,20 +19,22 @@ module.exports = function (spec) {
         }
         
         var satisfied = false,
-            violatedConditions = conditions.map(function (condition) {
-                try {
-                    condition(value, path);
-                    satisfied = true;
-                } catch (e) {
-                    if (e instanceof ConditionViolationException) {
-                        return e;
-                    } else {
-                        throw e;
-                    }
+            violatedConditions;
+        
+        violatedConditions = conditions.map(function (condition) {
+            try {
+                condition(value, path);
+                satisfied = true;
+            } catch (e) {
+                if (e instanceof ConditionViolationException) {
+                    return e;
+                } else {
+                    throw e;
                 }
-            }).filter(function (item) {
-                return !!item;
-            });
+            }
+        }).filter(function (item) {
+            return !!item;
+        });
         
         if (!satisfied) {
             throw new ConditionViolationException(

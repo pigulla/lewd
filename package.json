@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "description": "An intuitive and easy to use validator for JSON data.",
-  "main": "lewd.js",
+  "main": "src/lewd.js",
   "scripts": {
     "test": "grunt buster"
   },

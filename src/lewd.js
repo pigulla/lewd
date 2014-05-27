@@ -1,5 +1,4 @@
-var _ = require('lodash'),
-    Set = require('harmony-collections').Set;
+var _ = require('lodash');
 
 var util = require('util');
 
@@ -67,17 +66,6 @@ lewd._wrap = function (spec) {
         return condition.literal(spec);
     }
     
-    if (spec instanceof Set) {
-        var values = [];
-        spec.forEach(function (item) {
-            if (!utils.isLiteral(item)) {
-                throw new InvalidSchemaException('Set must only contain literals'); 
-            }
-            values.push(condition.literal(item));
-        });
-        return condition.some(values);
-    }
-
     if (spec instanceof RegExp) {
         return condition.regex(spec);
     }
@@ -95,7 +83,9 @@ lewd._wrap = function (spec) {
             return spec;
         } else {
             // custom condition
-            return utils.customMessageWrapper(spec);
+            return utils.customMessageWrapper(function customCondition(value, path) {
+                return spec.call(null, value, path || []);
+            });
         }
     }
 
@@ -225,5 +215,7 @@ lewd.object = function (spec, options) {
     assertParameterCount(arguments, 1, 2);
     return condition.object(spec, options);
 };
+
+lewd.ConditionViolationException = ConditionViolationException;
 
 module.exports = lewd;

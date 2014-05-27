@@ -1,7 +1,6 @@
 var util = require('util');
 
-var _ = require('lodash'),
-    Set = require('harmony-collections').Set;
+var _ = require('lodash');
 
 var ConditionViolationException = require('./exception/ConditionViolationException'),
     InvalidSchemaException = require('./exception/InvalidSchemaException');

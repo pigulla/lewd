@@ -1,5 +1,4 @@
-var buster = require('buster'),
-    Set = require('harmony-collections').Set;
+var buster = require('buster');
 
 var lewd = require('../src/lewd');
 
@@ -8,11 +7,6 @@ buster.testCase('api misuse', {
         buster.referee.assert.exception(function () {
             lewd();
         }, 'WrongParameterException');
-    },
-    'set with non-literals': function () {
-        buster.referee.assert.exception(function () {
-            lewd(Set([1, 2, {}]));
-        }, 'InvalidSchemaException');
     },
     'wrong parameter count for conditions': function () {
         buster.referee.assert.exception(function () {
