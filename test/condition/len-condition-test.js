@@ -48,20 +48,34 @@ buster.testCase('"len" condition', {
         acceptValues(condition, args, ['abc', 'abcde', [[], true, 42]]);
     },
     'error message': {
-        'minimum': function () {
-            assertViolationWithMessage(function () {
-                condition({ min: 5 })('1234');
-            }, _.template(errorMessages.Len.min, { min: 5 }));
-        },
-        'maximum': function () {
-            assertViolationWithMessage(function () {
-                condition({ max: 3 })('1234');
-            }, _.template(errorMessages.Len.max, { max: 3 }));
-        },
         'type': function () {
             assertViolationWithMessage(function () {
                 condition({ max: 3 })(42);
             }, _.template(errorMessages.Len.type, {}));
+        },
+        'minimumExclusive': function () {
+            var opts = { min: 5, minInclusive: false };
+            assertViolationWithMessage(function () {
+                condition(opts)('1234');
+            }, _.template(errorMessages.Len.min, opts));
+        },
+        'maximumExclusive': function () {
+            var opts = { max: 3, maxInclusive: false };
+            assertViolationWithMessage(function () {
+                condition(opts)('1234');
+            }, _.template(errorMessages.Len.max, opts));
+        },
+        'minimumInclusive': function () {
+            var opts = { min: 5, minInclusive: true };
+            assertViolationWithMessage(function () {
+                condition(opts)('1234');
+            }, _.template(errorMessages.Len.minInclusive, opts));
+        },
+        'maximumInclusive': function () {
+            var opts = { max: 3, maxInclusive: true };
+            assertViolationWithMessage(function () {
+                condition(opts)('1234');
+            }, _.template(errorMessages.Len.maxInclusive, opts));
         }
     }
 });

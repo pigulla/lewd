@@ -6,6 +6,7 @@ var ConditionViolationException = require('./exception/ConditionViolationExcepti
     WrongParameterException = require('./exception/WrongParameterException'),
     InvalidSchemaException = require('./exception/InvalidSchemaException'),
     utils = require('./utils'),
+    errorMessages = require('./messages'),
     condition = {
         all: require('./condition/All'),
         any: require('./condition/Any'),
@@ -93,13 +94,10 @@ lewd._wrap = function (spec) {
     }
 
     if (typeof spec === 'function') {
-        if (spec.hasOwnProperty('because')) {
+        if (spec.hasOwnProperty('_wrapped')) {
             return spec;
         } else {
-            // custom condition
-            return utils.customMessageWrapper(function customCondition(value, path) {
-                return spec.call(null, value, path || []);
-            });
+            return lewd.custom(spec);
         }
     }
 
@@ -140,6 +138,23 @@ lewd.expose = function (prefix) {
     if (p.length > 0) {
         additionalFunctions.forEach(expose);
     }
+};
+
+/**
+ * @since 0.2.0
+ * @param {function(*)} fn
+ * @return {function(*, Array.<string>)}
+ */
+lewd.custom = function (fn) {
+    return utils.customMessageWrapper(function customCondition(value, path) {
+        var result = fn.call(null, value, path || []);
+
+        if (typeof result === 'string') {
+            throw new ConditionViolationException(value, path, result);
+        } else if (result === false) {
+            throw new ConditionViolationException(value, path, errorMessages.Custom);
+        }
+    });
 };
 
 /**

@@ -18,11 +18,15 @@ module.exports = function (options) {
         });
 
     return utils.customMessageWrapper(function rangeCondition(value, path) {
+        var key;
+        
         if (value > opts.max || (value === opts.max && !opts.maxInclusive)) {
-            throw new ConditionViolationException(value, path, messages.max, opts);
+            key = 'max' + (opts.maxInclusive ? 'Inclusive' : '');
+            throw new ConditionViolationException(value, path, messages[key], opts);
         }
         if (value < opts.min || (value === opts.min && !opts.minInclusive)) {
-            throw new ConditionViolationException(value, path, messages.min, opts);
+            key = 'min' + (opts.minInclusive ? 'Inclusive' : '');
+            throw new ConditionViolationException(value, path, messages[key], opts);
         }
     });
 };

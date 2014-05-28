@@ -48,15 +48,29 @@ buster.testCase('"range" condition', {
         acceptValues(condition, args, [13.1, 49, 99]);
     },
     'error message': {
-        'minimum': function () {
+        'minimumExclusive': function () {
+            var opts = { min: 5, minInclusive: false };
             assertViolationWithMessage(function () {
-                condition({ min: 5 })(4);
-            }, _.template(errorMessages.Range.min, { min: 5 }));
+                condition(opts)(4);
+            }, _.template(errorMessages.Range.min, opts));
         },
-        'maximum': function () {
+        'maximumExclusive': function () {
+            var opts = { max: 3, maxInclusive: false };
             assertViolationWithMessage(function () {
-                condition({ max: 3 })(4);
-            }, _.template(errorMessages.Range.max, { max: 3 }));
+                condition(opts)(4);
+            }, _.template(errorMessages.Range.max, opts));
+        },
+        'minimumInclusive': function () {
+            var opts = { min: 5, minInclusive: true };
+            assertViolationWithMessage(function () {
+                condition(opts)(4);
+            }, _.template(errorMessages.Range.minInclusive, opts));
+        },
+        'maximumInclusive': function () {
+            var opts = { max: 3, maxInclusive: true };
+            assertViolationWithMessage(function () {
+                condition(opts)(4);
+            }, _.template(errorMessages.Range.maxInclusive, opts));
         }
     }
 });
