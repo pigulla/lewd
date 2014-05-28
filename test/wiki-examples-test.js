@@ -11,6 +11,19 @@ var refuteValues = helper.refuteValues,
     assertViolationWithMessage = helper.assertViolationWithMessage;
 
 buster.testCase('wiki examples', {
+    'home': function () {
+        var condition = lewd.array(lewd.some(lewd.all(String, /^x/), Boolean)),
+            data = ['x1', 'x2', true, 'x3'];
+
+        buster.referee.refute.exception(function () {
+            condition(data);
+        });
+
+        data.push('4');
+        assertViolationAt(function () {
+            condition(data);
+        }, ['#4']);
+    },
     'log messages': function () {
         var condition = lewd([{
                 timestamp: lewd.isoDateTime(),

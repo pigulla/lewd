@@ -19,7 +19,7 @@ module.exports = function (spec) {
     }
 
     // avoid the "some" condition if possible to get better error reporting 
-    condition = spec.length === 1 ? lewd._wrap(spec[0]) : lewd.some.apply(null, spec);
+    condition = spec.length === 1 ? lewd._wrap(spec[0]) : lewd.all.apply(null, spec);
 
     return utils.customMessageWrapper(function arrayCondition(values, path) {
         path = path || [];

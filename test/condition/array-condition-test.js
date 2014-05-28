@@ -61,17 +61,17 @@ buster.testCase('"array" condition', {
         }
     },
     'complex': {
-        '[String, Number]': function () {
-            var args = [String, Number];
+        '[String, /^\\d+$/]': function () {
+            var args = [String, /^\d+$/];
 
-            refuteValues(condition, args, [42, {}, [true], [42, '42', null]]);
-            acceptValues(condition, args, [[], ['42', 'hello'], [42, 13], ['one', 2, 3]]);
+            refuteValues(condition, args, [42, {}, [true], [42, '42', null], ['42', '19', 4], [19]]);
+            acceptValues(condition, args, [[], ['42', '13'], ['42']]);
         },
-        '[Boolean, /^\\d/]': function () {
-            var args = [Boolean, /^\d/];
+        '[Number, /^\\d+$/]': function () {
+            var args = [Number, /^\d+$/];
 
-            refuteValues(condition, args, [42, {}, [null], [42, '42', null], ['x', true], [1, -3]]);
-            acceptValues(condition, args, [[], ['42', false], [true, false], [42, 13], ['1xx', 2, true]]);
+            refuteValues(condition, args, [42, {}, [null], [42, '42'], ['x', true], [1, -3], [42, '3'], [42, 1.2]]);
+            acceptValues(condition, args, [[], [42, 14], [99.0, 14]]);
         },
         '[[]]': function () {
             var args = [[]];
