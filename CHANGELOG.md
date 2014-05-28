@@ -8,7 +8,7 @@
 ###### New features:
 
  - Custom conditions can now be inlined more easily
- - New option for validating objects: set `sanitize` to silently remove invalid properties.
+ - New option for validating objects: set `sanitize` to silently remove invalid and unexpected keys.
 
 ###### Improvements:
 

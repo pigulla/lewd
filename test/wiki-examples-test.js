@@ -25,13 +25,13 @@ buster.testCase('wiki examples', {
         }, ['#4']);
     },
     'sanitization': function () {
-        var condition = lewd.object({ a: Number, b: String }, { allowExtra: true, sanitize: true }),
-            data = { a: 1, b: 2, c: 3 };
+        var condition = lewd.object({ a: Number, b: String }, { sanitize: true }),
+            data = { a: 1, b: '2', c: 3 };
         
         buster.referee.refute.exception(function () {
             condition(data);
         });
-        buster.referee.assert.equals({ a: 1, c: 3 }, data);
+        buster.referee.assert.equals({ a: 1, b: '2' }, data);
     },
     'log messages': function () {
         var condition = lewd([{

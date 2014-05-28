@@ -127,7 +127,6 @@ module.exports = function (object, options) {
             if (opts.sanitize) {
                 try {
                     keysCondition(key, path.concat(KEYS_PROPERTY + key));
-                    valuesCondition(value[key], path.concat(KEYS_PROPERTY + key));
                 } catch (e) {
                     if (e instanceof ConditionViolationException) {
                         delete value[key];
@@ -136,6 +135,7 @@ module.exports = function (object, options) {
                         throw e;
                     }
                 }
+                valuesCondition(value[key], path.concat(KEYS_PROPERTY + key));
             } else {
                 keysCondition(key, path.concat(KEYS_PROPERTY + key));
                 valuesCondition(value[key], path.concat(KEYS_PROPERTY + key));
@@ -143,20 +143,7 @@ module.exports = function (object, options) {
         });
         
         keysToValidate.forEach(function (key) {
-            if (opts.sanitize) {
-                try {
-                    object[key](value[key], path.concat(key));
-                } catch (e) {
-                    if (e instanceof ConditionViolationException) {
-                        delete value[key];
-                        return;
-                    } else {
-                        throw e;
-                    }
-                }
-            } else {
-                object[key](value[key], path.concat(key));
-            }
+            object[key](value[key], path.concat(key));
         });
     });
 };

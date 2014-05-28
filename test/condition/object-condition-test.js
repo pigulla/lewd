@@ -300,10 +300,10 @@ buster.testCase('"object" condition', {
             buster.referee.assert.equals({ a: 1, B: 2 }, o);
         },
         '{ $k: /^a/, $v: Number } (with sanitization}': function () {
-            var o = { a: 1, aa: 'x', b: 2, $foo: false };
+            var o = { a: 1, aa: 4, b: 2, $foo: false };
             condition({ $k: /^a/, $v: Number }, { sanitize: true })(o);
             
-            buster.referee.assert.equals({ a: 1 }, o);
+            buster.referee.assert.equals({ a: 1, aa: 4 }, o);
         }
     },
     'passes exceptions through': {

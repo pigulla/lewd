@@ -26,7 +26,7 @@ But they can of course get more complex by logically combining conditions or nes
 ### Features
  - intuitive and concise API
  - supports arbitrarily nested structures
- - optionally remove invalid properties from objects
+ - optionally remove invalid or unexpected keys from objects
  - custom validators
  - custom error messages
  - thoroughly unit tested
