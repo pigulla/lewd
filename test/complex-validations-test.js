@@ -16,12 +16,12 @@ buster.testCase('complex validations', {
     'book': function () {
         var condition = lewd.object({
             title: lewd.all(String, lewd.len({ min: 1, max: 10 })),
-            author: { firstName: String, lastName: String },
+            author: lewd.optional({ firstName: String, lastName: String }),
             chapters: lewd.all([{
                 name: String,
                 pages: lewd.all(lewd.integer(), lewd.range({ min: 1 }))
             }], lewd.len({ min: 3 }).because('a book needs at least three chapters (where: ${path})'))
-        }, { optional: ['author']});
+        });
         
         buster.referee.refute.exception(function () {
             condition({

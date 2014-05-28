@@ -10,45 +10,25 @@ var KEYS_PROPERTY = '$k',
     REQUIRED = 'required',
     OPTIONAL = 'optional';
 
-function validateOptions(options, definedKeys, allowExtraDefault) {
-    var opts = _.defaults({}, options, {
-        allowExtra: allowExtraDefault,
-        byDefault: REQUIRED,
-        optional: [],
-        required: [],
-        keys: undefined,
-        values: undefined
-    });
+function validateOptions(options, allowExtraDefault) {
+    var defaults = {
+            allowExtra: allowExtraDefault,
+            byDefault: REQUIRED,
+            keys: undefined,
+            values: undefined
+        },
+        opts = _.defaults({}, options, defaults);
     
     if ([REQUIRED, OPTIONAL].indexOf(opts.byDefault) === -1) {
         throw new InvalidSchemaException('Invalid value for option "byDefault"');
     }
-
-    if (opts.byDefault === REQUIRED && options.hasOwnProperty('required')) {
-        throw new InvalidSchemaException('Option "required" not allowed if "byDefault" is set to "required"');
-    }
-    if (opts.byDefault === OPTIONAL && options.hasOwnProperty('optional')) {
-        throw new InvalidSchemaException('Option "optional" not allowed if "byDefault" is set to "optional"');
-    }
-    
     if (typeof opts.allowExtra !== 'boolean') {
         throw new InvalidSchemaException('Option "allowExtra" must be a boolean');
     }
-    if (!Array.isArray(opts.optional)) {
-        throw new InvalidSchemaException('Option "optional" must be an array');
-    }
-    if (!Array.isArray(opts.required)) {
-        throw new InvalidSchemaException('Option "required" must be an array');
-    }
     
-    var unknownRequired = _.difference(opts.required, definedKeys),
-        unknownOptional = _.difference(opts.optional, definedKeys);
-    
-    if (unknownRequired.length > 0) {
-        throw new InvalidSchemaException('Key "' + unknownRequired[0] + '" is marked as required but was not defined');
-    }
-    if (unknownOptional.length > 0) {
-        throw new InvalidSchemaException('Key "' + unknownOptional[0] + '" is marked as optional but was not defined');
+    var unknownOptions = _.difference(Object.keys(options), Object.keys(defaults));
+    if (unknownOptions.length > 0) {
+        throw new InvalidSchemaException('Unknown option: "' + unknownOptions[0] + '"');
     }
     
     return opts;
@@ -96,10 +76,21 @@ module.exports = function (object, options) {
         valuesCondition = anyCondition();
     }
     
-    opts = validateOptions(opts, Object.keys(object), allowExtraDefault);
+    opts = validateOptions(opts, allowExtraDefault);
+    
+    var optionalKeys = [],
+        requiredKeys = [];
 
     definedKeys.forEach(function (key) {
         object[key] = lewd._wrap(object[key]);
+        object[key]._property = object[key]._property || opts.byDefault;
+        
+        if (object[key]._property === REQUIRED) {
+            requiredKeys.push(key);
+        }
+        if (object[key]._property === OPTIONAL) {
+            optionalKeys.push(key);
+        }
     });
     
     return utils.customMessageWrapper(function objectCondition(value, path) {
@@ -112,7 +103,7 @@ module.exports = function (object, options) {
         var actualKeys = Object.keys(value),
             extraKeys = _.difference(actualKeys, definedKeys),
             missingKeys = opts.byDefault === REQUIRED ?
-                _.difference(definedKeys, opts.optional, actualKeys) : _.difference(opts.required, actualKeys),
+                _.difference(definedKeys, optionalKeys, actualKeys) : _.difference(requiredKeys, actualKeys),
             keysToValidate = _.intersection(definedKeys, actualKeys);
 
         if (extraKeys.length > 0 && !opts.allowExtra) {
@@ -121,7 +112,7 @@ module.exports = function (object, options) {
         if (missingKeys.length > 0) {
             throw new ConditionViolationException(value, path, messages.missingKey, { key: missingKeys[0] });
         }
-
+        
         extraKeys.forEach(function (key) {
             keysCondition(key, path.concat(KEYS_PROPERTY + key));
             valuesCondition(value[key], path.concat(KEYS_PROPERTY + key));

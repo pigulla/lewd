@@ -46,15 +46,14 @@ buster.testCase('wiki examples', {
     },
     'address': function () {
         var condition = lewd.object({
-                firstName: String,
-                lastName: String,
+                firstName: lewd.required(String),
+                lastName: lewd.required(String),
                 title: lewd('Mr', 'Mrs'),
                 dob: lewd.isoDateTime(),
                 city: String,
                 zip: lewd.all(Number, lewd.range({ min: 1000, max: 99999 }))
             }, {
-                byDefault: 'optional',
-                required: ['firstName', 'lastName']
+                byDefault: 'optional'
             }),
             data = {
                 'firstName': 'Foo',
@@ -75,21 +74,19 @@ buster.testCase('wiki examples', {
         var positiveInt = lewd.all(lewd.integer(), lewd.range({ min: 1 })),
             chapter, book, data;
 
-        chapter = lewd.object({
+        chapter = lewd({
             title: String,
             pages: positiveInt,
-            footnotes: [{
+            footnotes: lewd.optional([{
                 id: positiveInt,
                 text: String
-            }]
-        }, { optional: ['footnotes'] });
-        book = lewd.object({
+            }])
+        });
+        book = lewd({
             title: String,
-            price: lewd.all(Number, lewd.range({ min: 0 })),
+            price: lewd.optional(lewd.all(Number, lewd.range({ min: 0 }))),
             hasIndex: Boolean,
             chapters: lewd.all([chapter], lewd.len({ min: 3 }))
-        }, {
-            optional: ['price']
         });
         data = {
             'title': 'lewd for hackers',

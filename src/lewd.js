@@ -65,7 +65,7 @@ var lewd = function () {
 };
 
 /**
- * Wraps an arbitrary value in its appropriate condition wrapper.
+ * Wraps an arbitrary value in its appropriate condition wrapper (or returns the argument if it is already wrapped).
  *
  * @private
  * @param {*} spec
@@ -155,6 +155,19 @@ lewd.custom = function (fn) {
             throw new ConditionViolationException(value, path, errorMessages.Custom);
         }
     });
+};
+
+
+lewd.optional = function (condition) {
+    var fn = lewd._wrap(condition);
+    fn._property = 'optional';
+    return fn;
+};
+
+lewd.required = function (condition) {
+    var fn = lewd._wrap(condition);
+    fn._property = 'required';
+    return fn;
 };
 
 /**

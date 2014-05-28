@@ -54,11 +54,11 @@ buster.testCase('"object" condition', {
                 { n: 17.3, a: [null, {}] }
             ]);
         },
-        '{ s: String, b: Boolean } (required by default, b optional)': function () {
+        '{ s: String, b: optional(Boolean) } (required by default)': function () {
             var args = [{
                 s: String,
-                b: Boolean
-            }, { byDefault: 'required', optional: ['b'] }];
+                b: lewd.optional(Boolean)
+            }, { byDefault: 'required' }];
             
             refuteValues(condition, args, [
                 { b: true },
@@ -71,11 +71,11 @@ buster.testCase('"object" condition', {
                 { s: '', b: true }
             ]);
         },
-        '{ s: String, b: Boolean } (optional by default, b required)': function () {
+        '{ s: String, b: lewd.required(Boolean) } (optional by default)': function () {
             var args = [{
                 s: String,
-                b: Boolean
-            }, { byDefault: 'optional', required: ['b'] }];
+                b: lewd.required(Boolean)
+            }, { byDefault: 'optional' }];
             
             refuteValues(condition, args, [
                 { s: 'hello' },
@@ -312,13 +312,8 @@ buster.testCase('"object" condition', {
     },
     'invalid schema options': function () {
         refuteSchemaOptions(condition, [{}, { allowExtra: 42 }]);
-        refuteSchemaOptions(condition, [{}, { required: ['w00t'] }]);
+        refuteSchemaOptions(condition, [{}, { unknownKey: ['w00t'] }]);
         refuteSchemaOptions(condition, [{}, { optional: 'w00t' }]);
-        refuteSchemaOptions(condition, [{}, { byDefault: 'optional', required: 'w00t' }]);
         refuteSchemaOptions(condition, [{}, { byDefault: 'whatever' }]);
-        refuteSchemaOptions(condition, [{}, { byDefault: 'required', required: [] }]);
-        refuteSchemaOptions(condition, [{}, { byDefault: 'optional', optional: [] }]);
-        refuteSchemaOptions(condition, [{}, { byDefault: 'optional', required: ['x'] }]);
-        refuteSchemaOptions(condition, [{}, { byDefault: 'required', optional: ['x'] }]);
     }
 });
