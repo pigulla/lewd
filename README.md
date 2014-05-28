@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/pigulla/lewd.svg?branch=master)](https://travis-ci.org/pigulla/lewd)
 # lewd
 lewd is an intuitive and simple to use data validation library. It is inspired by Python's [voluptuous](https://github.com/alecthomas/voluptuous), blame them for the silly name.
 
