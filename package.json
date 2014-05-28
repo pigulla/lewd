@@ -6,7 +6,7 @@
   "description": "An intuitive and easy to use validator for JSON data.",
   "main": "src/lewd.js",
   "scripts": {
-    "test": "grunt buster"
+    "test": "node_modules/buster/bin/buster-test"
   },
   "repository": {
     "type": "git",
