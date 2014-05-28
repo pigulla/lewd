@@ -7,7 +7,8 @@ var lewd = require('../../src/lewd'),
 
 var refuteValues = helper.refuteValues,
     acceptValues = helper.acceptValues,
-    assertViolationWithMessage = helper.assertViolationWithMessage;
+    assertViolationWithMessage = helper.assertViolationWithMessage,
+    refuteSchemaOptions = helper.refuteSchemaOptions;
 
 var condition = lewd.range;
 
@@ -72,5 +73,13 @@ buster.testCase('"range" condition', {
                 condition(opts)(4);
             }, _.template(errorMessages.Range.maxInclusive, opts));
         }
+    },
+    'invalid schema options': function () {
+        refuteSchemaOptions(condition, [true]);
+        refuteSchemaOptions(condition, [{ min: 42, max: '13' }]);
+        refuteSchemaOptions(condition, [{ min: '42', max: 13 }]);
+        refuteSchemaOptions(condition, [{ minInclusive: 0 }]);
+        refuteSchemaOptions(condition, [{ maxInclusive: 0 }]);
+        refuteSchemaOptions(condition, [{ unknownKey: 'w00t' }]);
     }
 });

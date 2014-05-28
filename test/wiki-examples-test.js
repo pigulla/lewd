@@ -24,6 +24,15 @@ buster.testCase('wiki examples', {
             condition(data);
         }, ['#4']);
     },
+    'sanitization': function () {
+        var condition = lewd.object({ a: Number, b: String }, { allowExtra: true, sanitize: true }),
+            data = { a: 1, b: 2, c: 3 };
+        
+        buster.referee.refute.exception(function () {
+            condition(data);
+        });
+        buster.referee.assert.equals({ a: 1, c: 3 }, data);
+    },
     'log messages': function () {
         var condition = lewd([{
                 timestamp: lewd.isoDateTime(),

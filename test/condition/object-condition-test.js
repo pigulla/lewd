@@ -286,6 +286,46 @@ buster.testCase('"object" condition', {
             ]);
         }
     },
+    'sanitization': {
+        '{ a: Number, b: Number } (with sanitization}': function () {
+            var o = { a: 1, b: 2, c: 3 };
+            condition({ a: Number, b: Number }, { sanitize: true })(o);
+            
+            buster.referee.assert.equals({ a: 1, b: 2 }, o);
+        },
+        '{ $k: /^[a-z]+$/i } (with sanitization}': function () {
+            var o = { a: 1, B: 2, $foo: false, 1: 0 };
+            condition({ $k: /^[a-z]+$/i }, { sanitize: true })(o);
+            
+            buster.referee.assert.equals({ a: 1, B: 2 }, o);
+        },
+        '{ $k: /^a/, $v: Number } (with sanitization}': function () {
+            var o = { a: 1, aa: 'x', b: 2, $foo: false };
+            condition({ $k: /^a/, $v: Number }, { sanitize: true })(o);
+            
+            buster.referee.assert.equals({ a: 1 }, o);
+        }
+    },
+    'passes exceptions through': {
+        'value': function () {
+            buster.referee.assert.exception(function () {
+                condition({ a: function () { x(); } })({ a: 0 });
+            }, 'ReferenceError');
+
+            buster.referee.assert.exception(function () {
+                condition({ $v: function () { x(); } }, { allowExtra: true, sanitize: true })({ x: 0 });
+            }, 'ReferenceError');
+        },
+        'key': function () {
+            buster.referee.assert.exception(function () {
+                condition({ $k: function () { x(); } })({ a: 42 });
+            }, 'ReferenceError');
+
+            buster.referee.assert.exception(function () {
+                condition({ a: function () { x(); } }, { sanitize: true })({ a: 0 });
+            }, 'ReferenceError');
+        }
+    },
     'error message': {
         'type': function () {
             assertViolationWithMessage(function () {
@@ -312,6 +352,7 @@ buster.testCase('"object" condition', {
     },
     'invalid schema options': function () {
         refuteSchemaOptions(condition, [{}, { allowExtra: 42 }]);
+        refuteSchemaOptions(condition, [{}, { sanitize: 42 }]);
         refuteSchemaOptions(condition, [{}, { unknownKey: ['w00t'] }]);
         refuteSchemaOptions(condition, [{}, { optional: 'w00t' }]);
         refuteSchemaOptions(condition, [{}, { byDefault: 'whatever' }]);

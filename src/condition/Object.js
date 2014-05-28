@@ -15,20 +15,24 @@ function validateOptions(options, allowExtraDefault) {
             allowExtra: allowExtraDefault,
             byDefault: REQUIRED,
             keys: undefined,
-            values: undefined
+            values: undefined,
+            sanitize: false
         },
         opts = _.defaults({}, options, defaults);
     
     if ([REQUIRED, OPTIONAL].indexOf(opts.byDefault) === -1) {
-        throw new InvalidSchemaException('Invalid value for option "byDefault"');
+        throw new InvalidSchemaException('invalid value for option "byDefault"');
     }
     if (typeof opts.allowExtra !== 'boolean') {
-        throw new InvalidSchemaException('Option "allowExtra" must be a boolean');
+        throw new InvalidSchemaException('option "allowExtra" must be a boolean');
+    }
+    if (typeof opts.sanitize !== 'boolean') {
+        throw new InvalidSchemaException('option "sanitize" must be a boolean');
     }
     
     var unknownOptions = _.difference(Object.keys(options), Object.keys(defaults));
     if (unknownOptions.length > 0) {
-        throw new InvalidSchemaException('Unknown option: "' + unknownOptions[0] + '"');
+        throw new InvalidSchemaException('unknown option: "' + unknownOptions[0] + '"');
     }
     
     return opts;
@@ -105,21 +109,54 @@ module.exports = function (object, options) {
             missingKeys = opts.byDefault === REQUIRED ?
                 _.difference(definedKeys, optionalKeys, actualKeys) : _.difference(requiredKeys, actualKeys),
             keysToValidate = _.intersection(definedKeys, actualKeys);
-
+        
         if (extraKeys.length > 0 && !opts.allowExtra) {
-            throw new ConditionViolationException(value, path, messages.unexpectedKey, { key: extraKeys[0] });
+            if (opts.sanitize) {
+                extraKeys.forEach(function (key) {
+                    delete value[key];
+                });
+            } else {
+                throw new ConditionViolationException(value, path, messages.unexpectedKey, { key: extraKeys[0] });
+            }
         }
         if (missingKeys.length > 0) {
             throw new ConditionViolationException(value, path, messages.missingKey, { key: missingKeys[0] });
         }
         
         extraKeys.forEach(function (key) {
-            keysCondition(key, path.concat(KEYS_PROPERTY + key));
-            valuesCondition(value[key], path.concat(KEYS_PROPERTY + key));
+            if (opts.sanitize) {
+                try {
+                    keysCondition(key, path.concat(KEYS_PROPERTY + key));
+                    valuesCondition(value[key], path.concat(KEYS_PROPERTY + key));
+                } catch (e) {
+                    if (e instanceof ConditionViolationException) {
+                        delete value[key];
+                        return;
+                    } else {
+                        throw e;
+                    }
+                }
+            } else {
+                keysCondition(key, path.concat(KEYS_PROPERTY + key));
+                valuesCondition(value[key], path.concat(KEYS_PROPERTY + key));
+            }
         });
         
         keysToValidate.forEach(function (key) {
-            object[key](value[key], path.concat(key));
+            if (opts.sanitize) {
+                try {
+                    object[key](value[key], path.concat(key));
+                } catch (e) {
+                    if (e instanceof ConditionViolationException) {
+                        delete value[key];
+                        return;
+                    } else {
+                        throw e;
+                    }
+                }
+            } else {
+                object[key](value[key], path.concat(key));
+            }
         });
     });
 };

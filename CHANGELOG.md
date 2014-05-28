@@ -7,11 +7,13 @@ Breaking changes:
  
 New features:
 
- - Custom conditions can now easily inlined (see the wiki) 
+ - custom conditions can now easily inlined (see the wiki)
+ - new option for validating objects: set `sanitize` to silently remove invalid properties
 
 Improvements:
 
  - the `range` and `len` conditions have more fine-grained error messages
+ - better schema validation for `range` and `len`
 
 ## 0.1.0 (2014-05-28)
 
