@@ -1,6 +1,12 @@
 var ConditionViolationException = require('../exception/ConditionViolationException'),
     InvalidSchemaException = require('../exception/InvalidSchemaException');
 
+/**
+ * @since 0.1.0
+ * @param {Array} object
+ * @return {function(*, Array.<string>)}
+ * @throws InvalidSchemaException
+ */
 module.exports = function (spec) {
     var lewd = require('../lewd'),
         utils = require('../utils'),

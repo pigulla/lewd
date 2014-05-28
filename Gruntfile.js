@@ -13,9 +13,7 @@ module.exports = function (grunt) {
         buster: {
             tests: {
                 test: {
-                    config: 'test/buster.js',
-                    verbose: true,
-                    reporter: 'specification'
+                    config: 'test/buster.js'
                 }
             }
         }
@@ -23,4 +21,6 @@ module.exports = function (grunt) {
 
     grunt.loadNpmTasks('grunt-buster');
     grunt.loadNpmTasks('grunt-contrib-jshint');
+    
+    grunt.registerTask('default', ['jshint:all', 'buster:tests']);
 };

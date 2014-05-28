@@ -41,6 +41,12 @@ function nullTypeCondition(value, path) {
     }
 }
 
+/**
+ * @since 0.1.0
+ * @param {(function|null|undefined)} type
+ * @return {function(*, Array.<string>)}
+ * @throws InvalidSchemaException
+ */
 module.exports = function (type) {
     var utils = require('../utils'),
         fn;

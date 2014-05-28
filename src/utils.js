@@ -6,6 +6,13 @@ var ConditionViolationException = require('./exception/ConditionViolationExcepti
     InvalidSchemaException = require('./exception/InvalidSchemaException');
 
 var utils = {
+    /**
+     * Formats a value in a human readable way.
+     * 
+     * @since 0.1.0
+     * @param {*} value
+     * @return {string}
+     */
     smartFormat: function (value) {
         /*jshint maxcomplexity:false */
         if (value === null) {
@@ -48,7 +55,8 @@ var utils = {
     /**
      * Checks if the given value is a constructor for a native JSON type (i.e. Number, String, Boolean, Object,
      * Array or null). 
-     * 
+     *
+     * @since 0.1.0
      * @param {*} value
      * @return {boolean}
      */
@@ -60,7 +68,8 @@ var utils = {
     /**
      * Checks if the given value is a valid literal for a JSON value, excluding arrays and objects (i.e. a string,
      * number, boolean or null).
-     * 
+     *
+     * @since 0.1.0
      * @param {*} value
      * @return {boolean}
      */
@@ -71,9 +80,10 @@ var utils = {
 
     /**
      * Wraps a function so that its error message can be overridden.
-     * 
-     * @param {function} fn
-     * @return {function}
+     *
+     * @since 0.1.0
+     * @param {function(*, Array.<string>)} fn
+     * @return {function(*, Array.<string>)}
      */
     customMessageWrapper: function (fn) {
         var message,

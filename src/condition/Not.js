@@ -1,5 +1,10 @@
 var ConditionViolationException = require('../exception/ConditionViolationException');
 
+/**
+ * @since 0.1.0
+ * @param {*} condition
+ * @return {function(*, Array.<string>)}
+ */
 module.exports = function (condition) {
     var lewd = require('../lewd'),
         utils = require('../utils'),

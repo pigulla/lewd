@@ -2,6 +2,11 @@ var _ = require('lodash');
 
 var ConditionViolationException = require('../exception/ConditionViolationException');
 
+/**
+ * @since 0.1.0
+ * @param {*} options
+ * @return {function(*, Array.<string>)}
+ */
 module.exports = function (options) {
     var utils = require('../utils'),
         messages = require('../messages').Len,

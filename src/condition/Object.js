@@ -54,6 +54,12 @@ function validateOptions(options, definedKeys, allowExtraDefault) {
     return opts;
 }
 
+/**
+ * @since 0.1.0
+ * @param {*} object
+ * @param {Objects=} option 
+ * @return {function(*, Array.<string>)}
+ */
 module.exports = function (object, options) {
     // TODO: this could definitely use some refactoring
     

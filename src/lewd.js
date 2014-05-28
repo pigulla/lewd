@@ -23,6 +23,11 @@ var ConditionViolationException = require('./exception/ConditionViolationExcepti
         type: require('./condition/Type')
     };
 
+/**
+ * @param {Array} args
+ * @param {number} min
+ * @param {number=} max
+ */
 function assertParameterCount(args, min, max) {
     max = arguments.length === 2 ? min : max;
 
@@ -40,6 +45,12 @@ function assertParameterCount(args, min, max) {
     }
 }
 
+/**
+ * @param {...*} var_args
+ * @return {function(*, Array.<string>}
+ * @throws WrongParameterException
+ * @throws InvalidSchemaException
+ */
 var lewd = function () {
     if (arguments.length === 1) {
         return lewd._wrap(arguments[0]);
@@ -54,8 +65,10 @@ var lewd = function () {
 /**
  * Wraps an arbitrary value in its appropriate condition wrapper.
  *
+ * @private
  * @param {*} spec
- * @return {function}
+ * @return {function(*, Array.<string>)}
+ * @throws InvalidSchemaException
  */
 lewd._wrap = function (spec) {
     if (utils.isJsonType(spec) || spec === undefined) {
@@ -71,7 +84,7 @@ lewd._wrap = function (spec) {
     }
 
     if (Array.isArray(spec)) {
-        return condition.array(spec.map(lewd._wrap));
+        return condition.array(spec);
     }
 
     if (_.isPlainObject(spec)) {
@@ -94,6 +107,13 @@ lewd._wrap = function (spec) {
 };
 
 /* istanbul ignore next */
+/**
+ * Exposes the condition functions into the global namespace. Throws an error if a collision occurs.
+ * 
+ * @experimental 0.1.0
+ * @param {string=} prefix
+ * @throws Error
+ */
 lewd.expose = function (prefix) {
     var p = prefix || '',
         exposedFunctions = [
@@ -121,96 +141,183 @@ lewd.expose = function (prefix) {
     }
 };
 
+/**
+ * @since 0.1.0
+ * @param {Object} options
+ * @return {function(*, Array.<string>)}
+ */
 lewd.range = function (options) {
     assertParameterCount(arguments, 1);
     return condition.range(options);
 };
 
+/**
+ * @since 0.1.0
+ * @param {Object} options
+ * @return {function(*, Array.<string>)}
+ */
 lewd.len = function (options) {
     assertParameterCount(arguments, 1);
     return condition.len(options);
 };
 
-lewd.literal = function (literal) {
+/**
+ * @since 0.1.0
+ * @param {(string|number|boolean|null)} literal
+ * @return {function(*, Array.<string>)}
+ */
+lewd.literal = function(literal) {
     assertParameterCount(arguments, 1);
     return condition.literal(literal);
 };
 
+/**
+ * @since 0.1.0
+ * @return {function(*, Array.<string>)}
+ */
 lewd.isoDateTime = function () {
     assertParameterCount(arguments, 0);
     return condition.isoDateTime();
 };
 
+/**
+ * @since 0.1.0
+ * @return {function(*, Array.<string>)}
+ */
 lewd.integer = function () {
     assertParameterCount(arguments, 0);
     return condition.integer();
 };
 
+/**
+ * @since 0.1.0
+ * @param {RegExp} options
+ * @return {function(*, Array.<string>)}
+ */
 lewd.regex = function (regex) {
     assertParameterCount(arguments, 1);
     return condition.regex(regex);
 };
 
+/**
+ * @since 0.1.0
+ * @param {...*} var_args
+ * @return {function(*, Array.<string>)}
+ */
 lewd.all = function () {
     var args = Array.prototype.slice.call(arguments);
     return condition.all(args);
 };
 
+/**
+ * @since 0.1.0
+ * @return {function(*, Array.<string>)}
+ */
 lewd.Array = function () {
     assertParameterCount(arguments, 0);
     return lewd._wrap(Array);
 };
 
+/**
+ * @since 0.1.0
+ * @param {...*} var_args
+ * @return {function(*, Array.<string>)}
+ */
 lewd.array = function () {
     var args = Array.prototype.slice.call(arguments);
     return condition.array(args);
 };
 
+/**
+ * @since 0.1.0
+ * @param {...*} var_args
+ * @return {function(*, Array.<string>)}
+ */
 lewd.none = function () {
     var args = Array.prototype.slice.call(arguments);
     return condition.none(args);
 };
 
+/**
+ * @since 0.1.0
+ * @return {function(*, Array.<string>)}
+ */
 lewd.Object = function () {
     assertParameterCount(arguments, 0);
     return lewd._wrap(Object);
 };
 
+/**
+ * @since 0.1.0
+ * @return {function(*, Array.<string>)}
+ */
 lewd.String = function () {
     assertParameterCount(arguments, 0);
     return lewd._wrap(String);
 };
 
+/**
+ * @since 0.1.0
+ * @return {function(*, Array.<string>)}
+ */
 lewd.Number = function () {
     assertParameterCount(arguments, 0);
     return lewd._wrap(Number);
 };
 
+/**
+ * @since 0.1.0
+ * @return {function(*, Array.<string>)}
+ */
 lewd.Boolean = function () {
     assertParameterCount(arguments, 0);
     return lewd._wrap(Boolean);
 };
 
+/**
+ * @since 0.1.0
+ * @return {function(*, Array.<string>)}
+ */
 lewd.null = function () {
     assertParameterCount(arguments, 0);
     return lewd._wrap(null);
 };
 
+/**
+ * @since 0.1.0
+ * @return {function(*, Array.<string>)}
+ */
 lewd.undefined = function () {
     assertParameterCount(arguments, 0);
     return lewd._wrap(undefined);
 };
 
+/**
+ * @since 0.1.0
+ * @param {*} value
+ * @return {function(*, Array.<string>)}
+ */
 lewd.not = function (value) {
     assertParameterCount(arguments, 1);
     return condition.not(value);
 };
 
+/**
+ * @since 0.1.0
+ * @param {...*} var_args
+ * @return {function(*, Array.<string>)}
+ */
 lewd.some = function () {
     var args = Array.prototype.slice.call(arguments);
     return condition.some(args);
 };
 
+/**
+ * @since 0.1.0
+ * @param {Object} spec
+ * @param {Object=} options
+ * @return {function(*, Array.<string>)}
+ */
 lewd.object = function (spec, options) {
     assertParameterCount(arguments, 1, 2);
     return condition.object(spec, options);

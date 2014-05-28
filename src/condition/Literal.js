@@ -3,6 +3,12 @@ var _ = require('lodash');
 var ConditionViolationException = require('../exception/ConditionViolationException'),
     InvalidSchemaException = require('../exception/InvalidSchemaException');
 
+/**
+ * @since 0.1.0
+ * @param {string|number|boolean|null} literal
+ * @return {function(*, Array.<string>)}
+ * @throws InvalidSchemaException
+ */
 module.exports = function (literal) {
     var utils = require('../utils'),
         message = require('../messages').Literal;
