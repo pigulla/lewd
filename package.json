@@ -2,7 +2,6 @@
   "name": "lewd",
   "version": "0.1.0",
   "license": "BSD",
-  "private": true,
   "author": "Raphael Pigulla <pigulla@four66.com>",
   "description": "An intuitive and easy to use validator for JSON data.",
   "main": "src/lewd.js",
