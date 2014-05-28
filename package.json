@@ -4,6 +4,9 @@
   "license": "BSD",
   "author": "Raphael Pigulla <pigulla@four66.com>",
   "description": "An intuitive and easy to use validator for JSON data.",
+  "engines": {
+    "node": ">=0.10.0"
+  },
   "main": "src/lewd.js",
   "scripts": {
     "test": "node_modules/buster/bin/buster-test"
