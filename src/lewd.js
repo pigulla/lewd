@@ -46,8 +46,9 @@ function assertParameterCount(args, min, max) {
 }
 
 /**
+ * @version 0.1.0
  * @param {...*} var_args
- * @return {function(*, Array.<string>}
+ * @return {function(*, Array.<string>)}
  * @throws WrongParameterException
  * @throws InvalidSchemaException
  */
