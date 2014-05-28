@@ -1,16 +1,25 @@
 {
   "name": "lewd",
   "version": "0.0.1",
+  "license": "BSD",
   "private": true,
+  "author": "Raphael Pigulla <pigulla@four66.com>",
   "description": "An intuitive and easy to use validator for JSON data.",
   "main": "src/lewd.js",
   "scripts": {
     "test": "grunt buster"
   },
-  "author": "Raphael Pigulla <pigulla@four66.com>",
-  "license": "BSD",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pigulla/lewd"
+  },
+  "bugs": {
+    "url": "https://github.com/pigulla/lewd/issues"
+  },
+  "keywords": [
+    "validation", "json", "data", "sanity", "check"
+  ],
   "dependencies": {
-    "harmony-collections": "0.3.7",
     "lodash": "2.4.1"
   },
   "devDependencies": {
