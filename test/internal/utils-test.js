@@ -45,7 +45,7 @@ buster.testCase('utils', {
         'Array': function () {
             assert.equals(utils.smartFormat([1, 2, 3]), '<array:3>');
         },
-        'function': function () {
+        'functions': function () {
             var fn = function fn() {},
                 anonymous = function () {};
             

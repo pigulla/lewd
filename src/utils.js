@@ -46,10 +46,10 @@ var utils = {
             return util.format('<array:%d>', value.length);
         } else if (typeof value === 'object') {
             return 'object';
-        } else {
-            /* istanbul ignore next */
-            return '<unknown>' + value;
         }
+      
+        /* istanbul ignore next */
+        return '<unknown>' + value;
     },
     
     /**
