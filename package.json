@@ -9,7 +9,7 @@
   },
   "main": "src/lewd.js",
   "scripts": {
-    "test": "node_modules/buster/bin/buster-test"
+    "test": "grunt test"
   },
   "repository": {
     "type": "git",

@@ -309,20 +309,28 @@ buster.testCase('"object" condition', {
     'passes exceptions through': {
         'value': function () {
             buster.referee.assert.exception(function () {
-                condition({ a: function () { x(); } })({ a: 0 });
+                condition({
+                    a: function () { x(); }  // jshint ignore:line
+                })({ a: 0 }); 
             }, 'ReferenceError');
 
             buster.referee.assert.exception(function () {
-                condition({ $v: function () { x(); } }, { allowExtra: true, sanitize: true })({ x: 0 });
+                condition({
+                    $v: function () { x(); }  // jshint ignore:line
+                }, { allowExtra: true, sanitize: true })({ x: 0 });
             }, 'ReferenceError');
         },
         'key': function () {
             buster.referee.assert.exception(function () {
-                condition({ $k: function () { x(); } })({ a: 42 });
+                condition({
+                    $k: function () { x(); }  // jshint ignore:line
+                })({ a: 42 });
             }, 'ReferenceError');
 
             buster.referee.assert.exception(function () {
-                condition({ a: function () { x(); } }, { sanitize: true })({ a: 0 });
+                condition({
+                    a: function () { x(); }  // jshint ignore:line
+                }, { sanitize: true })({ a: 0 });
             }, 'ReferenceError');
         }
     },

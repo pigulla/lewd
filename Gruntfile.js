@@ -22,5 +22,6 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-buster');
     grunt.loadNpmTasks('grunt-contrib-jshint');
     
-    grunt.registerTask('default', ['jshint:all', 'buster:tests']);
+    grunt.registerTask('test', ['jshint:all', 'buster:tests']);
+    grunt.registerTask('default', ['test']);
 };
