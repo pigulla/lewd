@@ -7,11 +7,12 @@ lewd is an intuitive and simple to use data validation library. It is inspired b
 Typically, your validations will look something like this:
 ```javascript
 var addressValidator = lewd({
-    name: lewd.required(String),
+    name: String,
+    sex: lewd.optional('male', 'female'),
     street: String,
     zip: Number,
     city: String
-}, { byDefault: 'optional' });
+});
 
 var data = JSON.parse(rawData);
 
