@@ -157,14 +157,29 @@ lewd.custom = function (fn) {
     });
 };
 
-
+/**
+ * Marks an object property as optional.
+ * 
+ * @since 0.2.0
+ * @param {*} condition
+ * @return {function(*, Array.<string>)}
+ */
 lewd.optional = function (condition) {
+    assertParameterCount(arguments, 1);
     var fn = lewd._wrap(condition);
     fn._property = 'optional';
     return fn;
 };
 
+/**
+ * Marks an object property as required.
+ * 
+ * @since 0.2.0
+ * @param {*} condition
+ * @return {function(*, Array.<string>)}
+ */
 lewd.required = function (condition) {
+    assertParameterCount(arguments, 1);
     var fn = lewd._wrap(condition);
     fn._property = 'required';
     return fn;
