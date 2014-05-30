@@ -5,7 +5,7 @@
 [![devDependency Status](https://david-dm.org/pigulla/lewd/dev-status.svg)](https://david-dm.org/pigulla/lewd#info=devDependencies)
 
 # lewd
-lewd is an intuitive and simple to use data validation library. It is inspired by Python's [voluptuous](https://github.com/alecthomas/voluptuous), blame them for the silly name.
+> lewd is an intuitive and simple to use data validation library inspired by Python's [voluptuous](https://github.com/alecthomas/voluptuous).
 
 ### Getting Started
 Typically, your validations will look something like this:
