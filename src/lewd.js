@@ -7,6 +7,7 @@ var ConditionViolationException = require('./exception/ConditionViolationExcepti
     InvalidSchemaException = require('./exception/InvalidSchemaException'),
     utils = require('./utils'),
     errorMessages = require('./messages'),
+    abstractCondition = require('./condition/Base'),
     condition = {
         all: require('./condition/All'),
         any: require('./condition/Any'),
@@ -155,6 +156,10 @@ lewd.custom = function (fn) {
             throw new ConditionViolationException(value, path, errorMessages.Custom);
         }
     });
+};
+
+lewd.condition = function (object) {
+    return _.assign({}, abstractCondition, object);
 };
 
 /**
