@@ -24,6 +24,12 @@ module.exports = function (grunt) {
                 root: 'test'
             }
         },
+        coveralls: {
+            tests: {
+                src: 'test/coverage/lcov.info',
+                force: false
+            }
+        },
         jshint: {
             src: ['src/**/*.js', 'test/**/*.js'],
             options: {
@@ -35,8 +41,10 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-buster');
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-contrib-jshint');
+    grunt.loadNpmTasks('grunt-coveralls');
     grunt.loadNpmTasks('grunt-istanbul-coverage');
     
-    grunt.registerTask('test', ['jshint', 'clean:coverage', 'buster:tests', 'coverage']);
-    grunt.registerTask('default', ['test']);
+    grunt.registerTask('test', ['jshint', 'clean:coverage', 'buster:tests', 'coverage', 'coveralls:tests']);
+    grunt.registerTask('test-local', ['jshint', 'clean:coverage', 'buster:tests', 'coverage']);
+    grunt.registerTask('default', ['test-local']);
 };

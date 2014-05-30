@@ -5,7 +5,7 @@ module.exports.lewd = {
     tests: ['test/**/*-test.js'],
     'buster-istanbul': {
         outputDirectory: 'test/coverage',
-        format: 'json'
+        format: ['lcov', 'json']
     },
     extensions: [
         require('buster-istanbul')
