@@ -87,11 +87,13 @@ var utils = {
      */
     customMessageWrapper: function (fn) {
         var message,
-            wrap;
+            wrapped;
         
-        wrap = function () {
+        wrapped = function () {
+            var result;
+            
             try {
-                fn.apply(null, arguments);
+                result = fn.apply(null, arguments);
             } catch (e) {
                 if (message && e instanceof ConditionViolationException) {
                     var variables = _.assign(e.getTemplateVariables(), {
@@ -103,16 +105,18 @@ var utils = {
 
                 throw e;
             }
+            
+            return result;
         };
         
-        wrap.because = function (customMessage) {
+        wrapped.because = function (customMessage) {
             message = customMessage;
-            return wrap;
+            return wrapped;
         };
         
-        wrap._wrapped = fn.name || fn._wrapped;
+        wrapped._wrapped = fn.name || fn._wrapped;
         
-        return wrap; 
+        return wrapped; 
     }
 };
 

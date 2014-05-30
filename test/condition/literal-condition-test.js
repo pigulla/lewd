@@ -29,7 +29,7 @@ buster.testCase('"literal" condition', {
     'error message': function () {
         assertViolationWithMessage(function () {
             condition('x')({});
-        }, _.template(errorMessages.Literal, { valueStr: utils.smartFormat({}) }));
+        }, _.template(errorMessages.Literal, { literal: 'x', literalStr: utils.smartFormat('x') }));
     },
     'invalid schema options': function () {
         refuteSchemaOptions(condition, [[]]);

@@ -9,36 +9,48 @@ function arrayTypeCondition(value, path) {
     if (!Array.isArray(value)) {
         throw new ConditionViolationException(value, path, message, { type: 'array' });
     }
+
+    return value;
 }
 
 function numberTypeCondition(value, path) {
     if (typeof value !== 'number') {
         throw new ConditionViolationException(value, path, message, { type: 'number' });
     }
+
+    return value;
 }
 
 function stringTypeCondition(value, path) {
     if (typeof value !== 'string') {
         throw new ConditionViolationException(value, path, message, { type: 'string' });
     }
+
+    return value;
 }
 
 function booleanTypeCondition(value, path) {
     if (typeof value !== 'boolean') {
         throw new ConditionViolationException(value, path, message, { type: 'boolean' });
     }
+
+    return value;
 }
 
 function objectTypeCondition(value, path) {
     if (!_.isPlainObject(value)) {
         throw new ConditionViolationException(value, path, message, { type: 'object' });
     }
+
+    return value;
 }
 
 function nullTypeCondition(value, path) {
     if (value !== null) {
         throw new ConditionViolationException(value, path, message, { type: 'null' });
     }
+
+    return value;
 }
 
 /**

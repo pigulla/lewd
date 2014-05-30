@@ -14,7 +14,7 @@ module.exports = function (conditions) {
     
     return utils.customMessageWrapper(function noneCondition(value, path) {
         if (conditions.length === 0) {
-            return;
+            return value;
         }
 
         if (!conditions.every(function (condition) {
@@ -27,5 +27,7 @@ module.exports = function (conditions) {
         })) {
             throw new ConditionViolationException(value, path, message);
         }
+
+        return value;
     });
 };

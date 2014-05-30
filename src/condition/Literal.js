@@ -19,7 +19,12 @@ module.exports = function (literal) {
     
     return utils.customMessageWrapper(function literalCondition(value, path) {
         if (value !== literal) {
-            throw new ConditionViolationException(value, path, message);
+            throw new ConditionViolationException(value, path, message, {
+                literal: literal,
+                literalStr: utils.smartFormat(literal)
+            });
         }
+
+        return value;
     });
 };

@@ -13,5 +13,7 @@ module.exports = function (conditions) {
         conditions.forEach(function (condition) {
             condition(value, path);
         });
+        
+        return value;
     });
 };

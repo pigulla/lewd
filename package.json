@@ -38,6 +38,7 @@
     "grunt-contrib-clean": "^0.5.0",
     "grunt-contrib-jshint": "^0.10.0",
     "grunt-coveralls": "^0.3.0",
+    "grunt-githooks": "^0.3.1",
     "grunt-istanbul-coverage": "^0.0.5"
   }
 }

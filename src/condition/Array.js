@@ -33,5 +33,7 @@ module.exports = function (spec) {
                 condition(value, path.concat('#' + index));
             });
         }
+
+        return values;
     });
 };

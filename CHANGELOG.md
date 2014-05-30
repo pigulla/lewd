@@ -8,7 +8,11 @@
 ###### New features:
 
  - Custom conditions can now be inlined more easily
- - New option for validating objects: set `sanitize` to silently remove invalid and unexpected keys.
+ - New option for validating objects: set `removeExtra` to silently remove invalid and unexpected keys.
+
+###### Changes:
+
+ - In preparation to coercion support conditions now return the validated value (so `lewd(Number)(42) === 42`).
 
 ###### Improvements:
 

@@ -19,5 +19,7 @@ module.exports = function (regex) {
         if (!regex.test(value)) {
             throw new ConditionViolationException(value, path, message);
         }
+
+        return value;
     });
 };

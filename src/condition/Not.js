@@ -16,7 +16,7 @@ module.exports = function (condition) {
         try {
             condition(value, path);
         } catch (e) {
-            return;
+            return value;
         }
     
         throw new ConditionViolationException(value, path, message);

@@ -16,7 +16,7 @@ function validateOptions(options, allowExtraDefault) {
             byDefault: REQUIRED,
             keys: undefined,
             values: undefined,
-            sanitize: false
+            removeExtra: false
         },
         opts = _.defaults({}, options, defaults);
     
@@ -26,8 +26,8 @@ function validateOptions(options, allowExtraDefault) {
     if (typeof opts.allowExtra !== 'boolean') {
         throw new InvalidSchemaException('option "allowExtra" must be a boolean');
     }
-    if (typeof opts.sanitize !== 'boolean') {
-        throw new InvalidSchemaException('option "sanitize" must be a boolean');
+    if (typeof opts.removeExtra !== 'boolean') {
+        throw new InvalidSchemaException('option "removeExtra" must be a boolean');
     }
     
     var unknownOptions = _.difference(Object.keys(options), Object.keys(defaults));
@@ -40,11 +40,11 @@ function validateOptions(options, allowExtraDefault) {
 
 /**
  * @since 0.1.0
- * @param {*} object
- * @param {Objects=} option 
+ * @param {Object} spec
+ * @param {Object=} options 
  * @return {function(*, Array.<string>)}
  */
-module.exports = function (object, options) {
+module.exports = function (spec, options) {
     // TODO: this could definitely use some refactoring
     
     var lewd = require('../lewd'),
@@ -56,13 +56,13 @@ module.exports = function (object, options) {
     var keysCondition,
         valuesCondition,
         allowExtraDefault = false,
-        definedKeys = Object.keys(object);
+        definedKeys = Object.keys(spec);
 
     if (opts.hasOwnProperty('keys')) {
         keysCondition = lewd._wrap(opts.keys);
         allowExtraDefault = true;
-    } else if (object.hasOwnProperty(KEYS_PROPERTY)) {
-        keysCondition = lewd._wrap(object[KEYS_PROPERTY]);
+    } else if (spec.hasOwnProperty(KEYS_PROPERTY)) {
+        keysCondition = lewd._wrap(spec[KEYS_PROPERTY]);
         definedKeys = _.without(definedKeys, KEYS_PROPERTY);
         allowExtraDefault = true;
     } else {
@@ -72,8 +72,8 @@ module.exports = function (object, options) {
     if (opts.hasOwnProperty('values')) {
         valuesCondition = lewd._wrap(opts.values);
         allowExtraDefault = true;
-    } else if (object.hasOwnProperty(VALUES_PROPERTY)) {
-        valuesCondition = lewd._wrap(object[VALUES_PROPERTY]);
+    } else if (spec.hasOwnProperty(VALUES_PROPERTY)) {
+        valuesCondition = lewd._wrap(spec[VALUES_PROPERTY]);
         definedKeys = _.without(definedKeys, VALUES_PROPERTY);
         allowExtraDefault = true;
     } else {
@@ -86,13 +86,13 @@ module.exports = function (object, options) {
         requiredKeys = [];
 
     definedKeys.forEach(function (key) {
-        object[key] = lewd._wrap(object[key]);
-        object[key]._property = object[key]._property || opts.byDefault;
+        spec[key] = lewd._wrap(spec[key]);
+        spec[key]._property = spec[key]._property || opts.byDefault;
         
-        if (object[key]._property === REQUIRED) {
+        if (spec[key]._property === REQUIRED) {
             requiredKeys.push(key);
         }
-        if (object[key]._property === OPTIONAL) {
+        if (spec[key]._property === OPTIONAL) {
             optionalKeys.push(key);
         }
     });
@@ -111,7 +111,7 @@ module.exports = function (object, options) {
             keysToValidate = _.intersection(definedKeys, actualKeys);
         
         if (extraKeys.length > 0 && !opts.allowExtra) {
-            if (opts.sanitize) {
+            if (opts.removeExtra) {
                 extraKeys.forEach(function (key) {
                     delete value[key];
                 });
@@ -124,7 +124,7 @@ module.exports = function (object, options) {
         }
         
         extraKeys.forEach(function (key) {
-            if (opts.sanitize) {
+            if (opts.removeExtra) {
                 try {
                     keysCondition(key, path.concat(KEYS_PROPERTY + key));
                 } catch (e) {
@@ -143,7 +143,9 @@ module.exports = function (object, options) {
         });
         
         keysToValidate.forEach(function (key) {
-            object[key](value[key], path.concat(key));
+            spec[key](value[key], path.concat(key));
         });
+        
+        return value;
     });
 };

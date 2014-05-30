@@ -146,6 +146,11 @@ buster.testCase('"object" condition', {
                 { 1: 42, a: null, b: true },
                 { a: 42 }
             ]);
+        },
+        '{ $k: function } (extras allowed)': function () {
+            buster.referee.assert.exception(function () {
+                condition({ $k: function () { x(); } }, { removeExtra: true })({ n: 0 });  // jshint ignore:line                
+            }, 'ReferenceError');
         }
     },
     'keys with no extras allowed': {
@@ -286,22 +291,22 @@ buster.testCase('"object" condition', {
             ]);
         }
     },
-    'sanitization': {
-        '{ a: Number, b: Number } (with sanitization}': function () {
+    'removeExtra': {
+        '{ a: Number, b: Number } (with removeExtra}': function () {
             var o = { a: 1, b: 2, c: 3 };
-            condition({ a: Number, b: Number }, { sanitize: true })(o);
+            condition({ a: Number, b: Number }, { removeExtra: true })(o);
             
             buster.referee.assert.equals({ a: 1, b: 2 }, o);
         },
-        '{ $k: /^[a-z]+$/i } (with sanitization}': function () {
+        '{ $k: /^[a-z]+$/i } (with removeExtra}': function () {
             var o = { a: 1, B: 2, $foo: false, 1: 0 };
-            condition({ $k: /^[a-z]+$/i }, { sanitize: true })(o);
+            condition({ $k: /^[a-z]+$/i }, { removeExtra: true })(o);
             
             buster.referee.assert.equals({ a: 1, B: 2 }, o);
         },
-        '{ $k: /^a/, $v: Number } (with sanitization}': function () {
+        '{ $k: /^a/, $v: Number } (with removeExtra}': function () {
             var o = { a: 1, aa: 4, b: 2, $foo: false };
-            condition({ $k: /^a/, $v: Number }, { sanitize: true })(o);
+            condition({ $k: /^a/, $v: Number }, { removeExtra: true })(o);
             
             buster.referee.assert.equals({ a: 1, aa: 4 }, o);
         }
@@ -317,7 +322,7 @@ buster.testCase('"object" condition', {
             buster.referee.assert.exception(function () {
                 condition({
                     $v: function () { x(); }  // jshint ignore:line
-                }, { allowExtra: true, sanitize: true })({ x: 0 });
+                }, { allowExtra: true, removeExtra: true })({ x: 0 });
             }, 'ReferenceError');
         },
         'key': function () {
@@ -330,7 +335,7 @@ buster.testCase('"object" condition', {
             buster.referee.assert.exception(function () {
                 condition({
                     a: function () { x(); }  // jshint ignore:line
-                }, { sanitize: true })({ a: 0 });
+                }, { removeExtra: true })({ a: 0 });
             }, 'ReferenceError');
         }
     },
@@ -360,7 +365,7 @@ buster.testCase('"object" condition', {
     },
     'invalid schema options': function () {
         refuteSchemaOptions(condition, [{}, { allowExtra: 42 }]);
-        refuteSchemaOptions(condition, [{}, { sanitize: 42 }]);
+        refuteSchemaOptions(condition, [{}, { removeExtra: 42 }]);
         refuteSchemaOptions(condition, [{}, { unknownKey: ['w00t'] }]);
         refuteSchemaOptions(condition, [{}, { optional: 'w00t' }]);
         refuteSchemaOptions(condition, [{}, { byDefault: 'whatever' }]);

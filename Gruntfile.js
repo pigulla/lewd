@@ -30,6 +30,11 @@ module.exports = function (grunt) {
                 force: true
             }
         },
+        githooks: {
+            dev: {
+                'pre-push': 'test-local'
+            }
+        },
         jshint: {
             src: ['src/**/*.js', 'test/**/*.js'],
             options: {
@@ -42,6 +47,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-coveralls');
+    grunt.loadNpmTasks('grunt-githooks');
     grunt.loadNpmTasks('grunt-istanbul-coverage');
     
     grunt.registerTask('test', ['jshint', 'clean:coverage', 'buster:tests', 'coverage', 'coveralls:tests']);

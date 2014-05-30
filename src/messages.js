@@ -10,7 +10,7 @@ module.exports = {
         'minInclusive': 'must not be shorter than or equal to ${min}',
         'type': 'must be a string or array'
     },
-    'Literal': 'must be equal to ${valueStr}',
+    'Literal': 'must be equal to ${literalStr}',
     'None': 'must not satisfy any of the given conditions',
     'Not': 'must not satisfy the condition',
     'Object': {

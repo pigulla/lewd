@@ -62,5 +62,7 @@ module.exports = function (options) {
             key = 'min' + (opts.minInclusive ? 'Inclusive' : '');
             throw new ConditionViolationException(value, path, messages[key], opts);
         }
+
+        return value;
     });
 };

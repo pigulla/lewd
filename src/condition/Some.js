@@ -21,7 +21,7 @@ module.exports = function (spec) {
         var conditions = spec.map(lewd._wrap);
 
         if (conditions.length === 0) {
-            return;
+            return value;
         }
         
         var satisfied = false,
@@ -48,5 +48,7 @@ module.exports = function (spec) {
                 message
             );
         }
+
+        return value;
     });
 };

@@ -24,8 +24,8 @@ buster.testCase('wiki examples', {
             condition(data);
         }, ['#4']);
     },
-    'sanitization': function () {
-        var condition = lewd.object({ a: Number, b: String }, { sanitize: true }),
+    'removeExtra': function () {
+        var condition = lewd.object({ a: Number, b: String }, { removeExtra: true }),
             data = { a: 1, b: '2', c: 3 };
         
         buster.referee.refute.exception(function () {
