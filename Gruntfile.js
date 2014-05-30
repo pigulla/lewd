@@ -27,7 +27,7 @@ module.exports = function (grunt) {
         coveralls: {
             tests: {
                 src: 'test/coverage/lcov.info',
-                force: false
+                force: true
             }
         },
         jshint: {
