@@ -29,8 +29,6 @@ util.inherits(ConditionViolationException, Error);
 
 ConditionViolationException.prototype.getTemplateVariables = function () {
     return _.assign({}, this.data, {
-        originalMessage: this.message
-    }, {
         path: this.path,
         pathStr: this.pathStr,
         value: this.value,

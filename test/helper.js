@@ -43,7 +43,7 @@ module.exports = {
             return;
         }
 
-        buster.referee.assert(false, 'An exception should should have been thrown');
+        buster.referee.assert(false, 'An exception should have been thrown');
     },
     assertViolationAt: function (fn, path) {
         try {

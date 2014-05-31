@@ -28,6 +28,17 @@ buster.testCase('"isoDateTime" condition', {
             '2014-02-01T00:15:26.000Z',
         ]);
     },
+    'with custom message': function () {
+        try {
+            condition().because('i say so')('42');
+        } catch (e) {
+            buster.referee.assert.equals(e.name, 'ConditionViolationException');
+            buster.referee.assert.equals(e.message, 'i say so');
+            return;
+        }
+
+        buster.referee.assert(false, 'An exception should have been thrown');
+    },
     'error message': function () {
         assertViolationWithMessage(function () {
             condition()('foo');

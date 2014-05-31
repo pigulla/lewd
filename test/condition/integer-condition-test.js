@@ -31,7 +31,7 @@ buster.testCase('"integer" condition', {
             return;
         }
 
-        buster.referee.assert(false, 'An exception should should have been thrown');
+        buster.referee.assert(false, 'An exception should have been thrown');
     },
     'error message': function () {
         assertViolationWithMessage(function () {

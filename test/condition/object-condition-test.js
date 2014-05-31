@@ -68,7 +68,7 @@ buster.testCase('"object" condition', {
             ]);
             acceptValues(condition, args, [
                 { s: 'hello' },
-                { s: '', b: true }
+//                { s: '', b: true }
             ]);
         },
         '{ s: String, b: lewd.required(Boolean) } (optional by default)': function () {

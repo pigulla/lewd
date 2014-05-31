@@ -20,9 +20,10 @@ buster.testCase('"regex" condition', {
         acceptValues(condition, args, ['a', 'a42', 'aaa']);
     },
     'error message': function () {
+        var regex = /x/;
         assertViolationWithMessage(function () {
-            condition(/x/)(42);
-        }, _.template(errorMessages.Regex, {}));
+            condition(regex)(42);
+        }, _.template(errorMessages.Regex, { regex: regex }));
     },
     'invalid schema options': function () {
         refuteSchemaOptions(condition, [42]);

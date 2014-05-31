@@ -7,22 +7,32 @@ var ConditionViolationException = require('./exception/ConditionViolationExcepti
     InvalidSchemaException = require('./exception/InvalidSchemaException'),
     utils = require('./utils'),
     errorMessages = require('./messages'),
-    abstractCondition = require('./condition/Base'),
-    condition = {
-        all: require('./condition/All'),
-        any: require('./condition/Any'),
-        array: require('./condition/Array'),
-        integer: require('./condition/composite/Integer'),
-        isoDateTime: require('./condition/composite/IsoDateTime'),
-        len: require('./condition/Len'),
-        literal: require('./condition/Literal'),
-        none: require('./condition/None'),
-        not: require('./condition/Not'),
-        object: require('./condition/Object'),
-        range: require('./condition/Range'),
-        regex: require('./condition/Regex'),
-        some: require('./condition/Some'),
-        type: require('./condition/Type')
+    BaseCondition = require('./condition/Base'),
+    conditions = {
+        Custom: require('./condition/Custom'),
+        
+        Integer: require('./condition/composite/Integer'),
+        IsoDateTime: require('./condition/composite/IsoDateTime'),
+
+        Array: require('./condition/content/Array'),
+        Len: require('./condition/content/Len'),
+        Literal: require('./condition/content/Literal'),
+        Object: require('./condition/content/Object'),
+        Range: require('./condition/content/Range'),
+        Regex: require('./condition/content/Regex'),
+
+        All: require('./condition/logic/All'),
+        Any: require('./condition/logic/Any'),
+        None: require('./condition/logic/None'),
+        Not: require('./condition/logic/Not'),
+        Some: require('./condition/logic/Some'),
+
+        ArrayType: require('./condition/type/Array'),
+        BooleanType: require('./condition/type/Boolean'),
+        NullType: require('./condition/type/Null'),
+        NumberType: require('./condition/type/Number'),
+        ObjectType: require('./condition/type/Object'),
+        StringType: require('./condition/type/String')
     };
 
 /**
@@ -61,7 +71,7 @@ var lewd = function () {
         throw new WrongParameterException('at least one parameter must be given');
     } else {
         var args = Array.prototype.slice.call(arguments);
-        return condition.some(args);
+        return (new conditions.Some(args.map(lewd._wrap))).consumer();
     }
 };
 
@@ -74,35 +84,37 @@ var lewd = function () {
  * @throws InvalidSchemaException
  */
 lewd._wrap = function (spec) {
-    if (utils.isJsonType(spec) || spec === undefined) {
-        return condition.type(spec);
-    }
-
-    if (utils.isLiteral(spec)) {
-        return condition.literal(spec);
-    }
+    /*jshint maxcomplexity:false */
+    var condition;
     
-    if (spec instanceof RegExp) {
-        return condition.regex(spec);
+    if (spec === Array) {
+        return (new conditions.ArrayType()).consumer();
+    } else if (spec === Boolean) {
+        return (new conditions.BooleanType()).consumer();
+    } else if (spec === null) {
+        return (new conditions.NullType()).consumer();
+    } else if (spec === Number) {
+        return (new conditions.NumberType()).consumer();
+    } else if (spec === Object) {
+        return (new conditions.ObjectType()).consumer();
+    } else if (spec === String) {
+        return (new conditions.StringType()).consumer();
+    } else if (spec === undefined) {
+        return (new conditions.Any()).consumer();
+    } else if (utils.isLiteral(spec)) {
+        return (new conditions.Literal(spec)).consumer();
+    } else if (spec instanceof RegExp) {
+        return (new conditions.Regex(spec)).consumer();
+    } else if (Array.isArray(spec)) {
+        return (new conditions.Array(spec.map(lewd._wrap))).consumer();
+    } else if (_.isPlainObject(spec)) {
+        return (new conditions.Object(spec)).consumer();
+    } else if (spec instanceof BaseCondition) {
+        return spec.consumer();
+    } else if (typeof spec === 'function') {
+        return spec.name === 'consumerWrapper' ? spec : lewd.custom(spec);
     }
-
-    if (Array.isArray(spec)) {
-        return condition.array(spec);
-    }
-
-    if (_.isPlainObject(spec)) {
-        return condition.object(spec);
-    }
-
-    if (typeof spec === 'function') {
-        if (spec.hasOwnProperty('_wrapped')) {
-            return spec;
-        } else {
-            return lewd.custom(spec);
-        }
-    }
-
-    /* istanbul ignore next */
+     
     throw new InvalidSchemaException('Invalid specification');
 };
 
@@ -147,19 +159,7 @@ lewd.expose = function (prefix) {
  * @return {function(*, Array.<string>)}
  */
 lewd.custom = function (fn) {
-    return utils.customMessageWrapper(function customCondition(value, path) {
-        var result = fn.call(null, value, path || []);
-
-        if (typeof result === 'string') {
-            throw new ConditionViolationException(value, path, result);
-        } else if (result === false) {
-            throw new ConditionViolationException(value, path, errorMessages.Custom);
-        }
-    });
-};
-
-lewd.condition = function (object) {
-    return _.assign({}, abstractCondition, object);
+    return (new conditions.Custom(fn)).consumer();
 };
 
 /**
@@ -171,9 +171,7 @@ lewd.condition = function (object) {
  */
 lewd.optional = function (condition) {
     assertParameterCount(arguments, 1);
-    var fn = lewd._wrap(condition);
-    fn._property = 'optional';
-    return fn;
+    return lewd._wrap(condition).optional();
 };
 
 /**
@@ -185,9 +183,7 @@ lewd.optional = function (condition) {
  */
 lewd.required = function (condition) {
     assertParameterCount(arguments, 1);
-    var fn = lewd._wrap(condition);
-    fn._property = 'required';
-    return fn;
+    return lewd._wrap(condition).required();
 };
 
 /**
@@ -197,7 +193,7 @@ lewd.required = function (condition) {
  */
 lewd.range = function (options) {
     assertParameterCount(arguments, 1);
-    return condition.range(options);
+    return (new conditions.Range(options)).consumer();
 };
 
 /**
@@ -207,7 +203,7 @@ lewd.range = function (options) {
  */
 lewd.len = function (options) {
     assertParameterCount(arguments, 1);
-    return condition.len(options);
+    return (new conditions.Len(options)).consumer();
 };
 
 /**
@@ -217,7 +213,7 @@ lewd.len = function (options) {
  */
 lewd.literal = function(literal) {
     assertParameterCount(arguments, 1);
-    return condition.literal(literal);
+    return (new conditions.Literal(literal)).consumer();
 };
 
 /**
@@ -226,7 +222,7 @@ lewd.literal = function(literal) {
  */
 lewd.isoDateTime = function () {
     assertParameterCount(arguments, 0);
-    return condition.isoDateTime();
+    return (new conditions.IsoDateTime()).consumer();
 };
 
 /**
@@ -235,7 +231,7 @@ lewd.isoDateTime = function () {
  */
 lewd.integer = function () {
     assertParameterCount(arguments, 0);
-    return condition.integer();
+    return (new conditions.Integer()).consumer();
 };
 
 /**
@@ -245,7 +241,7 @@ lewd.integer = function () {
  */
 lewd.regex = function (regex) {
     assertParameterCount(arguments, 1);
-    return condition.regex(regex);
+    return (new conditions.Regex(regex)).consumer();
 };
 
 /**
@@ -255,7 +251,7 @@ lewd.regex = function (regex) {
  */
 lewd.all = function () {
     var args = Array.prototype.slice.call(arguments);
-    return condition.all(args);
+    return (new conditions.All(args.map(lewd._wrap))).consumer();
 };
 
 /**
@@ -264,7 +260,7 @@ lewd.all = function () {
  */
 lewd.Array = function () {
     assertParameterCount(arguments, 0);
-    return lewd._wrap(Array);
+    return (new conditions.ArrayType()).consumer();
 };
 
 /**
@@ -274,7 +270,7 @@ lewd.Array = function () {
  */
 lewd.array = function () {
     var args = Array.prototype.slice.call(arguments);
-    return condition.array(args);
+    return (new conditions.Array(args.map(lewd._wrap))).consumer();
 };
 
 /**
@@ -284,7 +280,7 @@ lewd.array = function () {
  */
 lewd.none = function () {
     var args = Array.prototype.slice.call(arguments);
-    return condition.none(args);
+    return (new conditions.None(args.map(lewd._wrap))).consumer();
 };
 
 /**
@@ -293,7 +289,7 @@ lewd.none = function () {
  */
 lewd.Object = function () {
     assertParameterCount(arguments, 0);
-    return lewd._wrap(Object);
+    return (new conditions.ObjectType()).consumer();
 };
 
 /**
@@ -302,7 +298,7 @@ lewd.Object = function () {
  */
 lewd.String = function () {
     assertParameterCount(arguments, 0);
-    return lewd._wrap(String);
+    return (new conditions.StringType()).consumer();
 };
 
 /**
@@ -311,7 +307,7 @@ lewd.String = function () {
  */
 lewd.Number = function () {
     assertParameterCount(arguments, 0);
-    return lewd._wrap(Number);
+    return (new conditions.NumberType()).consumer();
 };
 
 /**
@@ -320,7 +316,7 @@ lewd.Number = function () {
  */
 lewd.Boolean = function () {
     assertParameterCount(arguments, 0);
-    return lewd._wrap(Boolean);
+    return (new conditions.BooleanType()).consumer();
 };
 
 /**
@@ -329,7 +325,7 @@ lewd.Boolean = function () {
  */
 lewd.null = function () {
     assertParameterCount(arguments, 0);
-    return lewd._wrap(null);
+    return (new conditions.NullType()).consumer();
 };
 
 /**
@@ -338,7 +334,7 @@ lewd.null = function () {
  */
 lewd.undefined = function () {
     assertParameterCount(arguments, 0);
-    return lewd._wrap(undefined);
+    return (new conditions.Any()).consumer();
 };
 
 /**
@@ -348,7 +344,7 @@ lewd.undefined = function () {
  */
 lewd.not = function (value) {
     assertParameterCount(arguments, 1);
-    return condition.not(value);
+    return (new conditions.Not(lewd._wrap(value))).consumer();
 };
 
 /**
@@ -358,7 +354,7 @@ lewd.not = function (value) {
  */
 lewd.some = function () {
     var args = Array.prototype.slice.call(arguments);
-    return condition.some(args);
+    return (new conditions.Some(args.map(lewd._wrap))).consumer();
 };
 
 /**
@@ -369,7 +365,7 @@ lewd.some = function () {
  */
 lewd.object = function (spec, options) {
     assertParameterCount(arguments, 1, 2);
-    return condition.object(spec, options);
+    return (new conditions.Object(spec, options)).consumer();
 };
 
 lewd.ConditionViolationException = ConditionViolationException;

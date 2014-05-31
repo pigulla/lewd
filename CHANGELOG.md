@@ -1,3 +1,13 @@
+## 0.3.0 (2014-06-??)
+
+###### Breaking changes:
+
+ - The Number validator no longer accepts `NaN` or `Infinity` (as those never were valid JSON data types anyway).
+
+###### Improvements:
+
+ - Major refactoring of the way conditions are implemented. The public API didn't change but the inner workings are now much cleaner and more easily extensible.
+
 ## 0.2.0 (2014-05-30)
 
 ###### Breaking changes:

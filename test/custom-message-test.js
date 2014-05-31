@@ -11,7 +11,7 @@ function assertFailedWithMessage(condition, value, message) {
         return;
     }
 
-    buster.referee.assert(false, 'An exception should should have been thrown');
+    buster.referee.assert(false, 'An exception should have been thrown');
 }
 
 buster.testCase('custom messages', {
@@ -20,8 +20,8 @@ buster.testCase('custom messages', {
         assertFailedWithMessage(condition, 42, 'it must be so');
     },
     'nested': function () {
-        var condition = lewd.all(String, lewd.all(/^\d/, lewd.regex(/\d$/).because('must end with a digit')));
-        assertFailedWithMessage(condition, '4x', 'must end with a digit');
+        var condition = lewd.all(String, lewd.all(/^\d/, lewd.regex(/\d$/).because('must start and end with a digit')));
+        assertFailedWithMessage(condition, '4x', 'must start and end with a digit');
     },
     'with params': function () {
         var condition;
@@ -31,6 +31,20 @@ buster.testCase('custom messages', {
 
         condition = lewd.array(String).because('at: ${pathStr}');
         assertFailedWithMessage(condition, ['x', 42], 'at: #1');
+
+        condition = lewd.object({
+            a: { b: lewd.all(/^\d/, lewd.regex(/\d$/)).because('${pathStr} must start and end with a digit') }
+        });
+        assertFailedWithMessage(condition, { a: { b: '' } }, 'a.b must start and end with a digit');
+    },
+    'for object keys and values': function () {
+        var condition;
+        
+        condition = lewd.object({ $k: lewd.regex(/^a/).because('i say so') });
+        assertFailedWithMessage(condition, { x: null }, 'i say so');
+        
+        condition = lewd.object({ $v: lewd.regex(/^a/).because('i say so') });
+        assertFailedWithMessage(condition, { x: 'b' }, 'i say so');
     },
     'for some condition': function () {
         var condition;

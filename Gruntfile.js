@@ -7,6 +7,11 @@ module.exports = function (grunt) {
                 test: {
                     config: 'test/buster.js'
                 }
+            },
+            'tests-with-coverage': {
+                test: {
+                    config: 'test/buster-coverage.js'
+                }
             }
         },
         clean: {
@@ -50,7 +55,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-githooks');
     grunt.loadNpmTasks('grunt-istanbul-coverage');
     
-    grunt.registerTask('test', ['jshint', 'clean:coverage', 'buster:tests', 'coverage', 'coveralls:tests']);
-    grunt.registerTask('test-local', ['jshint', 'clean:coverage', 'buster:tests', 'coverage']);
+    grunt.registerTask('test', ['jshint', 'clean:coverage', 'buster:tests-with-coverage', 'coverage', 'coveralls:tests']);
+    grunt.registerTask('test-local', ['jshint', 'clean:coverage', 'buster:tests-with-coverage', 'coverage']);
     grunt.registerTask('default', ['test-local']);
 };
