@@ -76,47 +76,6 @@ var utils = {
     isLiteral: function (value) {
         return typeof value === 'string' || typeof value === 'boolean' || value === null ||
             (typeof value === 'number' && isFinite(value));
-    },
-
-    /**
-     * Wraps a function so that its error message can be overridden.
-     *
-     * @since 0.1.0
-     * @param {function(*, Array.<string>)} fn
-     * @return {function(*, Array.<string>)}
-     */
-    customMessageWrapper: function (fn) {
-        var message,
-            wrapped;
-        
-        wrapped = function () {
-            var result;
-            
-            try {
-                result = fn.apply(null, arguments);
-            } catch (e) {
-                if (message && e instanceof ConditionViolationException) {
-                    var variables = _.assign(e.getTemplateVariables(), {
-                        originalMessage: e.message
-                    });
-                    
-                    e.message = _.template(message, variables);
-                }
-
-                throw e;
-            }
-            
-            return result;
-        };
-        
-        wrapped.because = function (customMessage) {
-            message = customMessage;
-            return wrapped;
-        };
-        
-        wrapped._wrapped = fn.name || fn._wrapped;
-        
-        return wrapped; 
     }
 };
 

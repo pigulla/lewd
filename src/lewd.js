@@ -7,22 +7,32 @@ var ConditionViolationException = require('./exception/ConditionViolationExcepti
     InvalidSchemaException = require('./exception/InvalidSchemaException'),
     utils = require('./utils'),
     errorMessages = require('./messages'),
-    abstractCondition = require('./condition/Base'),
+    BaseCondition = require('./condition/Base'),
     condition = {
-        all: require('./condition/All'),
-        any: require('./condition/Any'),
-        array: require('./condition/Array'),
-        integer: require('./condition/composite/Integer'),
-        isoDateTime: require('./condition/composite/IsoDateTime'),
-        len: require('./condition/Len'),
-        literal: require('./condition/Literal'),
-        none: require('./condition/None'),
-        not: require('./condition/Not'),
-        object: require('./condition/Object'),
-        range: require('./condition/Range'),
-        regex: require('./condition/Regex'),
-        some: require('./condition/Some'),
-        type: require('./condition/Type')
+        Custom: require('./condition/Custom'),
+        
+        Integer: require('./condition/composite/Integer'),
+        IsoDateTime: require('./condition/composite/IsoDateTime'),
+
+        Array: require('./condition/content/Array'),
+        Len: require('./condition/content/Len'),
+        Literal: require('./condition/content/Literal'),
+        Object: require('./condition/content/Object'),
+        Range: require('./condition/content/Range'),
+        Regex: require('./condition/content/Regex'),
+
+        All: require('./condition/logic/All'),
+        Any: require('./condition/logic/Any'),
+        None: require('./condition/logic/None'),
+        Not: require('./condition/logic/Not'),
+        Some: require('./condition/logic/Some'),
+
+        ArrayType: require('./condition/type/Array'),
+        BooleanType: require('./condition/type/Boolean'),
+        NullType: require('./condition/type/Null'),
+        NumberType: require('./condition/type/Number'),
+        ObjectType: require('./condition/type/Object'),
+        StringType: require('./condition/type/String')
     };
 
 /**
@@ -61,7 +71,7 @@ var lewd = function () {
         throw new WrongParameterException('at least one parameter must be given');
     } else {
         var args = Array.prototype.slice.call(arguments);
-        return condition.some(args);
+        return new condition.Some(args);
     }
 };
 
@@ -74,32 +84,32 @@ var lewd = function () {
  * @throws InvalidSchemaException
  */
 lewd._wrap = function (spec) {
-    if (utils.isJsonType(spec) || spec === undefined) {
-        return condition.type(spec);
-    }
-
-    if (utils.isLiteral(spec)) {
-        return condition.literal(spec);
-    }
-    
-    if (spec instanceof RegExp) {
-        return condition.regex(spec);
-    }
-
-    if (Array.isArray(spec)) {
-        return condition.array(spec);
-    }
-
-    if (_.isPlainObject(spec)) {
-        return condition.object(spec);
-    }
-
-    if (typeof spec === 'function') {
-        if (spec.hasOwnProperty('_wrapped')) {
-            return spec;
-        } else {
-            return lewd.custom(spec);
-        }
+    if (spec === Array) {
+        return new condition.ArrayType();
+    } else if (spec === Boolean) {
+        return new condition.BooleanType();
+    } else if (spec === null) {
+        return new condition.NullType();
+    } else if (spec === Number) {
+        return new condition.NumberType();
+    } else if (spec === Object) {
+        return new condition.ObjectType();
+    } else if (spec === String) {
+        return new condition.StringType();
+    } else if (spec === undefined) {
+        return new condition.Any();
+    } else if (utils.isLiteral(spec)) {
+        return new condition.Literal(spec);
+    } else if (spec instanceof RegExp) {
+        return condition.Regex(spec);
+    } else if (Array.isArray(spec)) {
+        return condition.Array(spec);
+    } else if (_.isPlainObject(spec)) {
+        return condition.Object(spec);
+    } else if (typeof spec === 'function') {
+        return lewd.custom(spec);
+    } else if (spec instanceof BaseCondition) {
+        return spec;
     }
 
     /* istanbul ignore next */
@@ -147,19 +157,7 @@ lewd.expose = function (prefix) {
  * @return {function(*, Array.<string>)}
  */
 lewd.custom = function (fn) {
-    return utils.customMessageWrapper(function customCondition(value, path) {
-        var result = fn.call(null, value, path || []);
-
-        if (typeof result === 'string') {
-            throw new ConditionViolationException(value, path, result);
-        } else if (result === false) {
-            throw new ConditionViolationException(value, path, errorMessages.Custom);
-        }
-    });
-};
-
-lewd.condition = function (object) {
-    return _.assign({}, abstractCondition, object);
+    return new condition.Custom(fn);
 };
 
 /**
@@ -171,9 +169,9 @@ lewd.condition = function (object) {
  */
 lewd.optional = function (condition) {
     assertParameterCount(arguments, 1);
-    var fn = lewd._wrap(condition);
-    fn._property = 'optional';
-    return fn;
+    var instance = lewd._wrap(condition);
+    instance.asPropertyRequired(false);
+    return instance;
 };
 
 /**
@@ -185,9 +183,9 @@ lewd.optional = function (condition) {
  */
 lewd.required = function (condition) {
     assertParameterCount(arguments, 1);
-    var fn = lewd._wrap(condition);
-    fn._property = 'required';
-    return fn;
+    var instance = lewd._wrap(condition);
+    instance.asPropertyRequired(true);
+    return instance;
 };
 
 /**
@@ -197,7 +195,7 @@ lewd.required = function (condition) {
  */
 lewd.range = function (options) {
     assertParameterCount(arguments, 1);
-    return condition.range(options);
+    return new condition.Range(options);
 };
 
 /**
@@ -207,7 +205,7 @@ lewd.range = function (options) {
  */
 lewd.len = function (options) {
     assertParameterCount(arguments, 1);
-    return condition.len(options);
+    return new condition.Len(options);
 };
 
 /**
@@ -217,7 +215,7 @@ lewd.len = function (options) {
  */
 lewd.literal = function(literal) {
     assertParameterCount(arguments, 1);
-    return condition.literal(literal);
+    return new condition.Literal(literal);
 };
 
 /**
@@ -226,7 +224,7 @@ lewd.literal = function(literal) {
  */
 lewd.isoDateTime = function () {
     assertParameterCount(arguments, 0);
-    return condition.isoDateTime();
+    return new condition.IsoDateTime();
 };
 
 /**
@@ -235,7 +233,7 @@ lewd.isoDateTime = function () {
  */
 lewd.integer = function () {
     assertParameterCount(arguments, 0);
-    return condition.integer();
+    return new condition.Integer();
 };
 
 /**
@@ -245,7 +243,7 @@ lewd.integer = function () {
  */
 lewd.regex = function (regex) {
     assertParameterCount(arguments, 1);
-    return condition.regex(regex);
+    return new condition.Regex(regex);
 };
 
 /**
@@ -255,7 +253,7 @@ lewd.regex = function (regex) {
  */
 lewd.all = function () {
     var args = Array.prototype.slice.call(arguments);
-    return condition.all(args);
+    return new condition.All(args.map(lewd._wrap));
 };
 
 /**
@@ -264,7 +262,7 @@ lewd.all = function () {
  */
 lewd.Array = function () {
     assertParameterCount(arguments, 0);
-    return lewd._wrap(Array);
+    return new condition.ArrayType();
 };
 
 /**
@@ -274,7 +272,7 @@ lewd.Array = function () {
  */
 lewd.array = function () {
     var args = Array.prototype.slice.call(arguments);
-    return condition.array(args);
+    return new condition.Array(args.map(lewd._wrap));
 };
 
 /**
@@ -284,7 +282,7 @@ lewd.array = function () {
  */
 lewd.none = function () {
     var args = Array.prototype.slice.call(arguments);
-    return condition.none(args);
+    return new condition.None(args.map(lewd._wrap));
 };
 
 /**
@@ -293,7 +291,7 @@ lewd.none = function () {
  */
 lewd.Object = function () {
     assertParameterCount(arguments, 0);
-    return lewd._wrap(Object);
+    return new condition.ObjectType();
 };
 
 /**
@@ -302,7 +300,7 @@ lewd.Object = function () {
  */
 lewd.String = function () {
     assertParameterCount(arguments, 0);
-    return lewd._wrap(String);
+    return new condition.StringType();
 };
 
 /**
@@ -311,7 +309,7 @@ lewd.String = function () {
  */
 lewd.Number = function () {
     assertParameterCount(arguments, 0);
-    return lewd._wrap(Number);
+    return new condition.NumberType();
 };
 
 /**
@@ -320,7 +318,7 @@ lewd.Number = function () {
  */
 lewd.Boolean = function () {
     assertParameterCount(arguments, 0);
-    return lewd._wrap(Boolean);
+    return new condition.BooleanType();
 };
 
 /**
@@ -329,7 +327,7 @@ lewd.Boolean = function () {
  */
 lewd.null = function () {
     assertParameterCount(arguments, 0);
-    return lewd._wrap(null);
+    return new condition.NullType();
 };
 
 /**
@@ -338,7 +336,7 @@ lewd.null = function () {
  */
 lewd.undefined = function () {
     assertParameterCount(arguments, 0);
-    return lewd._wrap(undefined);
+    return new condition.Any();
 };
 
 /**
@@ -348,7 +346,7 @@ lewd.undefined = function () {
  */
 lewd.not = function (value) {
     assertParameterCount(arguments, 1);
-    return condition.not(value);
+    return new condition.Not(lewd._wrap(value));
 };
 
 /**
@@ -358,7 +356,7 @@ lewd.not = function (value) {
  */
 lewd.some = function () {
     var args = Array.prototype.slice.call(arguments);
-    return condition.some(args);
+    return new condition.Some(args.map(lewd._wrap));
 };
 
 /**
@@ -369,7 +367,7 @@ lewd.some = function () {
  */
 lewd.object = function (spec, options) {
     assertParameterCount(arguments, 1, 2);
-    return condition.object(spec, options);
+    return new condition.Object(spec, options);
 };
 
 lewd.ConditionViolationException = ConditionViolationException;

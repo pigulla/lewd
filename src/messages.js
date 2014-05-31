@@ -24,7 +24,7 @@ module.exports = {
         'min': 'must not be smaller than ${min}',
         'minInclusive': 'must not be smaller than or equal to ${min}'
     },
-    'Regex': 'must match the regular expression',
+    'Regex': 'must match the regular expression ${regex}',
     'Some': 'did not satisfy any of the given conditions',
     'Type': 'must be of type ${type}'
 };

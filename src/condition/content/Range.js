@@ -1,13 +1,16 @@
+var util = require('util');
+
 var _ = require('lodash');
 
-var ConditionViolationException = require('../exception/ConditionViolationException'),
-    InvalidSchemaException = require('../exception/InvalidSchemaException');
+var BaseCondition = require('../Base'),
+    InvalidSchemaException = require('../../exception/InvalidSchemaException'),
+    errorMessages = require('../../messages');
 
 function validateOptions(options) {
     if (typeof options !== 'object') {
         throw new InvalidSchemaException('Options must be an object');
     }
-    
+
     var defaults = {
             min: -Infinity,
             max: Infinity,
@@ -16,11 +19,11 @@ function validateOptions(options) {
         },
         opts = _.defaults({}, options, defaults),
         unknownOptions = _.difference(Object.keys(options), Object.keys(defaults));
-    
+
     if (unknownOptions.length > 0) {
         throw new InvalidSchemaException('Unknown option: "' + unknownOptions[0] + '"');
     }
-    
+
     if (typeof opts.min !== 'number') {
         throw new InvalidSchemaException('Option "min" must be a number');
     }
@@ -37,28 +40,26 @@ function validateOptions(options) {
     return opts;
 }
 
-/**
- * @since 0.1.0
- * @param {Objects} option
- * @return {function(*, Array.<string>)}
- */
-module.exports = function (options) {
-    var utils = require('../utils'),
-        messages = require('../messages').Range,
-        opts = validateOptions(options);
+function RangeCondition (options) {
+    BaseCondition.call(this, 'Range');
+    this.options = validateOptions(options);
+}
 
-    return utils.customMessageWrapper(function rangeCondition(value, path) {
-        var key;
-        
-        if (value > opts.max || (value === opts.max && !opts.maxInclusive)) {
-            key = 'max' + (opts.maxInclusive ? 'Inclusive' : '');
-            throw new ConditionViolationException(value, path, messages[key], opts);
-        }
-        if (value < opts.min || (value === opts.min && !opts.minInclusive)) {
-            key = 'min' + (opts.minInclusive ? 'Inclusive' : '');
-            throw new ConditionViolationException(value, path, messages[key], opts);
-        }
+util.inherits(RangeCondition, BaseCondition);
 
-        return value;
-    });
+RangeCondition.prototype.validate = function (value, path) {
+    var key;
+
+    if (value.length > this.options.max || (value.length === this.options.max && !this.options.maxInclusive)) {
+        key = 'max' + (this.options.maxInclusive ? 'Inclusive' : '');
+        this.reject(value, path, errorMessages.Range[key], this.options);
+    }
+    if (value.length < this.options.min || (value.length === this.options.min && !this.options.minInclusive)) {
+        key = 'min' + (this.options.minInclusive ? 'Inclusive' : '');
+        this.reject(value, path, errorMessages.Range[key], this.options);
+    }
+
+    return value;
 };
+
+module.exports = RangeCondition;
