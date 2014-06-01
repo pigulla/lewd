@@ -1,20 +1,20 @@
 var util = require('util');
 
-var BaseCondition = require('../Base'),
+var Condition = require('../Condition'),
     ConditionViolationException = require('../../exception/ConditionViolationException'),
     errorMessage = require('../../messages').Integer;
 
 function IntegerCondition () {
     var lewd = require('../../lewd');
     
-    BaseCondition.call(this, 'Integer');
+    Condition.call(this, 'Integer');
     
     this.supportsCoercion = true;
     this.condition = lewd.all(Number, lewd(/^-?\d+$/));
     this.coerceCondition = lewd.all(String, /^-?\d+$/);
 }
 
-util.inherits(IntegerCondition, BaseCondition);
+util.inherits(IntegerCondition, Condition);
 
 IntegerCondition.prototype.validate = function (value, path) {
     if (this.coerce) {

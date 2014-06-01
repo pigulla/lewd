@@ -1,12 +1,12 @@
 var util = require('util');
 
-var BaseCondition = require('../Base'),
+var Condition = require('../Condition'),
     ConditionViolationException = require('../../exception/ConditionViolationException'),
     errorMessages = require('../../messages'),
     WrongParameterException = require('../../exception/WrongParameterException');
 
 function SomeCondition(conditions) {
-    BaseCondition.call(this, 'Some');
+    Condition.call(this, 'Some');
 
     if (!Array.isArray(conditions)) {
         throw new WrongParameterException('Parameter must be an array');
@@ -15,7 +15,7 @@ function SomeCondition(conditions) {
     this.conditions = conditions;
 }
 
-util.inherits(SomeCondition, BaseCondition);
+util.inherits(SomeCondition, Condition);
 
 SomeCondition.prototype.validate = function (value, path) {
     if (this.conditions.length === 0) {

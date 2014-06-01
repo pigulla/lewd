@@ -1,13 +1,13 @@
 var util = require('util');
 
-var BaseCondition = require('../Base'),
+var Condition = require('../Condition'),
     errorMessages = require('../../messages');
 
 function ArrayTypeCondition () {
-    BaseCondition.call(this, 'ArrayType');
+    Condition.call(this, 'ArrayType');
 }
 
-util.inherits(ArrayTypeCondition, BaseCondition);
+util.inherits(ArrayTypeCondition, Condition);
 
 ArrayTypeCondition.prototype.validate = function (value, path) {
     if (Array.isArray(value)) {

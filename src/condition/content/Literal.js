@@ -1,12 +1,12 @@
 var util = require('util');
 
-var BaseCondition = require('../Base'),
+var Condition = require('../Condition'),
     errorMessages = require('../../messages'),
     InvalidSchemaException = require('../../exception/InvalidSchemaException'),
     utils = require('../../utils');
 
 function LiteralCondition (literal) {
-    BaseCondition.call(this, 'Literal');
+    Condition.call(this, 'Literal');
 
     if (!utils.isLiteral(literal)) {
         throw new InvalidSchemaException('Value must be a literal');
@@ -15,7 +15,7 @@ function LiteralCondition (literal) {
     this.literal = literal;
 }
 
-util.inherits(LiteralCondition, BaseCondition);
+util.inherits(LiteralCondition, Condition);
 
 LiteralCondition.prototype.validate = function (value, path) {
     if (this.literal === value) {

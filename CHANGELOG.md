@@ -4,6 +4,10 @@
 
  - The Number validator no longer accepts `NaN` or `Infinity` (as those never were valid JSON data types anyway).
 
+###### New features:
+
+ - Coercion support added via `lewd.coerce(condition)` or `condition.coerce()` (for `Number`, `Boolean`, `String` and `IsoDateTime` conditions).
+
 ###### Improvements:
 
  - Major refactoring of the way conditions are implemented. The public API didn't change but the inner workings are now much cleaner and more easily extensible.

@@ -1,15 +1,15 @@
 var util = require('util');
 
-var BaseCondition = require('../Base'),
+var Condition = require('../Condition'),
     ConditionViolationException = require('../../exception/ConditionViolationException'),
     errorMessages = require('../../messages');
 
 function NotCondition(condition) {
-    BaseCondition.call(this, 'Not');
+    Condition.call(this, 'Not');
     this.condition = condition;
 }
 
-util.inherits(NotCondition, BaseCondition);
+util.inherits(NotCondition, Condition);
 
 NotCondition.prototype.validate = function (value, path) {
     try {

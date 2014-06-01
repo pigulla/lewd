@@ -1,11 +1,11 @@
 var util = require('util');
 
-var BaseCondition = require('../Base'),
+var Condition = require('../Condition'),
     errorMessages = require('../../messages'),
     InvalidSchemaException = require('../../exception/InvalidSchemaException');
 
 function RegexCondition (regex) {
-    BaseCondition.call(this, 'Regex');
+    Condition.call(this, 'Regex');
 
     if (!(regex instanceof RegExp)) {
         throw new InvalidSchemaException('Parameter must be a regular expression');
@@ -14,7 +14,7 @@ function RegexCondition (regex) {
     this.regex = regex;
 }
 
-util.inherits(RegexCondition, BaseCondition);
+util.inherits(RegexCondition, Condition);
 
 RegexCondition.prototype.validate = function (value, path) {
     if (this.regex.test(value)) {

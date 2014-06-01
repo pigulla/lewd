@@ -1,6 +1,6 @@
 var util = require('util');
 
-var BaseCondition = require('../Base'),
+var Condition = require('../Condition'),
     ConditionViolationException = require('../../exception/ConditionViolationException'),
     errorMessage = require('../../messages').IsoDateTime;
 
@@ -11,7 +11,7 @@ function isParsable(value) {
 function IsoDateTimeCondition () {
     var lewd = require('../../lewd');
 
-    BaseCondition.call(this, 'IsoDateTime');
+    Condition.call(this, 'IsoDateTime');
     
     this.supportsCoercion = true;
     this.condition = new lewd.all(
@@ -21,7 +21,7 @@ function IsoDateTimeCondition () {
     );
 }
 
-util.inherits(IsoDateTimeCondition, BaseCondition);
+util.inherits(IsoDateTimeCondition, Condition);
 
 IsoDateTimeCondition.prototype.validate = function (value, path) {
     try {

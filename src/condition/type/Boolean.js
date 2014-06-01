@@ -1,14 +1,14 @@
 var util = require('util');
 
-var BaseCondition = require('../Base'),
+var Condition = require('../Condition'),
     errorMessages = require('../../messages');
     
 function BooleanTypeCondition () {
-    BaseCondition.call(this, 'BooleanType');
+    Condition.call(this, 'BooleanType');
     this.supportsCoercion = true;
 }
 
-util.inherits(BooleanTypeCondition, BaseCondition);
+util.inherits(BooleanTypeCondition, Condition);
 
 BooleanTypeCondition.prototype.validate = function (value, path) {
     if (typeof value === 'boolean') {

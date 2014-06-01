@@ -1,12 +1,12 @@
 var util = require('util');
 
-var BaseCondition = require('./Base'),
+var Condition = require('./Condition'),
     ConditionViolationException = require('../exception/ConditionViolationException'),
     errorMessages = require('../messages'),
     WrongParameterException = require('../exception/WrongParameterException');
 
 function CustomCondition(fn) {
-    BaseCondition.call(this, 'Custom');
+    Condition.call(this, 'Custom');
     
     if (typeof fn !== 'function') {
         throw new WrongParameterException('Parameter must be a function');        
@@ -15,7 +15,7 @@ function CustomCondition(fn) {
     this.fn = fn;
 }
 
-util.inherits(CustomCondition, BaseCondition);
+util.inherits(CustomCondition, Condition);
 
 CustomCondition.prototype.validate = function (value, path) {
     var result;

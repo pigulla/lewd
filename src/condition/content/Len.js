@@ -2,7 +2,7 @@ var util = require('util');
 
 var _ = require('lodash');
 
-var BaseCondition = require('../Base'),
+var Condition = require('../Condition'),
     InvalidSchemaException = require('../../exception/InvalidSchemaException'),
     errorMessages = require('../../messages').Len;
 
@@ -41,11 +41,11 @@ function validateOptions(options) {
 }
 
 function LenCondition (options) {
-    BaseCondition.call(this, 'Len');
+    Condition.call(this, 'Len');
     this.options = validateOptions(options);
 }
 
-util.inherits(LenCondition, BaseCondition);
+util.inherits(LenCondition, Condition);
 
 LenCondition.prototype.validate = function (value, path) {
     var key;

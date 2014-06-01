@@ -3,6 +3,7 @@ var _ = require('lodash');
 
 /**
  * @since 0.1.0
+ * @class lewd.ConditionViolationException
  * @extends Error
  * @param {*} value 
  * @param {Array.<string>} path 

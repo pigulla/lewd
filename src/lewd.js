@@ -7,7 +7,7 @@ var ConditionViolationException = require('./exception/ConditionViolationExcepti
     InvalidSchemaException = require('./exception/InvalidSchemaException'),
     utils = require('./utils'),
     errorMessages = require('./messages'),
-    BaseCondition = require('./condition/Base'),
+    Condition = require('./condition/Condition'),
     conditions = {
         Custom: require('./condition/Custom'),
         
@@ -107,7 +107,7 @@ lewd._wrap = function (spec) {
         return (new conditions.Array(spec.map(lewd._wrap))).consumer();
     } else if (_.isPlainObject(spec)) {
         return (new conditions.Object(spec)).consumer();
-    } else if (spec instanceof BaseCondition) {
+    } else if (spec instanceof Condition) {
         return spec.consumer();
     } else /* istanbul ignore else */ if (typeof spec === 'function') {
         return spec.name === 'consumerWrapper' ? spec : lewd.custom(spec);
@@ -159,6 +159,18 @@ lewd.expose = function (prefix) {
 lewd.custom = function (fn) {
     assertParameterCount(arguments, 1);
     return (new conditions.Custom(fn)).consumer();
+};
+
+/**
+ * Marks an object property as optional.
+ * 
+ * @since 0.3.0
+ * @param {*} condition
+ * @return {function(*, Array.<string>)}
+ */
+lewd.coerce = function (condition) {
+    assertParameterCount(arguments, 1);
+    return lewd._wrap(condition).coerce();
 };
 
 /**

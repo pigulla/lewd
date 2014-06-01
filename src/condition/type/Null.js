@@ -1,13 +1,13 @@
 var util = require('util');
 
-var BaseCondition = require('../Base'),
+var Condition = require('../Condition'),
     errorMessages = require('../../messages');
 
 function NullTypeCondition () {
-    BaseCondition.call(this, 'NullType');
+    Condition.call(this, 'NullType');
 }
 
-util.inherits(NullTypeCondition, BaseCondition);
+util.inherits(NullTypeCondition, Condition);
 
 NullTypeCondition.prototype.validate = function (value, path) {
     if (value === null) {

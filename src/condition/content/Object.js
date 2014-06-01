@@ -2,7 +2,7 @@ var util = require('util');
 
 var _ = require('lodash');
 
-var BaseCondition = require('../Base'),
+var Condition = require('../Condition'),
     errorMessages = require('../../messages'),
     ConditionViolationException = require('../../exception/ConditionViolationException'),
     InvalidSchemaException = require('../../exception/InvalidSchemaException');
@@ -41,7 +41,7 @@ function validateOptions(options, allowExtraDefault) {
 }
 
 function ObjectCondition (spec, options) {
-    BaseCondition.call(this, 'Object');
+    Condition.call(this, 'Object');
     this.spec = spec;
 
     var lewd = require('../../lewd');
@@ -81,22 +81,22 @@ function ObjectCondition (spec, options) {
     this.definedKeys.forEach(function (key) {
         spec[key] = lewd._wrap(spec[key]);
         
-        if (spec[key].asProperty() === null && opts.byDefault === REQUIRED) {
+        if (!spec[key].isOptional() && !spec[key].isRequired() && opts.byDefault === REQUIRED) {
             spec[key].required();
-        } else if (spec[key].asProperty() === null && opts.byDefault === OPTIONAL) {
+        } else if (!spec[key].isOptional() && !spec[key].isRequired() && opts.byDefault === OPTIONAL) {
             spec[key].optional();
         }
 
-        if (spec[key].asProperty() === true) {
+        if (spec[key].isRequired()) {
             this.requiredKeys.push(key);
         }
-        if (spec[key].asProperty() === false) {
+        if (spec[key].isOptional()) {
             this.optionalKeys.push(key);
         }
     }, this);
 }
 
-util.inherits(ObjectCondition, BaseCondition);
+util.inherits(ObjectCondition, Condition);
 
 ObjectCondition.prototype.validate = function (value, path) {
     if (!_.isPlainObject(value)) {

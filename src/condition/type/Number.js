@@ -1,16 +1,16 @@
 var util = require('util');
 
-var BaseCondition = require('../Base'),
+var Condition = require('../Condition'),
     errorMessages = require('../../messages');
 
 var coercionRegex = /^-?\d+(\.\d+)?$/;
 
 function NumberTypeCondition() {
-    BaseCondition.call(this, 'NumberType');
+    Condition.call(this, 'NumberType');
     this.supportsCoercion = true;
 }
 
-util.inherits(NumberTypeCondition, BaseCondition);
+util.inherits(NumberTypeCondition, Condition);
 
 NumberTypeCondition.prototype.validate = function (value, path) {
     if (typeof value === 'number' && isFinite(value)) {

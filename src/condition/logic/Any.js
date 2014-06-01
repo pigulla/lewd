@@ -1,13 +1,13 @@
 var util = require('util');
 
-var BaseCondition = require('../Base'),
+var Condition = require('../Condition'),
     errorMessages = require('../../messages');
 
 function AnyCondition() {
-    BaseCondition.call(this, 'Any');
+    Condition.call(this, 'Any');
 }
 
-util.inherits(AnyCondition, BaseCondition);
+util.inherits(AnyCondition, Condition);
 
 AnyCondition.prototype.validate = function (value, path) {
     return value;

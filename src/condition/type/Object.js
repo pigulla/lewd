@@ -2,14 +2,14 @@ var util = require('util');
 
 var _ = require('lodash');
 
-var BaseCondition = require('../Base'),
+var Condition = require('../Condition'),
     errorMessages = require('../../messages');
 
 function ObjectTypeCondition () {
-    BaseCondition.call(this, 'ObjectType');
+    Condition.call(this, 'ObjectType');
 }
 
-util.inherits(ObjectTypeCondition, BaseCondition);
+util.inherits(ObjectTypeCondition, Condition);
 
 ObjectTypeCondition.prototype.validate = function (value, path) {
     if (_.isPlainObject(value)) {

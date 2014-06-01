@@ -1,14 +1,14 @@
 var util = require('util');
 
-var BaseCondition = require('../Base'),
+var Condition = require('../Condition'),
     errorMessages = require('../../messages');
 
 function StringTypeCondition () {
-    BaseCondition.call(this, 'StringType');
+    Condition.call(this, 'StringType');
     this.supportsCoercion = true;
 }
 
-util.inherits(StringTypeCondition, BaseCondition);
+util.inherits(StringTypeCondition, Condition);
 
 StringTypeCondition.prototype.validate = function (value, path) {
     if (typeof value === 'string') {
