@@ -11,6 +11,7 @@ var BaseCondition = function (name) {
     this.supportsCoercion = false;
 };
 
+/* istanbul ignore next */
 BaseCondition.prototype.validate = function (value, path) {
     throw new Error('Condition must overwrite its validate() method');
 };
@@ -24,7 +25,7 @@ BaseCondition.prototype.reject = function (value, path, messageTemplate, templat
     
     throw new ConditionViolationException(
         value,
-        path || [],
+        path,
         this.customError ? this.customError : messageTemplate,
         data
     );
@@ -35,7 +36,11 @@ BaseCondition.prototype.because = function (messageTemplate) {
     return this;
 };
 
-BaseCondition.prototype.enableCoercion = function (enabled) {
+BaseCondition.prototype.setCoercionEnabled = function (enabled) {
+    if (!this.supportsCoercion) {
+        throw new InvalidSchemaException('Condition does not support coercion');
+    }
+    
     this.coerce = !!enabled;
     return this;
 };
@@ -58,8 +63,8 @@ BaseCondition.prototype.consumer = function () {
             self.because(reason);
             return wrapper;
         },
-        coerce: function (enabled) {
-            self.enableCoercion(arguments.length === 0 ? true : !!enabled);
+        coerce: function () {
+            self.setCoercionEnabled(true);
             return wrapper;
         },
         optional: function () {

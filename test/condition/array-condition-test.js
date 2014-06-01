@@ -98,6 +98,11 @@ buster.testCase('"array" condition', {
             ]);
         }
     },
+    'passes exceptions through': function () {
+        buster.referee.assert.exception(function () {
+            condition(function () { x(); })(['x']);  // jshint ignore:line                
+        }, 'ReferenceError');
+    },
     'error message': function () {
         assertViolationWithMessage(function () {
             condition()('foo');

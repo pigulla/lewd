@@ -16,7 +16,7 @@ function ConditionViolationException(value, path, template, data) {
     Error.call(this);
     
     this.name = 'ConditionViolationException';
-    this.path = path || [];
+    this.path = path;
     this.pathStr = this.path.length === 0 ? '.' : this.path.join('.');
     this.data = data || {};
     this.value = value;

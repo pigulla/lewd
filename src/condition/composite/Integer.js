@@ -1,34 +1,44 @@
 var util = require('util');
 
 var BaseCondition = require('../Base'),
-    AllCondition = require('../logic/All'),
     ConditionViolationException = require('../../exception/ConditionViolationException'),
-    NumberTypeCondition = require('../type/Number'),
-    RegexCondition = require('../content/Regex'),
-    errorMessages = require('../../messages');
-
-// TODO: add coercion support
+    errorMessage = require('../../messages').Integer;
 
 function IntegerCondition () {
+    var lewd = require('../../lewd');
+    
     BaseCondition.call(this, 'Integer');
     
-    this.condition = new AllCondition([
-        (new NumberTypeCondition()).consumer(),
-        (new RegexCondition(/^-?\d+$/)).consumer()
-    ]);
+    this.supportsCoercion = true;
+    this.condition = lewd.all(Number, lewd(/^-?\d+$/));
+    this.coerceCondition = lewd.all(String, /^-?\d+$/);
 }
 
 util.inherits(IntegerCondition, BaseCondition);
 
 IntegerCondition.prototype.validate = function (value, path) {
-    try {
-        this.condition.validate(value, path);
-        return value;
-    } catch (e) {
-        if (e instanceof ConditionViolationException) {
-            this.reject(value, path, errorMessages.Integer);
-        } else {
-            throw e;
+    if (this.coerce) {
+        try {
+            this.coerceCondition(value, path);
+            return parseInt(value, 10);
+        } catch (e) {
+            /* istanbul ignore else */
+            if (e instanceof ConditionViolationException) {
+                this.reject(value, path, errorMessage);
+            } else {
+                throw e;
+            }
+        }
+    } else {
+        try {
+            return this.condition(value, path);
+        } catch (e) {
+            /* istanbul ignore else */
+            if (e instanceof ConditionViolationException) {
+                this.reject(value, path, errorMessage);
+            } else {
+                throw e;
+            }
         }
     }
 };

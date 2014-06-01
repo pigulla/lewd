@@ -85,8 +85,6 @@ var lewd = function () {
  */
 lewd._wrap = function (spec) {
     /*jshint maxcomplexity:false */
-    var condition;
-    
     if (spec === Array) {
         return (new conditions.ArrayType()).consumer();
     } else if (spec === Boolean) {
@@ -111,11 +109,11 @@ lewd._wrap = function (spec) {
         return (new conditions.Object(spec)).consumer();
     } else if (spec instanceof BaseCondition) {
         return spec.consumer();
-    } else if (typeof spec === 'function') {
+    } else /* istanbul ignore else */ if (typeof spec === 'function') {
         return spec.name === 'consumerWrapper' ? spec : lewd.custom(spec);
+    } else {
+        throw new InvalidSchemaException('Invalid specification');
     }
-     
-    throw new InvalidSchemaException('Invalid specification');
 };
 
 /* istanbul ignore next */
@@ -159,6 +157,7 @@ lewd.expose = function (prefix) {
  * @return {function(*, Array.<string>)}
  */
 lewd.custom = function (fn) {
+    assertParameterCount(arguments, 1);
     return (new conditions.Custom(fn)).consumer();
 };
 

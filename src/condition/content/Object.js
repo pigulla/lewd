@@ -44,14 +44,10 @@ function ObjectCondition (spec, options) {
     BaseCondition.call(this, 'Object');
     this.spec = spec;
 
-    var lewd = require('../../lewd'),
-        utils = require('../../utils'),
-        AnyCondition = require('../logic/Any'),
-        messages = require('../../messages').Object;
+    var lewd = require('../../lewd');
 
-    var opts = options || {};
-
-    var allowExtraDefault = false;
+    var opts = options || {},
+        allowExtraDefault = false;
     
     this.definedKeys = Object.keys(spec);
 
@@ -63,7 +59,7 @@ function ObjectCondition (spec, options) {
         this.definedKeys = _.without(this.definedKeys, KEYS_PROPERTY);
         allowExtraDefault = true;
     } else {
-        this.keysCondition = (new AnyCondition()).consumer();
+        this.keysCondition = lewd(undefined);
     }
 
     if (opts.hasOwnProperty('values')) {
@@ -74,7 +70,7 @@ function ObjectCondition (spec, options) {
         this.definedKeys = _.without(this.definedKeys, VALUES_PROPERTY);
         allowExtraDefault = true;
     } else {
-        this.valuesCondition = (new AnyCondition()).consumer();
+        this.valuesCondition = lewd(undefined);
     }
 
     this.options = validateOptions(opts, allowExtraDefault);

@@ -3,7 +3,8 @@ var _ = require('lodash'),
 
 var helper = require('./helper'),
     errorMessages = require('../src/messages'),
-    lewd = require('../src/lewd');
+    lewd = require('../src/lewd'),
+    BooleanTypeCondition = require('../src/condition/type/Boolean');
 
 var refuteValues = helper.refuteValues,
     acceptValues = helper.acceptValues,
@@ -29,7 +30,6 @@ buster.testCase('shorthand syntax', {
         buster.referee.assert.equals(lewd(null).wrapped, 'NullType');
     },
     'undefined': function () {
-        var x = lewd(undefined);
         buster.referee.assert.equals(lewd(undefined).wrapped, 'Any');
     },
     '[1, 2, 3]': function () {
@@ -52,5 +52,9 @@ buster.testCase('shorthand syntax', {
     },
     'Number, "foo", 42': function () {
         buster.referee.assert.equals(lewd(Number, 'foo', 42).wrapped, 'Some');
+    },
+    'existing condition': function () {
+        var condition = new BooleanTypeCondition();
+        buster.referee.assert.equals(lewd(condition).wrapped, 'BooleanType');
     }
 });

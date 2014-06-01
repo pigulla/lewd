@@ -3,13 +3,13 @@ var util = require('util');
 var BaseCondition = require('../Base'),
     ConditionViolationException = require('../../exception/ConditionViolationException'),
     errorMessages = require('../../messages'),
-    InvalidSchemaException = require('../../exception/InvalidSchemaException');
+    WrongParameterException = require('../../exception/WrongParameterException');
 
 function AllCondition(conditions) {
     BaseCondition.call(this, 'All');
 
     if (!Array.isArray(conditions)) {
-        throw new InvalidSchemaException('Parameter must be an array');
+        throw new WrongParameterException('Parameter must be an array');
     }
 
     this.conditions = conditions;

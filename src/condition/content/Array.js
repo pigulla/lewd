@@ -1,27 +1,26 @@
 var util = require('util');
 
 var BaseCondition = require('../Base'),
-    errorMessages = require('../../messages'),
+    errorMessage = require('../../messages').Array,
     ConditionViolationException = require('../../exception/ConditionViolationException'),
-    InvalidSchemaException = require('../../exception/InvalidSchemaException');
+    WrongParameterException = require('../../exception/WrongParameterException');
 
 function ArrayCondition (conditions) {
-    var AllCondition = require('../logic/All'),
-        AnyCondition = require('../logic/Any');
+    var lewd = require('../../lewd');
     
     BaseCondition.call(this, 'Array');
 
     if (!Array.isArray(conditions)) {
-        throw new InvalidSchemaException('Parameter must be an array');
+        throw new WrongParameterException('Parameter must be an array');
     }
 
     // avoid the "some" condition if possible to get better error reporting
     if (conditions.length === 0) {
-        this.condition = (new AnyCondition()).consumer();
+        this.condition = lewd(undefined);
     } else if (conditions.length === 1) {
         this.condition = conditions[0];
     } else {
-        this.condition = (new AllCondition(conditions)).consumer();
+        this.condition = lewd.all.apply(lewd, conditions);
     }
 }
 
@@ -29,7 +28,7 @@ util.inherits(ArrayCondition, BaseCondition);
 
 ArrayCondition.prototype.validate = function (value, path) {
     if (!Array.isArray(value)) {
-        this.reject(value, path, errorMessages.Array);
+        this.reject(value, path, errorMessage);
     }
 
     try {

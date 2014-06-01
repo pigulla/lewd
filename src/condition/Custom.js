@@ -3,13 +3,13 @@ var util = require('util');
 var BaseCondition = require('./Base'),
     ConditionViolationException = require('../exception/ConditionViolationException'),
     errorMessages = require('../messages'),
-    InvalidSchemaException = require('../exception/InvalidSchemaException');
+    WrongParameterException = require('../exception/WrongParameterException');
 
 function CustomCondition(fn) {
     BaseCondition.call(this, 'Custom');
     
     if (typeof fn !== 'function') {
-        throw new InvalidSchemaException('Parameter must be a function');        
+        throw new WrongParameterException('Parameter must be a function');        
     }
     
     this.fn = fn;

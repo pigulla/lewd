@@ -4,7 +4,7 @@ var _ = require('lodash');
 
 var BaseCondition = require('../Base'),
     InvalidSchemaException = require('../../exception/InvalidSchemaException'),
-    errorMessages = require('../../messages');
+    errorMessages = require('../../messages').Len;
 
 function validateOptions(options) {
     if (typeof options !== 'object') {
@@ -51,16 +51,16 @@ LenCondition.prototype.validate = function (value, path) {
     var key;
 
     if (typeof value !== 'string' && !Array.isArray(value)) {
-        this.reject(value, path, errorMessages.Len.type, this.options);
+        this.reject(value, path, errorMessages.type, this.options);
     }
 
     if (value.length > this.options.max || (value.length === this.options.max && !this.options.maxInclusive)) {
         key = 'max' + (this.options.maxInclusive ? 'Inclusive' : '');
-        this.reject(value, path, errorMessages.Len[key], this.options);
+        this.reject(value, path, errorMessages[key], this.options);
     }
     if (value.length < this.options.min || (value.length === this.options.min && !this.options.minInclusive)) {
         key = 'min' + (this.options.minInclusive ? 'Inclusive' : '');
-        this.reject(value, path, errorMessages.Len[key], this.options);
+        this.reject(value, path, errorMessages[key], this.options);
     }
 
     return value;

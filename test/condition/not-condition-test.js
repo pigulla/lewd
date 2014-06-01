@@ -24,6 +24,11 @@ buster.testCase('"not" condition', {
         refuteValues(condition, args, [null]);
         acceptValues(condition, args, [0, -17.3, 'foo', 'X', false, [], {}, ['foo']]);
     },
+    'passes exceptions through': function () {
+        buster.referee.assert.exception(function () {
+            condition(function () { x(); })(null);  // jshint ignore:line                
+        }, 'ReferenceError');
+    },
     'error message': function () {
         assertViolationWithMessage(function () {
             condition(Number)(42);

@@ -44,12 +44,11 @@ var utils = {
             return '<boolean>' + (value ? 'true' : 'false');
         } else if (Array.isArray(value)) {
             return util.format('<array:%d>', value.length);
-        } else if (typeof value === 'object') {
+        } else /* istanbul ignore else */ if (typeof value === 'object') {
             return 'object';
+        } else {
+            return '<unknown>' + value;
         }
-      
-        /* istanbul ignore next */
-        return '<unknown>' + value;
     },
     
     /**
