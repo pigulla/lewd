@@ -11,6 +11,7 @@ var ConditionViolationException = require('../exception/ConditionViolationExcept
 var Condition = function (name) {
     this.name = name;
     this.state = null;
+    this.default = undefined;
     this.coerce = false;
     this.customError = null;
 };
@@ -33,6 +34,20 @@ Condition.PROPERTY_STATE = {
  * @type {string}
  */
 Condition.prototype.name;
+
+/**
+ * The required/optional state for object properties.
+ * 
+ * @type {string}
+ */
+Condition.prototype.state;
+
+/**
+ * The default value for object properties.
+ * 
+ * @type {*}
+ */
+Condition.prototype.default;
 
 /**
  * Internal flag to indicate whether coercion is enabled.
@@ -123,6 +138,17 @@ Condition.prototype.setPropertyState = function (state) {
 };
 
 /**
+ * Sets the default value when used as an object property (ignored if it is not).
+ * 
+ * @param {*} value
+ * @return {lewd.condition.Condition}
+ */
+Condition.prototype.setDefaultValue = function (value) {
+    this.default = value;
+    return this;
+};
+
+/**
  * Returns a "consumer" object of this condition that hides away the internals and provides convenience methods.
  * 
  * @return {lewd.condition.ConsumerCondition}
@@ -139,6 +165,13 @@ Condition.prototype.consumer = function () {
         because: function (reason) {
             self.setCustomMessage(reason);
             return wrapper;
+        },
+        default: function (value) {
+            self.setDefaultValue(value);
+            return wrapper;
+        },
+        getDefault: function () {
+            return self.default;
         },
         coerce: function () {
             self.setCoercionEnabled(true);

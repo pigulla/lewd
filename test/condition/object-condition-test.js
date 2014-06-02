@@ -311,6 +311,35 @@ buster.testCase('"object" condition', {
             buster.referee.assert.equals({ a: 1, aa: 4 }, o);
         }
     },
+    'default values': {
+        'doesn\'t break anything': function () {
+            buster.referee.refute.exception(function () {
+                condition({ a: lewd.Number().optional().default(42) })({});
+            });
+        },
+        'is applied': function () {
+            buster.referee.assert.equals(
+                condition({ a: lewd.Number().optional().default(42) })({}),
+                { a: 42 }
+            );
+        },
+        'is not applied if not optional': function () {
+            buster.referee.assert.exception(function () {
+                condition({ a: lewd.Number().default(42) })({});
+            }, 'ConditionViolationException');
+        },
+        'doesn\'t overwrite the actual value': function () {
+            buster.referee.assert.equals(
+                condition({ a: lewd.Number().optional().default(42) })({ a: 13 }),
+                { a: 13 }
+            );
+        },
+        'is still validated': function () {
+            buster.referee.assert.exception(function () {
+                condition({ a: lewd.Number().optional().default('42') })({});
+            }, 'ConditionViolationException');
+        }
+    },
     'passes exceptions through': {
         'value': function () {
             buster.referee.assert.exception(function () {

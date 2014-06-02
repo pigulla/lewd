@@ -148,6 +148,13 @@ ObjectCondition.prototype.validate = function (value, path) {
             this.valuesCondition(value[key], path.concat(KEYS_PROPERTY + key));
         }
     }, this);
+    
+    this.optionalKeys.forEach(function (key) {
+        if (actualKeys.indexOf(key) === -1 && this.spec[key].getDefault() !== undefined) {
+            value[key] = this.spec[key].getDefault();
+            keysToValidate.push(key);
+        }
+    }, this);
 
     keysToValidate.forEach(function (key) {
         this.spec[key](value[key], path.concat(key));

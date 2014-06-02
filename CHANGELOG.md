@@ -6,7 +6,8 @@
 
 ###### New features:
 
- - Coercion support added via `lewd.coerce(condition)` or `condition.coerce()` (for `Number`, `Boolean`, `String` and `IsoDateTime` conditions).
+ - Coercion support added via `lewd.coerce(condition)` or `condition.coerce()` (for `Number`, `Boolean`, `String`, `Integer` and `IsoDateTime` conditions).
+ - Support for default values added via `condition.default(value)`
 
 ###### Improvements:
 

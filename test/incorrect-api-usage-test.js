@@ -61,6 +61,12 @@ buster.testCase('api misuse', {
             buster.referee.assert.exception(function () {
                 new Some('');
             }, 'IllegalParameterException');
+        },
+        'custom': function () {
+            var Custom = require('../src/condition/Custom');
+            buster.referee.assert.exception(function () {
+                new Custom('');
+            }, 'IllegalParameterException');
         }
     }
 });

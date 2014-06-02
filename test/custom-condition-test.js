@@ -1,3 +1,5 @@
+var util = require('util');
+
 var buster = require('buster');
 
 var lewd = require('../src/lewd'),
@@ -19,6 +21,17 @@ function oddNumberConditionWithReturnFalse(value) {
 }
 
 buster.testCase('custom condition', {
+    'wraps correctly': function () {
+        function MyCondition() {
+            lewd.Condition.call(this, 'MyCondition');
+        }
+
+        util.inherits(MyCondition, lewd.Condition);
+
+        MyCondition.prototype.validate = function (value, path) {};
+        
+        buster.referee.assert.equals(lewd.custom(new MyCondition()).wrapped, 'MyCondition');
+    },
     'without custom message': function () {
         try {
             lewd(oddNumberConditionWithException)(4);
