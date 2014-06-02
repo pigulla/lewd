@@ -32,7 +32,7 @@ module.exports = {
     refuteSchemaOptions: function (condition, args) {
         buster.referee.assert.exception(function () {
             condition.apply(lewd, args);
-        }, 'InvalidSchemaException');
+        }, 'IllegalParameterException');
     },
     assertViolationWithMessage: function (fn, message) {
         try {

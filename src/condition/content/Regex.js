@@ -2,13 +2,18 @@ var util = require('util');
 
 var Condition = require('../Condition'),
     errorMessages = require('../../messages'),
-    InvalidSchemaException = require('../../exception/InvalidSchemaException');
+    IllegalParameterException = require('../../exception/IllegalParameterException');
 
+/**
+ * @class lewd.condition.content.Regex
+ * @extends {lewd.condition.Condition}
+ * @constructor
+ */
 function RegexCondition (regex) {
     Condition.call(this, 'Regex');
 
     if (!(regex instanceof RegExp)) {
-        throw new InvalidSchemaException('Parameter must be a regular expression');
+        throw new IllegalParameterException('Parameter must be a regular expression');
     }
 
     this.regex = regex;
@@ -16,6 +21,9 @@ function RegexCondition (regex) {
 
 util.inherits(RegexCondition, Condition);
 
+/**
+ * @inheritdoc
+ */
 RegexCondition.prototype.validate = function (value, path) {
     if (this.regex.test(value)) {
         return value;

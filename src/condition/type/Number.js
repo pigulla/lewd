@@ -1,17 +1,24 @@
 var util = require('util');
 
-var Condition = require('../Condition'),
-    errorMessages = require('../../messages');
+var CoercableCondition = require('../CoercableCondition'),
+    errorMessage = require('../../messages').Type;
 
 var coercionRegex = /^-?\d+(\.\d+)?$/;
 
+/**
+ * @class lewd.condition.type.Number
+ * @extends {lewd.condition.Condition}
+ * @constructor
+ */
 function NumberTypeCondition() {
-    Condition.call(this, 'NumberType');
-    this.supportsCoercion = true;
+    CoercableCondition.call(this, 'NumberType');
 }
 
-util.inherits(NumberTypeCondition, Condition);
+util.inherits(NumberTypeCondition, CoercableCondition);
 
+/**
+ * @inheritdoc
+ */
 NumberTypeCondition.prototype.validate = function (value, path) {
     if (typeof value === 'number' && isFinite(value)) {
         return value;
@@ -21,7 +28,7 @@ NumberTypeCondition.prototype.validate = function (value, path) {
         return parseFloat(value);
     }
 
-    this.reject(value, path, errorMessages.Type, { type: 'number' });
+    this.reject(value, path, errorMessage, { type: 'number' });
 };
 
 module.exports = NumberTypeCondition;

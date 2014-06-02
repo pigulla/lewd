@@ -8,59 +8,59 @@ buster.testCase('api misuse', {
     'wrong parameter count for lewd': function () {
         buster.referee.assert.exception(function () {
             lewd();
-        }, 'WrongParameterException');
+        }, 'IllegalParameterException');
     },
     'wrong parameter for lewd.custom': function () {
         buster.referee.assert.exception(function () {
             lewd.custom(0);
-        }, 'WrongParameterException');
+        }, 'IllegalParameterException');
     },
     'wrong parameter count for conditions': function () {
         buster.referee.assert.exception(function () {
             lewd.custom();
-        }, 'WrongParameterException');
+        }, 'IllegalParameterException');
         
         buster.referee.assert.exception(function () {
             lewd.Boolean(true);
-        }, 'WrongParameterException');
+        }, 'IllegalParameterException');
 
         buster.referee.assert.exception(function () {
             lewd.object({}, {}, false);
-        }, 'WrongParameterException');
+        }, 'IllegalParameterException');
 
         buster.referee.assert.exception(function () {
             lewd.object();
-        }, 'WrongParameterException');
+        }, 'IllegalParameterException');
     },
     'unsupported coercion': function () {
         buster.referee.assert.exception(function () {
             lewd.Object().coerce();
-        }, 'InvalidSchemaException');
+        }, 'IllegalParameterException');
     },
     'incorrectly instantiated conditions': {
         'all': function () {
             var All = require('../src/condition/logic/All');
             buster.referee.assert.exception(function () {
                 new All('');
-            }, 'WrongParameterException');
+            }, 'IllegalParameterException');
         },
         'array': function () {
             var Array = require('../src/condition/content/Array');
             buster.referee.assert.exception(function () {
                 new Array('');
-            }, 'WrongParameterException');
+            }, 'IllegalParameterException');
         },
         'none': function () {
             var None = require('../src/condition/logic/None');
             buster.referee.assert.exception(function () {
                 new None('');
-            }, 'WrongParameterException');
+            }, 'IllegalParameterException');
         },
         'some': function () {
             var Some = require('../src/condition/logic/Some');
             buster.referee.assert.exception(function () {
                 new Some('');
-            }, 'WrongParameterException');
+            }, 'IllegalParameterException');
         }
     }
 });

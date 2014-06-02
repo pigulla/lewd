@@ -3,12 +3,12 @@ var util = require('util');
 var _ = require('lodash');
 
 var Condition = require('../Condition'),
-    InvalidSchemaException = require('../../exception/InvalidSchemaException'),
+    IllegalParameterException = require('../../exception/IllegalParameterException'),
     errorMessages = require('../../messages');
 
 function validateOptions(options) {
     if (typeof options !== 'object') {
-        throw new InvalidSchemaException('Options must be an object');
+        throw new IllegalParameterException('Options must be an object');
     }
 
     var defaults = {
@@ -21,25 +21,30 @@ function validateOptions(options) {
         unknownOptions = _.difference(Object.keys(options), Object.keys(defaults));
 
     if (unknownOptions.length > 0) {
-        throw new InvalidSchemaException('Unknown option: "' + unknownOptions[0] + '"');
+        throw new IllegalParameterException('Unknown option: "' + unknownOptions[0] + '"');
     }
 
     if (typeof opts.min !== 'number') {
-        throw new InvalidSchemaException('Option "min" must be a number');
+        throw new IllegalParameterException('Option "min" must be a number');
     }
     if (typeof opts.max !== 'number') {
-        throw new InvalidSchemaException('Option "max" must be a number');
+        throw new IllegalParameterException('Option "max" must be a number');
     }
     if (typeof opts.minInclusive !== 'boolean') {
-        throw new InvalidSchemaException('Option "minInclusive" must be a boolean');
+        throw new IllegalParameterException('Option "minInclusive" must be a boolean');
     }
     if (typeof opts.maxInclusive !== 'boolean') {
-        throw new InvalidSchemaException('Option "maxInclusive" must be a boolean');
+        throw new IllegalParameterException('Option "maxInclusive" must be a boolean');
     }
 
     return opts;
 }
 
+/**
+ * @class lewd.condition.content.Range
+ * @extends {lewd.condition.Condition}
+ * @constructor
+ */
 function RangeCondition (options) {
     Condition.call(this, 'Range');
     this.options = validateOptions(options);
@@ -47,6 +52,9 @@ function RangeCondition (options) {
 
 util.inherits(RangeCondition, Condition);
 
+/**
+ * @inheritdoc
+ */
 RangeCondition.prototype.validate = function (value, path) {
     var key;
 

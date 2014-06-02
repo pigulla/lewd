@@ -3,7 +3,7 @@ var util = require('util');
 var _ = require('lodash');
 
 var ConditionViolationException = require('./exception/ConditionViolationException'),
-    InvalidSchemaException = require('./exception/InvalidSchemaException');
+    IllegalParameterException = require('./exception/IllegalParameterException');
 
 var utils = {
     /**

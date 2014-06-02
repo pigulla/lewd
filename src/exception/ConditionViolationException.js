@@ -3,13 +3,12 @@ var _ = require('lodash');
 
 /**
  * @since 0.1.0
- * @class lewd.ConditionViolationException
+ * @class lewd.exception.ConditionViolationException
  * @extends Error
  * @param {*} value 
  * @param {Array.<string>} path 
  * @param {string} template 
  * @param {Object=} data
- * @throws InvalidSchemaException
  */
 function ConditionViolationException(value, path, template, data) {
     var smartFormat = require('../utils').smartFormat;
@@ -23,12 +22,17 @@ function ConditionViolationException(value, path, template, data) {
     this.value = value;
     this.valueStr = smartFormat(this.value);
     
-    this.message = _.template(template, this.getTemplateVariables());
+    this.message = _.template(template, this._getTemplateVariables());
 }
 
 util.inherits(ConditionViolationException, Error);
 
-ConditionViolationException.prototype.getTemplateVariables = function () {
+/**
+ * Returns the template variables hash for constructing the actual error message.
+ * 
+ * @return {Object.<string, *>}
+ */
+ConditionViolationException.prototype._getTemplateVariables = function () {
     return _.assign({}, this.data, {
         path: this.path,
         pathStr: this.pathStr,

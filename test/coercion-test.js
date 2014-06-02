@@ -1,7 +1,10 @@
+var util = require('util');
+
 var _ = require('lodash'),
     buster = require('buster');
 
-var lewd = require('../src/lewd');
+var lewd = require('../src/lewd'),
+    CoercableCondition = require('../src/condition/CoercableCondition');
 
 buster.testCase('coercion', {
     '"integer condition"': {
@@ -46,5 +49,45 @@ buster.testCase('coercion', {
     '"String" condition': function () {
         var value = lewd.String().coerce()(42);
         buster.referee.assert.same(value, '42');
+    },
+    'pass exception through for broken _coerce method': function () {
+        var BrokenCondition = function () {
+            var strict = lewd(String),
+                coercable = lewd(undefined);
+            
+            CoercableCondition.call(this, 'BrokenCondition', strict, coercable);
+        };
+        
+        util.inherits(BrokenCondition, CoercableCondition);
+        
+        BrokenCondition.prototype.validate = function (value, path) {
+            CoercableCondition.prototype.validate.call(this, value, path, 'its broken!');
+        };
+        BrokenCondition.prototype._coerce = function (value) {
+            x(); // jshint ignore:line
+        };
+        
+        buster.referee.assert.exception(function () {
+            (new BrokenCondition()).consumer().coerce()(42);
+        }, 'ReferenceError');
+    },
+    'pass exception through for broken strict condition': function () {
+        var BrokenCondition = function () {
+            var strict = lewd(function () {
+                    x(); // jshint ignore:line
+                });
+            
+            CoercableCondition.call(this, 'BrokenCondition', strict, strict);
+        };
+        
+        util.inherits(BrokenCondition, CoercableCondition);
+        
+        BrokenCondition.prototype.validate = function (value, path) {
+            CoercableCondition.prototype.validate.call(this, value, path, 'its broken!');
+        };
+        
+        buster.referee.assert.exception(function () {
+            (new BrokenCondition()).consumer()(42);
+        }, 'ReferenceError');
     }
 });

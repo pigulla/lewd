@@ -3,13 +3,19 @@ var util = require('util');
 var Condition = require('../Condition'),
     ConditionViolationException = require('../../exception/ConditionViolationException'),
     errorMessages = require('../../messages'),
-    WrongParameterException = require('../../exception/WrongParameterException');
+    IllegalParameterException = require('../../exception/IllegalParameterException');
 
+/**
+ * @class lewd.condition.logic.Not
+ * @extends {lewd.condition.Condition}
+ * @constructor
+ * @param {Array.<lewd.condition.ConsumerCondition>} conditions
+ */
 function SomeCondition(conditions) {
     Condition.call(this, 'Some');
 
     if (!Array.isArray(conditions)) {
-        throw new WrongParameterException('Parameter must be an array');
+        throw new IllegalParameterException('Parameter must be an array');
     }
 
     this.conditions = conditions;
@@ -17,6 +23,9 @@ function SomeCondition(conditions) {
 
 util.inherits(SomeCondition, Condition);
 
+/**
+ * @inheritdoc
+ */
 SomeCondition.prototype.validate = function (value, path) {
     if (this.conditions.length === 0) {
         return value;

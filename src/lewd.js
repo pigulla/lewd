@@ -3,8 +3,8 @@ var _ = require('lodash');
 var util = require('util');
 
 var ConditionViolationException = require('./exception/ConditionViolationException'),
-    WrongParameterException = require('./exception/WrongParameterException'),
-    InvalidSchemaException = require('./exception/InvalidSchemaException'),
+    IllegalParameterException = require('./exception/IllegalParameterException'),
+    IllegalParameterException = require('./exception/IllegalParameterException'),
     utils = require('./utils'),
     errorMessages = require('./messages'),
     Condition = require('./condition/Condition'),
@@ -44,13 +44,13 @@ function assertParameterCount(args, min, max) {
     max = arguments.length === 2 ? min : max;
 
     if (args.length > max) {
-        throw new WrongParameterException(util.format(
+        throw new IllegalParameterException(util.format(
             'Function expected at most %d parameters but was called with %d',
             max, args.length
         ));
     }
     if (args.length < min) {
-        throw new WrongParameterException(util.format(
+        throw new IllegalParameterException(util.format(
             'Function expected no more than %d parameters but was called with %d',
             min, args.length
         ));
@@ -60,15 +60,15 @@ function assertParameterCount(args, min, max) {
 /**
  * @version 0.1.0
  * @param {...*} var_args
- * @return {function(*, Array.<string>)}
- * @throws WrongParameterException
- * @throws InvalidSchemaException
+ * @return {lewd.condition.ConsumerCondition}
+ * @throws IllegalParameterException
+ * @throws IllegalParameterException
  */
 var lewd = function () {
     if (arguments.length === 1) {
         return lewd._wrap(arguments[0]);
     } else if (arguments.length === 0) {
-        throw new WrongParameterException('at least one parameter must be given');
+        throw new IllegalParameterException('at least one parameter must be given');
     } else {
         var args = Array.prototype.slice.call(arguments);
         return (new conditions.Some(args.map(lewd._wrap))).consumer();
@@ -80,8 +80,8 @@ var lewd = function () {
  *
  * @private
  * @param {*} spec
- * @return {function(*, Array.<string>)}
- * @throws InvalidSchemaException
+ * @return {lewd.condition.ConsumerCondition}
+ * @throws IllegalParameterException
  */
 lewd._wrap = function (spec) {
     /*jshint maxcomplexity:false */
@@ -112,7 +112,7 @@ lewd._wrap = function (spec) {
     } else /* istanbul ignore else */ if (typeof spec === 'function') {
         return spec.name === 'consumerWrapper' ? spec : lewd.custom(spec);
     } else {
-        throw new InvalidSchemaException('Invalid specification');
+        throw new IllegalParameterException('Invalid specification');
     }
 };
 
@@ -127,10 +127,11 @@ lewd._wrap = function (spec) {
 lewd.expose = function (prefix) {
     var p = prefix || '',
         exposedFunctions = [
-            'range', 'len', 'literal', 'isoDateTime', 'integer', 'regex', 'all', 'array', 'none', 'not',
-            'some', 'object'
+            'integer', 'isoDateTime',
+            'array', 'len', 'literal', 'object', 'range', 'regex',
+            'all', 'any', 'none', 'not', 'some'
         ],
-        additionalFunctions = ['Boolean', 'Number', 'Object', 'null', 'undefined', 'String', 'Array'];
+        additionalFunctions = ['Array', 'Boolean', 'null', 'Number', 'Object', 'String', 'undefined'];
     
     var expose = function (name) {
         var exposedName = p + name;
@@ -154,7 +155,7 @@ lewd.expose = function (prefix) {
 /**
  * @since 0.2.0
  * @param {function(*)} fn
- * @return {function(*, Array.<string>)}
+ * @return {lewd.condition.ConsumerCondition}
  */
 lewd.custom = function (fn) {
     assertParameterCount(arguments, 1);
@@ -166,7 +167,7 @@ lewd.custom = function (fn) {
  * 
  * @since 0.3.0
  * @param {*} condition
- * @return {function(*, Array.<string>)}
+ * @return {lewd.condition.ConsumerCondition}
  */
 lewd.coerce = function (condition) {
     assertParameterCount(arguments, 1);
@@ -178,7 +179,7 @@ lewd.coerce = function (condition) {
  * 
  * @since 0.2.0
  * @param {*} condition
- * @return {function(*, Array.<string>)}
+ * @return {lewd.condition.ConsumerCondition}
  */
 lewd.optional = function (condition) {
     assertParameterCount(arguments, 1);
@@ -190,7 +191,7 @@ lewd.optional = function (condition) {
  * 
  * @since 0.2.0
  * @param {*} condition
- * @return {function(*, Array.<string>)}
+ * @return {lewd.condition.ConsumerCondition}
  */
 lewd.required = function (condition) {
     assertParameterCount(arguments, 1);
@@ -200,7 +201,7 @@ lewd.required = function (condition) {
 /**
  * @since 0.1.0
  * @param {Object} options
- * @return {function(*, Array.<string>)}
+ * @return {lewd.condition.ConsumerCondition}
  */
 lewd.range = function (options) {
     assertParameterCount(arguments, 1);
@@ -210,7 +211,7 @@ lewd.range = function (options) {
 /**
  * @since 0.1.0
  * @param {Object} options
- * @return {function(*, Array.<string>)}
+ * @return {lewd.condition.ConsumerCondition}
  */
 lewd.len = function (options) {
     assertParameterCount(arguments, 1);
@@ -220,7 +221,7 @@ lewd.len = function (options) {
 /**
  * @since 0.1.0
  * @param {(string|number|boolean|null)} literal
- * @return {function(*, Array.<string>)}
+ * @return {lewd.condition.ConsumerCondition}
  */
 lewd.literal = function(literal) {
     assertParameterCount(arguments, 1);
@@ -229,7 +230,7 @@ lewd.literal = function(literal) {
 
 /**
  * @since 0.1.0
- * @return {function(*, Array.<string>)}
+ * @return {lewd.condition.ConsumerCondition}
  */
 lewd.isoDateTime = function () {
     assertParameterCount(arguments, 0);
@@ -238,7 +239,7 @@ lewd.isoDateTime = function () {
 
 /**
  * @since 0.1.0
- * @return {function(*, Array.<string>)}
+ * @return {lewd.condition.ConsumerCondition}
  */
 lewd.integer = function () {
     assertParameterCount(arguments, 0);
@@ -248,7 +249,7 @@ lewd.integer = function () {
 /**
  * @since 0.1.0
  * @param {RegExp} options
- * @return {function(*, Array.<string>)}
+ * @return {lewd.condition.ConsumerCondition}
  */
 lewd.regex = function (regex) {
     assertParameterCount(arguments, 1);
@@ -258,7 +259,7 @@ lewd.regex = function (regex) {
 /**
  * @since 0.1.0
  * @param {...*} var_args
- * @return {function(*, Array.<string>)}
+ * @return {lewd.condition.ConsumerCondition}
  */
 lewd.all = function () {
     var args = Array.prototype.slice.call(arguments);
@@ -267,7 +268,7 @@ lewd.all = function () {
 
 /**
  * @since 0.1.0
- * @return {function(*, Array.<string>)}
+ * @return {lewd.condition.ConsumerCondition}
  */
 lewd.Array = function () {
     assertParameterCount(arguments, 0);
@@ -277,7 +278,7 @@ lewd.Array = function () {
 /**
  * @since 0.1.0
  * @param {...*} var_args
- * @return {function(*, Array.<string>)}
+ * @return {lewd.condition.ConsumerCondition}
  */
 lewd.array = function () {
     var args = Array.prototype.slice.call(arguments);
@@ -287,7 +288,7 @@ lewd.array = function () {
 /**
  * @since 0.1.0
  * @param {...*} var_args
- * @return {function(*, Array.<string>)}
+ * @return {lewd.condition.ConsumerCondition}
  */
 lewd.none = function () {
     var args = Array.prototype.slice.call(arguments);
@@ -296,7 +297,7 @@ lewd.none = function () {
 
 /**
  * @since 0.1.0
- * @return {function(*, Array.<string>)}
+ * @return {lewd.condition.ConsumerCondition}
  */
 lewd.Object = function () {
     assertParameterCount(arguments, 0);
@@ -305,7 +306,7 @@ lewd.Object = function () {
 
 /**
  * @since 0.1.0
- * @return {function(*, Array.<string>)}
+ * @return {lewd.condition.ConsumerCondition}
  */
 lewd.String = function () {
     assertParameterCount(arguments, 0);
@@ -314,7 +315,7 @@ lewd.String = function () {
 
 /**
  * @since 0.1.0
- * @return {function(*, Array.<string>)}
+ * @return {lewd.condition.ConsumerCondition}
  */
 lewd.Number = function () {
     assertParameterCount(arguments, 0);
@@ -323,7 +324,7 @@ lewd.Number = function () {
 
 /**
  * @since 0.1.0
- * @return {function(*, Array.<string>)}
+ * @return {lewd.condition.ConsumerCondition}
  */
 lewd.Boolean = function () {
     assertParameterCount(arguments, 0);
@@ -332,7 +333,7 @@ lewd.Boolean = function () {
 
 /**
  * @since 0.1.0
- * @return {function(*, Array.<string>)}
+ * @return {lewd.condition.ConsumerCondition}
  */
 lewd.null = function () {
     assertParameterCount(arguments, 0);
@@ -341,7 +342,7 @@ lewd.null = function () {
 
 /**
  * @since 0.1.0
- * @return {function(*, Array.<string>)}
+ * @return {lewd.condition.ConsumerCondition}
  */
 lewd.undefined = function () {
     assertParameterCount(arguments, 0);
@@ -351,7 +352,7 @@ lewd.undefined = function () {
 /**
  * @since 0.1.0
  * @param {*} value
- * @return {function(*, Array.<string>)}
+ * @return {lewd.condition.ConsumerCondition}
  */
 lewd.not = function (value) {
     assertParameterCount(arguments, 1);
@@ -361,7 +362,7 @@ lewd.not = function (value) {
 /**
  * @since 0.1.0
  * @param {...*} var_args
- * @return {function(*, Array.<string>)}
+ * @return {lewd.condition.ConsumerCondition}
  */
 lewd.some = function () {
     var args = Array.prototype.slice.call(arguments);
@@ -372,7 +373,7 @@ lewd.some = function () {
  * @since 0.1.0
  * @param {Object} spec
  * @param {Object=} options
- * @return {function(*, Array.<string>)}
+ * @return {lewd.condition.ConsumerCondition}
  */
 lewd.object = function (spec, options) {
     assertParameterCount(arguments, 1, 2);

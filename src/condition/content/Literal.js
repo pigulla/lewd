@@ -2,14 +2,20 @@ var util = require('util');
 
 var Condition = require('../Condition'),
     errorMessages = require('../../messages'),
-    InvalidSchemaException = require('../../exception/InvalidSchemaException'),
+    IllegalParameterException = require('../../exception/IllegalParameterException'),
     utils = require('../../utils');
 
+/**
+ * @class lewd.condition.content.Literal
+ * @extends {lewd.condition.Condition}
+ * @constructor
+ * @param {(string|number|boolean|null)} literal
+ */
 function LiteralCondition (literal) {
     Condition.call(this, 'Literal');
 
     if (!utils.isLiteral(literal)) {
-        throw new InvalidSchemaException('Value must be a literal');
+        throw new IllegalParameterException('Value must be a literal');
     }
     
     this.literal = literal;
@@ -17,6 +23,9 @@ function LiteralCondition (literal) {
 
 util.inherits(LiteralCondition, Condition);
 
+/**
+ * @inheritdoc
+ */
 LiteralCondition.prototype.validate = function (value, path) {
     if (this.literal === value) {
         return value;

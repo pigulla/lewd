@@ -1,40 +1,39 @@
 var util = require('util');
 
-var Condition = require('../Condition'),
+var CoercableCondition = require('../CoercableCondition'),
     ConditionViolationException = require('../../exception/ConditionViolationException'),
     errorMessage = require('../../messages').IsoDateTime;
 
-function isParsable(value) {
-    return !isNaN(Date.parse(value));
+/**
+ * @class lewd.condition.composite.IsoDateTime
+ * @extends {lewd.condition.CoercableCondition}
+ * @constructor
+ */
+function IsoDateTimeCondition() {
+    var lewd = require('../../lewd'),
+        condition = lewd.all(
+            lewd(String),
+            lewd(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z$/),
+            lewd(function (value) { return !isNaN(Date.parse(value)); })
+        );
+
+    CoercableCondition.call(this, 'IsoDateTime', condition);
 }
 
-function IsoDateTimeCondition () {
-    var lewd = require('../../lewd');
+util.inherits(IsoDateTimeCondition, CoercableCondition);
 
-    Condition.call(this, 'IsoDateTime');
-    
-    this.supportsCoercion = true;
-    this.condition = new lewd.all(
-        lewd(String),
-        lewd(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z$/),
-        lewd(isParsable)
-    );
-}
+/**
+ * @inheritdoc
+ */
+IsoDateTimeCondition.prototype._coerce = function (value) {
+    return new Date(Date.parse(value));
+};
 
-util.inherits(IsoDateTimeCondition, Condition);
-
+/**
+ * @inheritdoc
+ */
 IsoDateTimeCondition.prototype.validate = function (value, path) {
-    try {
-        this.condition(value, path);
-        return this.coerce ? new Date(Date.parse(value)) : value;
-    } catch (e) {
-        /* istanbul ignore else */
-        if (e instanceof ConditionViolationException) {
-            this.reject(value, path, errorMessage);
-        } else {
-            throw e;
-        }
-    }
+    return CoercableCondition.prototype.validate.call(this, value, path, errorMessage);
 };
 
 module.exports = IsoDateTimeCondition;

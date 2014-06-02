@@ -1,46 +1,36 @@
 var util = require('util');
 
-var Condition = require('../Condition'),
+var CoercableCondition = require('../CoercableCondition'),
     ConditionViolationException = require('../../exception/ConditionViolationException'),
     errorMessage = require('../../messages').Integer;
 
-function IntegerCondition () {
-    var lewd = require('../../lewd');
-    
-    Condition.call(this, 'Integer');
-    
-    this.supportsCoercion = true;
-    this.condition = lewd.all(Number, lewd(/^-?\d+$/));
-    this.coerceCondition = lewd.all(String, /^-?\d+$/);
+/**
+ * @class lewd.condition.composite.Integer
+ * @extends {lewd.condition.CoercableCondition}
+ * @constructor
+ */
+function IntegerCondition() {
+    var lewd = require('../../lewd'),
+        strict = lewd.all(Number, lewd(/^-?\d+$/)),
+        coercable = lewd.all(String, /^-?\d+$/);
+
+    CoercableCondition.call(this, 'Integer', strict, coercable);
 }
 
-util.inherits(IntegerCondition, Condition);
+util.inherits(IntegerCondition, CoercableCondition);
 
+/**
+ * @inheritdoc
+ */
+IntegerCondition.prototype._coerce = function (value) {
+    return parseInt(value, 10);
+};
+    
+/**
+ * @inheritdoc
+ */
 IntegerCondition.prototype.validate = function (value, path) {
-    if (this.coerce) {
-        try {
-            this.coerceCondition(value, path);
-            return parseInt(value, 10);
-        } catch (e) {
-            /* istanbul ignore else */
-            if (e instanceof ConditionViolationException) {
-                this.reject(value, path, errorMessage);
-            } else {
-                throw e;
-            }
-        }
-    } else {
-        try {
-            return this.condition(value, path);
-        } catch (e) {
-            /* istanbul ignore else */
-            if (e instanceof ConditionViolationException) {
-                this.reject(value, path, errorMessage);
-            } else {
-                throw e;
-            }
-        }
-    }
+    return CoercableCondition.prototype.validate.call(this, value, path, errorMessage);
 };
 
 module.exports = IntegerCondition;

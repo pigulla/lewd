@@ -1,10 +1,10 @@
 var _ = require('lodash');
 
 var ConditionViolationException = require('../exception/ConditionViolationException'),
-    InvalidSchemaException = require('../exception/InvalidSchemaException');
+    IllegalParameterException = require('../exception/IllegalParameterException');
 
 /**
- * @class lewd.Condition 
+ * @class lewd.condition.Condition 
  * @constructor
  * @param {string} name
  */
@@ -13,10 +13,10 @@ var Condition = function (name) {
     this.state = null;
     this.coerce = false;
     this.customError = null;
-    this.supportsCoercion = false;
 };
 
 /**
+ * Constants used by `setPropertyState`.
  * 
  * @type {Object.<string, string>}
  */
@@ -28,69 +28,67 @@ Condition.PROPERTY_STATE = {
 
 /* jshint -W030 */
 /**
+ * The (hopefully unique) name of the condition.
+ * 
  * @type {string}
  */
 Condition.prototype.name;
 
 /**
- * @type {string}
- */
-Condition.prototype.name;
-
-/**
+ * Internal flag to indicate whether coercion is enabled.
+ * 
  * @type {boolean}
  */
 Condition.prototype.coerce;
 
 /**
- * @type {string}
+ * The custom error message or `null` if the default message is to be used.
+ * 
+ * @type {(string|null)}
  */
 Condition.prototype.customError;
-
-/**
- * @type {boolean}
- */
-Condition.prototype.supportsCoercion;
-
 /* jshint +W030 */
 
 /* istanbul ignore next */
 /**
+ * The actual validation function. Must return the input value (or its coerced version).
+ * 
  * @abstract
  * @param {*} value
  * @param {Array.<string>} path
+ * @return {*}
+ * @throws {lewd.exception.ConditionViolationException}
  */
 Condition.prototype.validate = function (value, path) {
     throw new Error('Condition must overwrite its validate() method');
 };
 
 /**
+ * Wrapper function for rejecting a value by throwing the appropriate exception.
+ * Takes care of overriding the passed message with the custom message if needed.
  * 
  * @param {*} value
  * @param {Array.<string>} path
  * @param {string} messageTemplate
  * @param {Object.<string, *>=} templateData
- * @throws {lewd.ConditionViolationException}
+ * @throws {lewd.exception.ConditionViolationException}
  */
 Condition.prototype.reject = function (value, path, messageTemplate, templateData) {
-    var data = templateData || {};
+    var data = templateData || {},
+        error = this.customError ? this.customError : messageTemplate;
     
     if (this.customError) {
         data.originalMessage = messageTemplate;
     }
     
-    throw new ConditionViolationException(
-        value,
-        path,
-        this.customError ? this.customError : messageTemplate,
-        data
-    );
+    throw new ConditionViolationException(value, path, error, data);
 };
 
 /**
+ * Set a custom error message.
  * 
  * @param {string} messageTemplate
- * @return {lewd.Condition}
+ * @return {lewd.condition.Condition}
  */
 Condition.prototype.setCustomMessage = function (messageTemplate) {
     this.customError = messageTemplate;
@@ -98,13 +96,16 @@ Condition.prototype.setCustomMessage = function (messageTemplate) {
 };
 
 /**
+ * Enable or disable coercion.
  * 
  * @param {boolean} enabled
- * @return {lewd.Condition}
+ * @return {lewd.condition.Condition}
  */
 Condition.prototype.setCoercionEnabled = function (enabled) {
-    if (!this.supportsCoercion) {
-        throw new InvalidSchemaException('Condition does not support coercion');
+    var CoercableCondition = require('./CoercableCondition');
+    
+    if (!(this instanceof CoercableCondition)) {
+        throw new IllegalParameterException('Condition does not support coercion');
     }
     
     this.coerce = !!enabled;
@@ -112,9 +113,11 @@ Condition.prototype.setCoercionEnabled = function (enabled) {
 };
 
 /**
+ * Sets the property state, i.e. whether the value associated with this condition is required or optional (or neither)
+ * when used as an object property (ignored if it is not).
  * 
  * @param {string} state
- * @return {lewd.Condition}
+ * @return {lewd.condition.Condition}
  */
 Condition.prototype.setPropertyState = function (state) {
     this.state = state;
@@ -122,8 +125,9 @@ Condition.prototype.setPropertyState = function (state) {
 };
 
 /**
+ * Returns a "consumer" object of this condition that hides away the internals and provides convenience methods.
  * 
- * @return {Object}
+ * @return {lewd.condition.ConsumerCondition}
  */
 Condition.prototype.consumer = function () {
     var self = this,

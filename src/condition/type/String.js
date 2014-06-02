@@ -1,15 +1,22 @@
 var util = require('util');
 
-var Condition = require('../Condition'),
-    errorMessages = require('../../messages');
+var CoercableCondition = require('../CoercableCondition'),
+    errorMessage = require('../../messages').Type;
 
+/**
+ * @class lewd.condition.type.String
+ * @extends {lewd.condition.CoercableCondition}
+ * @constructor
+ */
 function StringTypeCondition () {
-    Condition.call(this, 'StringType');
-    this.supportsCoercion = true;
+    CoercableCondition.call(this, 'StringType');
 }
 
-util.inherits(StringTypeCondition, Condition);
+util.inherits(StringTypeCondition, CoercableCondition);
 
+/**
+ * @inheritdoc
+ */
 StringTypeCondition.prototype.validate = function (value, path) {
     if (typeof value === 'string') {
         return value;
@@ -19,7 +26,7 @@ StringTypeCondition.prototype.validate = function (value, path) {
         return value + '';
     }
 
-    this.reject(value, path, errorMessages.Type, { type: 'string' });
+    this.reject(value, path, errorMessage, { type: 'string' });
 };
 
 module.exports = StringTypeCondition;

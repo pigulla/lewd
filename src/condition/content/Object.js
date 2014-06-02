@@ -5,7 +5,7 @@ var _ = require('lodash');
 var Condition = require('../Condition'),
     errorMessages = require('../../messages'),
     ConditionViolationException = require('../../exception/ConditionViolationException'),
-    InvalidSchemaException = require('../../exception/InvalidSchemaException');
+    IllegalParameterException = require('../../exception/IllegalParameterException');
 
 var KEYS_PROPERTY = '$k',
     VALUES_PROPERTY = '$v',
@@ -23,23 +23,28 @@ function validateOptions(options, allowExtraDefault) {
         opts = _.defaults({}, options, defaults);
 
     if ([REQUIRED, OPTIONAL].indexOf(opts.byDefault) === -1) {
-        throw new InvalidSchemaException('invalid value for option "byDefault"');
+        throw new IllegalParameterException('invalid value for option "byDefault"');
     }
     if (typeof opts.allowExtra !== 'boolean') {
-        throw new InvalidSchemaException('option "allowExtra" must be a boolean');
+        throw new IllegalParameterException('option "allowExtra" must be a boolean');
     }
     if (typeof opts.removeExtra !== 'boolean') {
-        throw new InvalidSchemaException('option "removeExtra" must be a boolean');
+        throw new IllegalParameterException('option "removeExtra" must be a boolean');
     }
 
     var unknownOptions = _.difference(Object.keys(options), Object.keys(defaults));
     if (unknownOptions.length > 0) {
-        throw new InvalidSchemaException('unknown option: "' + unknownOptions[0] + '"');
+        throw new IllegalParameterException('unknown option: "' + unknownOptions[0] + '"');
     }
 
     return opts;
 }
 
+/**
+ * @class lewd.condition.content.Object
+ * @extends {lewd.condition.Condition}
+ * @constructor
+ */
 function ObjectCondition (spec, options) {
     Condition.call(this, 'Object');
     this.spec = spec;
@@ -98,6 +103,9 @@ function ObjectCondition (spec, options) {
 
 util.inherits(ObjectCondition, Condition);
 
+/**
+ * @inheritdoc
+ */
 ObjectCondition.prototype.validate = function (value, path) {
     if (!_.isPlainObject(value)) {
         this.reject(value, path, errorMessages.Object.type);
