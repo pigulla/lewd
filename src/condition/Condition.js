@@ -102,9 +102,7 @@ Condition.prototype.setCustomMessage = function (messageTemplate) {
  * @return {lewd.condition.Condition}
  */
 Condition.prototype.setCoercionEnabled = function (enabled) {
-    var CoercableCondition = require('./CoercableCondition');
-    
-    if (!(this instanceof CoercableCondition)) {
+    if (!this.supportsCoercion) {
         throw new IllegalParameterException('Condition does not support coercion');
     }
     

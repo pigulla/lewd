@@ -1,18 +1,20 @@
 var util = require('util');
 
-var CoercableCondition = require('../CoercableCondition'),
+var Condition = require('../Condition'),
     errorMessages = require('../../messages');
 
 /**
  * @class lewd.condition.type.Boolean
- * @extends {lewd.condition.CoercableCondition}
+ * @extends {lewd.condition.Condition}
  * @constructor
  */
 function BooleanTypeCondition () {
-    CoercableCondition.call(this, 'BooleanType');
+    Condition.call(this, 'BooleanType');
+
+    this.supportsCoercion = true;
 }
 
-util.inherits(BooleanTypeCondition, CoercableCondition);
+util.inherits(BooleanTypeCondition, Condition);
 
 /**
  * @inheritdoc

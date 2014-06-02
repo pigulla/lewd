@@ -4,8 +4,9 @@ var buster = require('buster');
 
 var lewd = require('../src/lewd');
 
-function test(condition, args, accept, values) {
-    values.forEach(function (value) {
+/*jshint maxparams: 5*/
+function test(condition, args, accept, values, expected) {
+    values.forEach(function (value, index) {
         if (accept) {
             var result;
             
@@ -13,7 +14,7 @@ function test(condition, args, accept, values) {
                 result = condition.apply(lewd, args)(value);
             }, null, util.format('Value %s not expected to fail for arguments %s', value, args));
             
-            buster.referee.assert.same(value, result);
+            buster.referee.assert.same(result, expected[index]);
         } else {
             buster.referee.assert.exception(function () {
                 condition.apply(lewd, args)(value);
@@ -23,8 +24,8 @@ function test(condition, args, accept, values) {
 }
 
 module.exports = {
-    acceptValues: function (condition, args, values) {
-        test(condition, args, true, values);
+    acceptValues: function (condition, args, values, returned) {
+        test(condition, args, true, values, arguments.length > 3 ? returned : values);
     },
     refuteValues: function (condition, args, values) {
         test(condition, args, false, values);

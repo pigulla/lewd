@@ -8,7 +8,6 @@ var ConditionViolationException = require('./exception/ConditionViolationExcepti
     utils = require('./utils'),
     errorMessages = require('./messages'),
     Condition = require('./condition/Condition'),
-    CoercableCondition = require('./condition/CoercableCondition'),
     conditions = {
         Custom: require('./condition/Custom'),
         
@@ -155,12 +154,21 @@ lewd.expose = function (prefix) {
 
 /**
  * @since 0.2.0
- * @param {function(*)} fn
+ * @param {(function|lewd.condition.Condition)} fn
  * @return {lewd.condition.ConsumerCondition}
  */
 lewd.custom = function (fn) {
     assertParameterCount(arguments, 1);
-    return (new conditions.Custom(fn)).consumer();
+    
+    if (typeof fn === 'function' && fn.name === 'consumerWrapper') {
+        return fn;
+    } else if (fn instanceof Condition) {
+        return fn.consumer();
+    } else if (typeof fn === 'function') {
+        return (new conditions.Custom(fn)).consumer();
+    } else {
+        throw new IllegalParameterException('Invalid specification');
+    }
 };
 
 /**
@@ -383,6 +391,5 @@ lewd.object = function (spec, options) {
 
 lewd.ConditionViolationException = ConditionViolationException;
 lewd.Condition = Condition;
-lewd.CoercableCondition = CoercableCondition;
 
 module.exports = lewd;

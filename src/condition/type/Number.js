@@ -1,6 +1,6 @@
 var util = require('util');
 
-var CoercableCondition = require('../CoercableCondition'),
+var Condition = require('../Condition'),
     errorMessage = require('../../messages').Type;
 
 var coercionRegex = /^-?\d+(\.\d+)?$/;
@@ -11,10 +11,12 @@ var coercionRegex = /^-?\d+(\.\d+)?$/;
  * @constructor
  */
 function NumberTypeCondition() {
-    CoercableCondition.call(this, 'NumberType');
+    Condition.call(this, 'NumberType');
+
+    this.supportsCoercion = true;
 }
 
-util.inherits(NumberTypeCondition, CoercableCondition);
+util.inherits(NumberTypeCondition, Condition);
 
 /**
  * @inheritdoc
@@ -24,7 +26,7 @@ NumberTypeCondition.prototype.validate = function (value, path) {
         return value;
     }
     
-    if (this.coerce && coercionRegex.test(value)) {
+    if (this.coerce && typeof value === 'string' && coercionRegex.test(value)) {
         return parseFloat(value);
     }
 

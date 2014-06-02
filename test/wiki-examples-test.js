@@ -1,3 +1,5 @@
+var util = require('util');
+
 var _ = require('lodash'),
     buster = require('buster');
 
@@ -123,5 +125,36 @@ buster.testCase('wiki examples', {
         buster.referee.refute.exception(function () {
             book(data);
         });
+    },
+    'custom coercion condition': function () {
+        function MyCoercableCondition() {
+            lewd.Condition.call(this, 'MyCoercableCondition');
+            this.supportsCoercion = true;
+        }
+
+        util.inherits(MyCoercableCondition, lewd.Condition);
+
+        MyCoercableCondition.prototype.validate = function (value, path) {
+            if (typeof value === 'boolean') {
+                return value;
+            }
+            
+            if (typeof value === 'string' && this.coerce) {
+                if (value === 'true' || value === 'false') {
+                    return value === 'true';
+                }
+            }
+            
+            this.reject(value, path, 'No can do, sir.');
+        };
+        
+        var defaultCondition = (new MyCoercableCondition()).consumer(),
+            coercingCondition = (new MyCoercableCondition()).consumer().coerce();
+
+        helper.refuteValues(lewd.custom, [defaultCondition], [42, 'true', 0, null]);
+        helper.acceptValues(lewd.custom, [defaultCondition], [true, false]);
+        helper.refuteValues(lewd.custom, [coercingCondition], [42, 'TRUE', 0, null]);
+        helper.acceptValues(lewd.custom, [coercingCondition],
+            [true, false, 'true', 'false'], [true, false, true, false]);
     }
 });

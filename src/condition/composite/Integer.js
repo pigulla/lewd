@@ -1,36 +1,45 @@
 var util = require('util');
 
-var CoercableCondition = require('../CoercableCondition'),
+var Condition = require('../Condition'),
     ConditionViolationException = require('../../exception/ConditionViolationException'),
     errorMessage = require('../../messages').Integer;
 
 /**
  * @class lewd.condition.composite.Integer
- * @extends {lewd.condition.CoercableCondition}
+ * @extends {lewd.condition.Condition}
  * @constructor
  */
 function IntegerCondition() {
-    var lewd = require('../../lewd'),
-        strict = lewd.all(Number, lewd(/^-?\d+$/)),
-        coercable = lewd.all(String, /^-?\d+$/);
+    Condition.call(this, 'Integer');
 
-    CoercableCondition.call(this, 'Integer', strict, coercable);
+    this.supportsCoercion = true;
 }
 
-util.inherits(IntegerCondition, CoercableCondition);
+util.inherits(IntegerCondition, Condition);
 
-/**
- * @inheritdoc
- */
-IntegerCondition.prototype._coerce = function (value) {
-    return parseInt(value, 10);
-};
-    
 /**
  * @inheritdoc
  */
 IntegerCondition.prototype.validate = function (value, path) {
-    return CoercableCondition.prototype.validate.call(this, value, path, errorMessage);
+    if (typeof value === 'number') {
+        if (/^-?\d+$/.test(value)) {
+            return value;
+        } else if (this.coerce) {
+            return Math.round(value);
+        } else {
+            this.reject(value, path, errorMessage);
+        }
+    }
+    
+    if (!this.coerce) {
+        this.reject(value, path, errorMessage);
+    }
+    
+    if (typeof value === 'string' && /^-?\d+$/.test(value)) {
+        return parseInt(value, 10);
+    }
+
+    this.reject(value, path, errorMessage);
 };
 
 module.exports = IntegerCondition;

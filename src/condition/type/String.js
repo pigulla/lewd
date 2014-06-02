@@ -1,18 +1,20 @@
 var util = require('util');
 
-var CoercableCondition = require('../CoercableCondition'),
+var Condition = require('../Condition'),
     errorMessage = require('../../messages').Type;
 
 /**
  * @class lewd.condition.type.String
- * @extends {lewd.condition.CoercableCondition}
+ * @extends {lewd.condition.Condition}
  * @constructor
  */
 function StringTypeCondition () {
-    CoercableCondition.call(this, 'StringType');
+    Condition.call(this, 'StringType');
+
+    this.supportsCoercion = true;
 }
 
-util.inherits(StringTypeCondition, CoercableCondition);
+util.inherits(StringTypeCondition, Condition);
 
 /**
  * @inheritdoc
