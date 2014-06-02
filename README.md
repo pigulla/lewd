@@ -10,12 +10,13 @@
 ### Getting Started
 Typically, your validations will look something like this:
 ```javascript
-var addressValidator = lewd({
+var signUpValidator = lewd({
     name: String,
     sex: lewd.optional('male', 'female'),
     street: String,
     zip: Number,
-    city: String
+    city: String,
+    subscribeToNewsletter: lewd.optional(Boolean).default(false)
 });
 
 var data = JSON.parse(rawData);
@@ -32,6 +33,8 @@ But they can of course get more complex by logically combining conditions or nes
  - intuitive and concise API
  - supports arbitrarily nested structures
  - optionally remove invalid or unexpected keys from objects
+ - value coercion
+ - default values
  - custom validators
  - custom error messages
  - thoroughly unit tested
