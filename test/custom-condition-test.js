@@ -69,6 +69,23 @@ buster.testCase('custom condition', {
     
             buster.referee.assert(false, 'An exception should have been thrown');
         },
+        'nested with reject': function () {
+            var inlineCondition = function (value, path) {
+                    if (value < 5) { this.reject(value, path, 'Denied!'); }
+                },
+                condition = lewd({ a: [Number, inlineCondition] });
+    
+            try {
+                condition({ a: [42, 13.2, -7, 9] });
+            } catch (e) {
+                buster.referee.assert.equals(e.name, 'ConditionViolationException');
+                buster.referee.assert.equals(e.path, ['a', '#2']);
+                buster.referee.assert.equals(e.message, 'Denied!');
+                return;
+            }
+    
+            buster.referee.assert(false, 'An exception should have been thrown');
+        },
         'nested with return false': function () {
             var condition = lewd({ a: [Number, oddNumberConditionWithReturnFalse] });
     

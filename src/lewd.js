@@ -8,6 +8,7 @@ var ConditionViolationException = require('./exception/ConditionViolationExcepti
     utils = require('./utils'),
     errorMessages = require('./messages'),
     Condition = require('./condition/Condition'),
+    CoercableCondition = require('./condition/CoercableCondition'),
     conditions = {
         Custom: require('./condition/Custom'),
         
@@ -381,5 +382,7 @@ lewd.object = function (spec, options) {
 };
 
 lewd.ConditionViolationException = ConditionViolationException;
+lewd.Condition = Condition;
+lewd.CoercableCondition = CoercableCondition;
 
 module.exports = lewd;
