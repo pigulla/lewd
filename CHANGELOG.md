@@ -1,3 +1,10 @@
+## 0.4.0 (2014-??-??)
+
+###### Breaking changes:
+
+ - `lewd.integer` no longer coerces strings.
+
+
 ## 0.3.0 (2014-06-03)
 
 ###### Breaking changes:

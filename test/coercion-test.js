@@ -17,10 +17,13 @@ buster.testCase('coercion', {
     },
     '"integer condition"': {
         successful: function () {
-            buster.referee.assert.same(lewd.integer().coerce()('42'), 42);
+            buster.referee.assert.same(lewd.integer().coerce()(42), 42);
             buster.referee.assert.same(lewd.integer().coerce()(42.3), 42);
         },
         failed: function () {
+            buster.referee.assert.exception(function () {
+                lewd.integer().coerce()('42');
+            }, 'ConditionViolationException');
             buster.referee.assert.exception(function () {
                 lewd.integer().coerce()('42x');
             }, 'ConditionViolationException');

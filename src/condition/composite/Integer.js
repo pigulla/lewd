@@ -21,24 +21,18 @@ util.inherits(IntegerCondition, Condition);
  * @inheritdoc
  */
 IntegerCondition.prototype.validate = function (value, path) {
-    if (typeof value === 'number') {
-        if (/^-?\d+$/.test(value)) {
-            return value;
-        } else if (this.coerce) {
-            return Math.round(value);
-        } else {
-            this.reject(value, path, errorMessage);
-        }
-    }
-    
-    if (!this.coerce) {
+    if (typeof value !== 'number' || !isFinite(value)) {
         this.reject(value, path, errorMessage);
     }
     
-    if (typeof value === 'string' && /^-?\d+$/.test(value)) {
-        return parseInt(value, 10);
+    if (this.coerce) {
+        return Math.round(value);
     }
-
+    
+    if (value === Math.round(value)) {
+        return value;
+    }
+        
     this.reject(value, path, errorMessage);
 };
 

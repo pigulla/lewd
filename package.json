@@ -1,6 +1,6 @@
 {
   "name": "lewd",
-  "version": "0.3.0",
+  "version": "0.4.0-dev",
   "license": "BSD-2-Clause",
   "author": "Raphael Pigulla <pigulla@four66.com>",
   "description": "An intuitive and easy to use data validation libray for JSON data.",
