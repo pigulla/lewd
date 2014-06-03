@@ -25,7 +25,7 @@ buster.testCase('"isoDateTime" condition', {
         ]);
         acceptValues(condition, args, [
             '2014-05-22T07:15:26.692Z',
-            '2014-02-01T00:15:26.000Z',
+            '2014-02-01T00:15:26.000Z'
         ]);
     },
     'with custom message': function () {

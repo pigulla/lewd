@@ -7,6 +7,14 @@ var lewd = require('../src/lewd'),
     Condition = require('../src/condition/Condition');
 
 buster.testCase('coercion', {
+    'coercion within objects': function () {
+        var condition = lewd.object({ a: lewd(Boolean).coerce() }),
+            obj = { a: 1 },
+            result = condition(obj); 
+
+        buster.referee.assert.same(result, obj);
+        buster.referee.assert.equals(result, { a: true });
+    },
     '"integer condition"': {
         successful: function () {
             buster.referee.assert.same(lewd.integer().coerce()('42'), 42);

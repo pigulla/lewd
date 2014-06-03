@@ -12,6 +12,8 @@ Typically, your validations will look something like this:
 ```javascript
 var signUpValidator = lewd({
     name: String,
+    username: lewd.all(String, lewd.range({ min: 3, max: 8 }), /^[a-z][a-z0-9]+$/i),
+    password: lewd.all(String, lewd.range({ min: 5, max: 15 })),
     sex: lewd.optional('male', 'female'),
     street: String,
     zip: Number,

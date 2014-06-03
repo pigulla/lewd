@@ -60,7 +60,7 @@ buster.testCase('wiki examples', {
                 firstName: lewd.required(String),
                 lastName: lewd.required(String),
                 title: lewd('Mr', 'Mrs'),
-                dob: lewd.isoDateTime(),
+                dob: lewd.isoDateTime().coerce(),
                 city: String,
                 zip: lewd.all(Number, lewd.range({ min: 1000, max: 99999 }))
             }, {
@@ -70,13 +70,17 @@ buster.testCase('wiki examples', {
                 'firstName': 'Foo',
                 'lastName': 'Bar',
                 'title': 'Mr',
+                'dob': '1977-06-25T00:00:00.000Z',
                 'zip': 12345
             };
 
         buster.referee.refute.exception(function () {
             condition(data);
         });
+        buster.referee.assert.equals(data.dob.getTime(), Date.parse('1977-06-25T00:00:00.000Z'));
+        
         data.zip = 200;
+        data.dob = '1977-06-25T00:00:00.000Z';
         assertViolationAt(function () {
             condition(data);
         }, ['zip']);

@@ -157,7 +157,7 @@ ObjectCondition.prototype.validate = function (value, path) {
     }, this);
 
     keysToValidate.forEach(function (key) {
-        this.spec[key](value[key], path.concat(key));
+        value[key] = this.spec[key](value[key], path.concat(key));
     }, this);
 
     return value;
