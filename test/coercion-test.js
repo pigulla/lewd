@@ -18,17 +18,6 @@ buster.testCase('coercion', {
             }, 'ConditionViolationException');
         }
     }, 
-    '"Number condition"': {
-        successful: function () {
-            buster.referee.assert.same(lewd.Number().coerce()('42.3'), 42.3);
-            buster.referee.assert.same(lewd.coerce(Number)('42.3'), 42.3);
-        },
-        failed: function () {
-            buster.referee.assert.exception(function () {
-                lewd.Number().coerce()('42x');
-            }, 'ConditionViolationException');
-        }
-    },
     '"isoDateTime" condition': {
         successful: function () {
             var date = new Date(),
@@ -45,7 +34,9 @@ buster.testCase('coercion', {
     },
     '"Boolean" condition': function () {
         buster.referee.assert.same(lewd.Boolean().coerce()('1'), true);
+        buster.referee.assert.same(lewd.Boolean().coerce()(0), false);
         buster.referee.assert.same(lewd.coerce(Boolean)('1'), true);
+        buster.referee.assert.same(lewd.coerce(Boolean)(0), false);
     },
     '"String" condition': function () {
         var value = lewd.String().coerce()(42);
