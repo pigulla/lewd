@@ -1,3 +1,12 @@
+/**
+ * lewd - an intuitive and easy to use data validation library
+ *
+ * @class lewd
+ * @version 0.3.0
+ * @author Raphael Pigulla <pigulla@four66.com>
+ * @license BSD-2-Clause
+ */
+    
 var _ = require('lodash');
 
 var util = require('util');
@@ -35,9 +44,12 @@ var ConditionViolationException = require('./exception/ConditionViolationExcepti
     };
 
 /**
- * @param {Array} args
- * @param {number} min
- * @param {number=} max
+ * Asserts that the given arguments array contains at least `min` and no more than `max` parameters.
+ * 
+ * @param {Array} args The arguments array.
+ * @param {number} min The number of required parameters.
+ * @param {number=} max The number of allowed parameters (defaults to `min`).
+ * @throws lewd.exception.IllegalParameterException
  */
 function assertParameterCount(args, min, max) {
     max = arguments.length === 2 ? min : max;
@@ -57,17 +69,16 @@ function assertParameterCount(args, min, max) {
 }
 
 /**
- * @version 0.3.0
  * @param {...*} var_args
  * @return {lewd.condition.ConsumerCondition}
  * @throws IllegalParameterException
  * @throws IllegalParameterException
  */
 var lewd = function () {
+    assertParameterCount(arguments, 1, Infinity);
+
     if (arguments.length === 1) {
         return lewd._wrap(arguments[0]);
-    } else if (arguments.length === 0) {
-        throw new IllegalParameterException('at least one parameter must be given');
     } else {
         var args = Array.prototype.slice.call(arguments);
         return (new conditions.Some(args.map(lewd._wrap))).consumer();
@@ -153,7 +164,7 @@ lewd.expose = function (prefix) {
 
 /**
  * @since 0.2.0
- * @param {(function|lewd.condition.Condition)} fn
+ * @param {(function|lewd.condition.Condition|lewd.condition.ConsumerCondition)} fn
  * @return {lewd.condition.ConsumerCondition}
  */
 lewd.custom = function (fn) {
@@ -183,7 +194,7 @@ lewd.coerce = function (condition) {
 };
 
 /**
- * Marks an object property as optional.
+ * Allows coercion for an object property (if the corresponding condition supports it).
  * 
  * @since 0.2.0
  * @param {*} condition
