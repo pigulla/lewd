@@ -1,4 +1,4 @@
-## 0.3.0 (2014-06-??)
+## 0.3.0 (2014-06-03)
 
 ###### Breaking changes:
 
@@ -7,7 +7,7 @@
 ###### New features:
 
  - Coercion support added via `lewd.coerce(condition)` or `condition.coerce()` for `Boolean`, `String`, `integer` and `isoDateTime` conditions.
- - Support for default values added via `condition.default(value)`.
+ - Object properties can now have default values, specified via `condition.default(value)`.
 
 ###### Improvements:
 

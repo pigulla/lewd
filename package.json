@@ -3,7 +3,7 @@
   "version": "0.3.0",
   "license": "BSD-2-Clause",
   "author": "Raphael Pigulla <pigulla@four66.com>",
-  "description": "An intuitive and easy to use validator for JSON data.",
+  "description": "An intuitive and easy to use data validation libray for JSON data.",
   "engines": {
     "node": ">=0.10.0"
   },
@@ -19,12 +19,12 @@
     "url": "https://github.com/pigulla/lewd/issues"
   },
   "keywords": [
+    "json",
+    "data",
     "validation",
     "condition",
     "schema",
     "syntax",
-    "json",
-    "data",
     "check"
   ],
   "dependencies": {
