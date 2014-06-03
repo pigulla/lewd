@@ -4,7 +4,6 @@ var util = require('util');
 
 var ConditionViolationException = require('./exception/ConditionViolationException'),
     IllegalParameterException = require('./exception/IllegalParameterException'),
-    IllegalParameterException = require('./exception/IllegalParameterException'),
     utils = require('./utils'),
     errorMessages = require('./messages'),
     Condition = require('./condition/Condition'),
@@ -58,7 +57,7 @@ function assertParameterCount(args, min, max) {
 }
 
 /**
- * @version 0.1.0
+ * @version 0.3.0
  * @param {...*} var_args
  * @return {lewd.condition.ConsumerCondition}
  * @throws IllegalParameterException
@@ -109,7 +108,7 @@ lewd._wrap = function (spec) {
         return (new conditions.Object(spec)).consumer();
     } else if (spec instanceof Condition) {
         return spec.consumer();
-    } else /* istanbul ignore else */ if (typeof spec === 'function') {
+    } else if (typeof spec === 'function') {
         return spec.name === 'consumerWrapper' ? spec : lewd.custom(spec);
     } else {
         throw new IllegalParameterException('Invalid specification');

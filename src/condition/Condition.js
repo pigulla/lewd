@@ -64,7 +64,6 @@ Condition.prototype.coerce;
 Condition.prototype.customError;
 /* jshint +W030 */
 
-/* istanbul ignore next */
 /**
  * The actual validation function. Must return the input value (or its coerced version).
  * 
@@ -167,6 +166,7 @@ Condition.prototype.consumer = function () {
             return wrapper;
         },
         default: function (value) {
+            self.setPropertyState(Condition.PROPERTY_STATE.OPTIONAL);
             self.setDefaultValue(value);
             return wrapper;
         },

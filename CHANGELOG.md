@@ -6,8 +6,8 @@
 
 ###### New features:
 
- - Coercion support added via `lewd.coerce(condition)` or `condition.coerce()` for `Boolean`, `String`, `Integer` and `IsoDateTime` conditions.
- - Support for default values added via `condition.default(value)`
+ - Coercion support added via `lewd.coerce(condition)` or `condition.coerce()` for `Boolean`, `String`, `integer` and `isoDateTime` conditions.
+ - Support for default values added via `condition.default(value)`.
 
 ###### Improvements:
 
@@ -22,7 +22,7 @@
  
 ###### New features:
 
- - Custom conditions can now be inlined more easily
+ - Custom conditions can now be inlined more easily.
  - New option for validating objects: set `removeExtra` to silently remove invalid and unexpected keys.
 
 ###### Changes:

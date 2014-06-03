@@ -323,9 +323,14 @@ buster.testCase('"object" condition', {
                 { a: 42 }
             );
         },
+        'makes the property optional': function () {
+            buster.referee.refute.exception(function () {
+                condition({ a: lewd.Number().default(42) })({});
+            });
+        },
         'is not applied if not optional': function () {
             buster.referee.assert.exception(function () {
-                condition({ a: lewd.Number().default(42) })({});
+                condition({ a: lewd.Number().default(42).required() })({});
             }, 'ConditionViolationException');
         },
         'doesn\'t overwrite the actual value': function () {

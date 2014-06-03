@@ -2,7 +2,6 @@ var util = require('util');
 var _ = require('lodash');
 
 /**
- * @since 0.1.0
  * @class lewd.exception.ConditionViolationException
  * @extends Error
  * @param {*} value 

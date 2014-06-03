@@ -1,7 +1,6 @@
 var util = require('util');
 
 /**
- * @since 0.1.0
  * @class lewd.exception.IllegalParameterException
  * @extends Error
  * @param {string} message

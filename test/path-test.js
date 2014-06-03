@@ -29,6 +29,11 @@ buster.testCase('paths in exceptions', {
                 lewd.object({ a: String, b: Boolean })({ a: '', b: null });
             }, ['b']);
         },
+        '{ s: lewd.all(String, lewd.len({ min: 1, max: 10 })) }': function () {
+            assertViolationAt(function () {
+                lewd.object({ s: lewd.all(String, lewd.len({ min: 1, max: 10 })) })({ s: '' });
+            }, ['s']);
+        },
         '{ n: all(Number, some(range({ max: 5 }), range({ min: 10, max: 99 })) }': function () {
             assertViolationAt(function () {
                 lewd.object({

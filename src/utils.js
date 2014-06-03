@@ -9,7 +9,6 @@ var utils = {
     /**
      * Formats a value in a human readable way.
      * 
-     * @since 0.1.0
      * @param {*} value
      * @return {string}
      */
@@ -55,7 +54,6 @@ var utils = {
      * Checks if the given value is a constructor for a native JSON type (i.e. Number, String, Boolean, Object,
      * Array or null). 
      *
-     * @since 0.1.0
      * @param {*} value
      * @return {boolean}
      */
@@ -68,7 +66,6 @@ var utils = {
      * Checks if the given value is a valid literal for a JSON value, excluding arrays and objects (i.e. a string,
      * number, boolean or null).
      *
-     * @since 0.1.0
      * @param {*} value
      * @return {boolean}
      */
