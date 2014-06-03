@@ -18,7 +18,7 @@ var signUpValidator = lewd({
     street: String,
     zip: Number,
     city: String,
-    subscribeToNewsletter: lewd.optional(Boolean).default(false)
+    subscribeToNewsletter: lewd(Boolean).default(false)
 });
 
 // assuming you know your data is a valid JSON string
