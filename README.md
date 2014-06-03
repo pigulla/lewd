@@ -21,6 +21,7 @@ var signUpValidator = lewd({
     subscribeToNewsletter: lewd.optional(Boolean).default(false)
 });
 
+// assuming you know your data is a valid JSON string
 var data = JSON.parse(rawData);
 
 try {
