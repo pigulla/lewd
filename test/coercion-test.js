@@ -15,6 +15,14 @@ buster.testCase('coercion', {
         buster.referee.assert.same(result, obj);
         buster.referee.assert.equals(result, { a: true });
     },
+    'coercion within arrays': function () {
+        var condition = lewd([lewd.integer().coerce()]),
+            array = [42, 1.3, 0],
+            result = condition(array);
+
+        buster.referee.assert.same(result, array);
+        buster.referee.assert.equals(result, [42, 1, 0]);
+    },
     '"integer condition"': {
         successful: function () {
             buster.referee.assert.same(lewd.integer().coerce()(42), 42);

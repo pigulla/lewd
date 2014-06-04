@@ -7,10 +7,11 @@ var Condition = require('../Condition'),
     utils = require('../../utils');
 
 /**
- * Checks if all values in an array are unique, ignoring non-literals.
+ * Checks if all values in an array are unique, ignoring non-literals. Returns an object describing the first found
+ * duplicate or false if there were none.
  *  
  * @param {Array} array
- * @return {*} Returns the first found duplicate or undefined if there are none.
+ * @return {(Object|boolean)}
  */
 function checkUniqueness(array) {
     var o = Object.create(null),
@@ -25,14 +26,16 @@ function checkUniqueness(array) {
         key = (typeof array[i]) + ':' + array[i];
         
         if (o[key]) {
-            return array[i];
+            return {
+                index: i,
+                value: array[i]
+            };
         }
         
         o[key] = true;
     }
     
-    // Returned undefined if no duplicates are found. This works as a return value because it can not naturally occur
-    // in a "JSON object".
+    return false;
 }
 
 /**
@@ -56,11 +59,12 @@ UniqueCondition.prototype.validate = function (value, path) {
     
     var duplicate = checkUniqueness(value);
     
-    if (duplicate !== undefined) {
+    if (duplicate) {
         this.reject(
-            value, path,
-            errorMessages.duplicateFound,
-            { duplicate: duplicate, duplicateStr: utils.smartFormat(duplicate) }
+            value, path.concat('#' + duplicate.index), errorMessages.duplicateFound, {
+                duplicate: duplicate.value,
+                duplicateStr: utils.smartFormat(duplicate.value)
+            }
         );
     }
     

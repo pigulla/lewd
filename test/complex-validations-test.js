@@ -93,7 +93,7 @@ buster.testCase('complex validations', {
                     { name: 'Chapter 3', pages: 3, references: [1, 2, 1] }
                 ]
             });
-        }, ['chapters', '#2', 'references']);
+        }, ['chapters', '#2', 'references', '#2']);
 
         assertViolationWithMessage(function () {
             condition({

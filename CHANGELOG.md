@@ -12,6 +12,10 @@
 
  - Support for an even more concise notation for `lewd.integer` and `lewd.isoDateTime`. 
  - Better error handling when using conditions with incorrect parameters.
+ 
+###### Bug fixes:
+
+ - Fixed coercion not working correctly for arrays.
 
 ## 0.3.0 (2014-06-03)
 

@@ -26,6 +26,18 @@ buster.testCase('wiki examples', {
             condition(data);
         }, ['#4']);
     },
+    'coercion order': function () {
+        var cond1 = lewd.all(lewd.unique, [lewd.integer().coerce()]),
+            cond2 = lewd.all([lewd.integer().coerce()], lewd.unique);
+
+
+        buster.referee.refute.exception(function () {
+            cond1([42.13, 42]);
+        });
+        assertViolationAt(function () {
+            cond2([42.13, 42]);
+        }, ['#1']);
+    },
     'removeExtra': function () {
         var condition = lewd.object({ a: Number, b: String }, { removeExtra: true }),
             data = { a: 1, b: '2', c: 3 };
