@@ -4,7 +4,7 @@ module.exports.lewd = {
     sources: ['src/**/*.js'],
     tests: ['test/**/*-test.js'],
     'buster-istanbul': {
-        outputDirectory: 'test/coverage',
+        outputDirectory: 'reports/coverage',
         format: ['lcov', 'json']
     },
     extensions: [
