@@ -7,7 +7,7 @@ var Condition = require('../Condition'),
     errorMessages = require('../../messages');
 
 function validateOptions(options) {
-    if (typeof options !== 'object') {
+    if (options === null || typeof options !== 'object') {
         throw new IllegalParameterException('Options must be an object');
     }
 

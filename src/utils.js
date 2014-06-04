@@ -7,6 +7,16 @@ var ConditionViolationException = require('./exception/ConditionViolationExcepti
 
 var utils = {
     /**
+     * Checks if the given value is the consumer wrapper of a condition.
+     *
+     * @param {*} value
+     * @return {boolean}
+     */
+    isConsumerWrapper: function (value) {
+        return typeof value === 'function' && value.name === 'consumerWrapper' && value.hasOwnProperty('wrapped');
+    },
+    
+    /**
      * Formats a value in a human readable way.
      * 
      * @param {*} value

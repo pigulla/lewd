@@ -26,5 +26,9 @@ module.exports = {
     },
     'Regex': 'must match the regular expression ${regex}',
     'Some': 'did not satisfy any of the given conditions',
-    'Type': 'must be of type ${type}'
+    'Type': 'must be of type ${type}',
+    'Unique': {
+        'type': 'must be an array', 
+        'duplicateFound': 'values must be unique'
+    }
 };

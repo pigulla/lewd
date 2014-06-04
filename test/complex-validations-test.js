@@ -19,8 +19,9 @@ buster.testCase('complex validations', {
             author: lewd.optional({ firstName: String, lastName: String }),
             chapters: lewd.all([{
                 name: String,
-                inProgress: lewd(Boolean).optional().default(false),
-                pages: lewd.all(lewd.integer(), lewd.range({ min: 1 }))
+                inProgress: lewd.optional(Boolean).default(false),
+                references: lewd.optional(lewd.all([lewd.integer], lewd.unique)),
+                pages: lewd.all(lewd.integer, lewd.range({ min: 1 }))
             }], lewd.len({ min: 3 }).because('a book needs at least three chapters (where: ${path})'))
         });
         
@@ -79,6 +80,17 @@ buster.testCase('complex validations', {
                     { name: 'Chapter 1', pages: 4 },
                     { name: 'Chapter 2', pages: 2 },
                     { name: 'Chapter 3', pages: 0 }
+                ]
+            });
+        }, ['chapters', '#2', 'pages']);
+        
+        assertViolationAt(function () {
+            condition({
+                title: 'My Book',
+                chapters: [
+                    { name: 'Chapter 1', pages: 4, references: [] },
+                    { name: 'Chapter 2', pages: 2 },
+                    { name: 'Chapter 3', pages: 3, references: [1, 2, 1] }
                 ]
             });
         }, ['chapters', '#2', 'pages']);

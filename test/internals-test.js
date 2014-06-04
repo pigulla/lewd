@@ -37,6 +37,9 @@ buster.testCase('internals', {
                 'undefined': function () {
                     assert.equals(lewd._wrap(lewd.undefined).wrapped, 'Any');
                 },
+                'unique': function () {
+                    assert.equals(lewd._wrap(lewd.unique).wrapped, 'Unique');
+                },
                 'integer': function () {
                     assert.equals(lewd._wrap(lewd.integer).wrapped, 'Integer');
                 },

@@ -31,6 +31,10 @@ buster.testCase('api misuse', {
         buster.referee.assert.exception(function () {
             lewd.object();
         }, 'IllegalParameterException');
+
+        buster.referee.assert.exception(function () {
+            lewd.unique(42);
+        }, 'IllegalParameterException');
     },
     'unsupported coercion': function () {
         buster.referee.assert.exception(function () {
@@ -50,10 +54,22 @@ buster.testCase('api misuse', {
                 new Array('');
             }, 'IllegalParameterException');
         },
+        'len': function () {
+            var Len = require('../src/condition/content/Len');
+            buster.referee.assert.exception(function () {
+                new Len('');
+            }, 'IllegalParameterException');
+        },
         'none': function () {
             var None = require('../src/condition/logic/None');
             buster.referee.assert.exception(function () {
                 new None('');
+            }, 'IllegalParameterException');
+        },
+        'range': function () {
+            var Range = require('../src/condition/content/Range');
+            buster.referee.assert.exception(function () {
+                new Range('');
             }, 'IllegalParameterException');
         },
         'some': function () {

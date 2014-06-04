@@ -9,7 +9,6 @@ function test(condition, args, accept, values, expected) {
     values.forEach(function (value, index) {
         if (accept) {
             var result;
-            
             buster.referee.refute.exception(function () {
                 result = condition.apply(lewd, args)(value);
             }, null, util.format('Value %s not expected to fail for arguments %s', value, args));

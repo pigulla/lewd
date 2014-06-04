@@ -28,6 +28,7 @@ var ConditionViolationException = require('./exception/ConditionViolationExcepti
         Object: require('./condition/content/Object'),
         Range: require('./condition/content/Range'),
         Regex: require('./condition/content/Regex'),
+        Unique: require('./condition/content/Unique'),
 
         All: require('./condition/logic/All'),
         Any: require('./condition/logic/Any'),
@@ -96,7 +97,7 @@ var lewd = function () {
 lewd._wrap = function (spec) {
     var shorthands = [
         lewd.Array, lewd.Boolean, lewd.null, lewd.Number, lewd.Object, lewd.String, lewd.undefined,
-        lewd.isoDateTime, lewd.integer
+        lewd.unique, lewd.isoDateTime, lewd.integer
     ];
     
     /*jshint maxcomplexity:false */
@@ -127,7 +128,7 @@ lewd._wrap = function (spec) {
     } else if (shorthands.indexOf(spec) !== -1) {
         return spec();
     } else if (typeof spec === 'function') {
-        return spec.name === 'consumerWrapper' ? spec : lewd.custom(spec);
+        return utils.isConsumerWrapper(spec) ? spec : lewd.custom(spec);
     } else {
         throw new IllegalParameterException('Invalid specification');
     }
@@ -274,12 +275,21 @@ lewd.range = function (options) {
 
 /**
  * @since 0.1.0
- * @param {RegExp} options
+ * @param {RegExp} regex
  * @return {lewd.condition.ConsumerCondition}
  */
 lewd.regex = function (regex) {
     assertParameterCount(arguments, 1);
     return (new conditions.Regex(regex)).consumer();
+};
+
+/**
+ * @since 0.4.0
+ * @return {lewd.condition.ConsumerCondition}
+ */
+lewd.unique = function () {
+    assertParameterCount(arguments, 0);
+    return (new conditions.Unique()).consumer();
 };
 
 /**
