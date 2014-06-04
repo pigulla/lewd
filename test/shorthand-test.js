@@ -6,10 +6,6 @@ var helper = require('./helper'),
     lewd = require('../src/lewd'),
     BooleanTypeCondition = require('../src/condition/type/Boolean');
 
-var refuteValues = helper.refuteValues,
-    acceptValues = helper.acceptValues,
-    assertViolationWithMessage = helper.assertViolationWithMessage;
-
 buster.testCase('shorthand syntax', {
     'Boolean': function () {
         buster.referee.assert.equals(lewd(Boolean).wrapped, 'BooleanType');

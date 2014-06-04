@@ -9,10 +9,41 @@ var assert = buster.referee.assert,
 buster.testCase('internals', {
     // some of these tests are just here to make istanbul happy, they can not really occur when using the API
     'lewd': {
-        '_wrap': function () {
-            assert.exception(function () {
-                lewd._wrap(new Date());
-            }, 'IllegalParameterException');
+        '_wrap': {
+            'illegal invocation': function () {
+                assert.exception(function () {
+                    lewd._wrap(new Date());
+                }, 'IllegalParameterException');
+            },
+            'shorthand support': {
+                'Array': function () {
+                    assert.equals(lewd._wrap(lewd.Array).wrapped, 'ArrayType');
+                },
+                'Boolean': function () {
+                    assert.equals(lewd._wrap(lewd.Boolean).wrapped, 'BooleanType');
+                },
+                'null': function () {
+                    assert.equals(lewd._wrap(lewd.null).wrapped, 'NullType');
+                },
+                'Number': function () {
+                    assert.equals(lewd._wrap(lewd.Number).wrapped, 'NumberType');
+                },
+                'Object': function () {
+                    assert.equals(lewd._wrap(lewd.Object).wrapped, 'ObjectType');
+                },
+                'String': function () {
+                    assert.equals(lewd._wrap(lewd.String).wrapped, 'StringType');
+                },
+                'undefined': function () {
+                    assert.equals(lewd._wrap(lewd.undefined).wrapped, 'Any');
+                },
+                'integer': function () {
+                    assert.equals(lewd._wrap(lewd.integer).wrapped, 'Integer');
+                },
+                'isoDateTime': function () {
+                    assert.equals(lewd._wrap(lewd.isoDateTime).wrapped, 'IsoDateTime');
+                }
+            }
         }
     },
     'Condition': {

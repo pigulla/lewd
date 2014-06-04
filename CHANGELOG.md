@@ -3,6 +3,10 @@
 ###### Breaking changes:
 
  - `lewd.integer` no longer coerces strings.
+ 
+###### Improvements:
+
+ - Support for an even more concise notation for `lewd.integer` and `lewd.isoDateTime`. 
 
 
 ## 0.3.0 (2014-06-03)
