@@ -1,7 +1,6 @@
 var util = require('util');
 
 var Condition = require('../Condition'),
-    ConditionViolationException = require('../../exception/ConditionViolationException'),
     errorMessage = require('../../messages').Integer;
 
 /**

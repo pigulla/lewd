@@ -2,6 +2,10 @@ module.exports = {
     'Array': 'must be an array',
     'Custom': 'custom condition failed',
     'Integer': 'must be an integer',
+    'Isbn': {
+        'type': 'must be a string',
+        'invalid': 'not a valid ISBN'
+    },
     'IsoDateTime': 'not a valid ISO 8601 datetime string',
     'Len': {
         'max': 'must not be longer than ${max}',
@@ -30,5 +34,9 @@ module.exports = {
     'Unique': {
         'type': 'must be an array', 
         'duplicateFound': 'values must be unique'
+    },
+    'Uuid': {
+        'type': 'must be a string',
+        'invalid': 'not a valid UUID'
     }
 };
