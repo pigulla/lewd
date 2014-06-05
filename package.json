@@ -1,9 +1,18 @@
 {
   "name": "lewd",
   "version": "0.4.0-dev",
-  "license": "BSD-2-Clause",
-  "author": "Raphael Pigulla <pigulla@four66.com>",
-  "description": "An intuitive and easy to use data validation libray for JSON data.",
+  "license": [
+    {
+      "type": "BSD-2-Clause",
+      "url": "https://github.com/pigulla/lewd/raw/master/LICENSE"
+    }
+  ],
+  "author": {
+    "name": "Raphael Pigulla",
+    "email": "pigulla@four66.com",
+    "url": "http://www.n3rd.org"
+  },
+  "description": "An intuitive and easy to use validation libray for JSON data.",
   "engines": {
     "node": ">=0.10.0"
   },
