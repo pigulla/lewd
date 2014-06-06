@@ -1,4 +1,4 @@
-## 0.4.0 (2014-??-??)
+## 0.4.0 (2014-06-06)
 
 ###### Breaking changes:
 
@@ -7,11 +7,11 @@
 ###### New features:
 
  - Check for distinct values in an array with `lewd.unique`.
- - Added condition wrappers for validator's `isCreditCard`, `isEmail`, `isIP`, `isISBN`, `isURL`, and `isUUID` checks. 
+ - Added condition wrappers for validator.js' `isCreditCard`, `isEmail`, `isIP`, `isISBN`, `isURL`, and `isUUID` checks. 
  
 ###### Improvements:
 
- - Support for an even more concise notation for all parameterless conditions 
+ - Support for an even more concise notation for all parameterless conditions.
  - Better error handling when using conditions with incorrect parameters.
  
 ###### Bug fixes:
