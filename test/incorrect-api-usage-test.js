@@ -4,7 +4,7 @@ var lewd = require('../src/lewd');
 
 /*jshint nonew:false */
 
-buster.testCase('api misuse', {
+buster.testCase('incorrect api usage', {
     'wrong parameter count for lewd': function () {
         buster.referee.assert.exception(function () {
             lewd();
@@ -49,9 +49,15 @@ buster.testCase('api misuse', {
             }, 'IllegalParameterException');
         },
         'array': function () {
-            var Array = require('../src/condition/content/Array');
+            var ArrayC = require('../src/condition/structure/Array');
             buster.referee.assert.exception(function () {
-                new Array('');
+                new ArrayC('');
+            }, 'IllegalParameterException');
+        },
+        'object': function () {
+            var ObjectC = require('../src/condition/structure/Object');
+            buster.referee.assert.exception(function () {
+                new ObjectC('');
             }, 'IllegalParameterException');
         },
         'len': function () {

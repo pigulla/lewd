@@ -22,17 +22,21 @@ var ConditionViolationException = require('./exception/ConditionViolationExcepti
         Integer: require('./condition/composite/Integer'),
         IsoDateTime: require('./condition/composite/IsoDateTime'),
 
+        Creditcard: require('./condition/validator/Creditcard'),
+        Email: require('./condition/validator/Email'),
+        Ip: require('./condition/validator/Ip'),
         Isbn: require('./condition/validator/Isbn'),
         Url: require('./condition/validator/Url'),
         Uuid: require('./condition/validator/Uuid'),
 
-        Array: require('./condition/content/Array'),
+        Array: require('./condition/structure/Array'),
+        Object: require('./condition/structure/Object'),
+        Unique: require('./condition/structure/Unique'),
+
         Len: require('./condition/content/Len'),
         Literal: require('./condition/content/Literal'),
-        Object: require('./condition/content/Object'),
         Range: require('./condition/content/Range'),
         Regex: require('./condition/content/Regex'),
-        Unique: require('./condition/content/Unique'),
 
         All: require('./condition/logic/All'),
         Any: require('./condition/logic/Any'),
@@ -101,7 +105,8 @@ var lewd = function () {
 lewd._wrap = function (spec) {
     var shorthands = [
         lewd.Array, lewd.Boolean, lewd.null, lewd.Number, lewd.Object, lewd.String, lewd.undefined,
-        lewd.unique, lewd.isoDateTime, lewd.integer
+        lewd.unique, lewd.isoDateTime, lewd.integer, lewd.ip, lewd.email, lewd.uuid, lewd.url, lewd.isbn,
+        lewd.creditcard
     ];
     
     /*jshint maxcomplexity:false */
@@ -149,7 +154,7 @@ lewd._wrap = function (spec) {
 lewd.expose = function (prefix) {
     var p = prefix || '',
         exposedFunctions = [
-            'isbn', 'url', 'uuid',
+            'creditcard', 'email', 'ip', 'isbn', 'url', 'uuid',
             'integer', 'isoDateTime',
             'array', 'len', 'literal', 'object', 'range', 'regex',
             'all', 'any', 'none', 'not', 'some'
@@ -246,6 +251,34 @@ lewd.integer = function () {
 lewd.isoDateTime = function () {
     assertParameterCount(arguments, 0);
     return (new conditions.IsoDateTime()).consumer();
+};
+
+/**
+ * @since 0.4.0
+ * @return {lewd.condition.ConsumerCondition}
+ */
+lewd.creditcard = function () {
+    assertParameterCount(arguments, 0);
+    return (new conditions.Creditcard()).consumer();
+};
+
+/**
+ * @since 0.4.0
+ * @return {lewd.condition.ConsumerCondition}
+ */
+lewd.email = function () {
+    assertParameterCount(arguments, 0);
+    return (new conditions.Email()).consumer();
+};
+
+/**
+ * @since 0.4.0
+ * @param {(string|number)=} version
+ * @return {lewd.condition.ConsumerCondition}
+ */
+lewd.ip = function (version) {
+    assertParameterCount(arguments, 0, 1);
+    return (new conditions.Ip(version)).consumer();
 };
 
 /**

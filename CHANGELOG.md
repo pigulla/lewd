@@ -7,10 +7,11 @@
 ###### New features:
 
  - Check for distinct values in an array with `lewd.unique`.
+ - Added condition wrappers for validator's `isCreditCard`, `isEmail`, `isIP`, `isISBN`, `isURL`, and `isUUID` checks. 
  
 ###### Improvements:
 
- - Support for an even more concise notation for `lewd.integer` and `lewd.isoDateTime`. 
+ - Support for an even more concise notation for all parameterless conditions 
  - Better error handling when using conditions with incorrect parameters.
  
 ###### Bug fixes:

@@ -2,9 +2,21 @@ module.exports = {
     'Array': 'must be an array',
     'Custom': 'custom condition failed',
     'Integer': 'must be an integer',
+    'Email': {
+        'type': 'must be a string',
+        'invalid': 'not a valid email'
+    },  
+    'Creditcard': {
+        'type': 'must be a string',
+        'invalid': 'not a valid credit card number'
+    },  
     'Isbn': {
         'type': 'must be a string',
         'invalid': 'not a valid ISBN'
+    },
+    'Ip': {
+        'type': 'must be a string',
+        'invalid': 'not a valid IP'
     },
     'IsoDateTime': 'not a valid ISO 8601 datetime string',
     'Len': {

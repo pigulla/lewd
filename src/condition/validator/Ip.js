@@ -4,39 +4,39 @@ var validator = require('validator');
 
 var Condition = require('../Condition'),
     IllegalParameterException = require('../../exception/IllegalParameterException'),
-    errorMessages = require('../../messages').Isbn;
+    errorMessages = require('../../messages').Ip;
 
 /**
- * @class lewd.condition.validator.Isbn
+ * @class lewd.condition.validator.Ip
  * @extends {lewd.condition.Condition}
  * @constructor
  * @param {(string|number)?} version
  */
-function IsbnCondition(version) {
-    if (arguments.length > 0 && (version !== undefined && ['10', '13', 10, 13].indexOf(version) === -1)) {
-        throw new IllegalParameterException('Parameter must be valid ISBN version');
+function IpCondition(version) {
+    if (arguments.length > 0 && (version !== undefined && ['4', '6', 4, 6].indexOf(version) === -1)) {
+        throw new IllegalParameterException('Parameter must be valid IP version');
     }
 
     this.version = version;
 
-    Condition.call(this, 'Isbn');
+    Condition.call(this, 'Ip');
 }
 
-util.inherits(IsbnCondition, Condition);
+util.inherits(IpCondition, Condition);
 
 /**
  * @inheritdoc
  */
-IsbnCondition.prototype.validate = function (value, path) {
+IpCondition.prototype.validate = function (value, path) {
     if (typeof value !== 'string') {
         this.reject(value, path, errorMessages.type);
     }
 
-    if (!validator.isISBN(value, this.version)) {
+    if (!validator.isIP(value, this.version)) {
         this.reject(value, path, errorMessages.invalid);
     }
 
     return value;
 };
 
-module.exports = IsbnCondition;
+module.exports = IpCondition;

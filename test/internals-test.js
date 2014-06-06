@@ -37,8 +37,26 @@ buster.testCase('internals', {
                 'undefined': function () {
                     assert.equals(lewd._wrap(lewd.undefined).wrapped, 'Any');
                 },
+                'creditcard': function () {
+                    assert.equals(lewd._wrap(lewd.creditcard).wrapped, 'Creditcard');
+                },
+                'email': function () {
+                    assert.equals(lewd._wrap(lewd.email).wrapped, 'Email');
+                },
+                'ip': function () {
+                    assert.equals(lewd._wrap(lewd.ip).wrapped, 'Ip');
+                },
+                'isbn': function () {
+                    assert.equals(lewd._wrap(lewd.isbn).wrapped, 'Isbn');
+                },
                 'unique': function () {
                     assert.equals(lewd._wrap(lewd.unique).wrapped, 'Unique');
+                },
+                'url': function () {
+                    assert.equals(lewd._wrap(lewd.url).wrapped, 'Url');
+                },
+                'uuid': function () {
+                    assert.equals(lewd._wrap(lewd.uuid).wrapped, 'Uuid');
                 },
                 'integer': function () {
                     assert.equals(lewd._wrap(lewd.integer).wrapped, 'Integer');

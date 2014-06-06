@@ -48,6 +48,10 @@ function validateOptions(options, allowExtraDefault) {
  * @param {object=} options
  */
 function ObjectCondition (spec, options) {
+    if (spec === null || typeof spec !== 'object') {
+        throw new IllegalParameterException('Parameter must be an object');
+    }
+    
     Condition.call(this, 'Object');
     this.spec = spec;
 
