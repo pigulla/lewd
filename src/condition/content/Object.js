@@ -44,6 +44,8 @@ function validateOptions(options, allowExtraDefault) {
  * @class lewd.condition.content.Object
  * @extends {lewd.condition.Condition}
  * @constructor
+ * @param {object} spec
+ * @param {object=} options
  */
 function ObjectCondition (spec, options) {
     Condition.call(this, 'Object');

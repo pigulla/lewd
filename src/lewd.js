@@ -23,6 +23,7 @@ var ConditionViolationException = require('./exception/ConditionViolationExcepti
         IsoDateTime: require('./condition/composite/IsoDateTime'),
 
         Isbn: require('./condition/validator/Isbn'),
+        Url: require('./condition/validator/Url'),
         Uuid: require('./condition/validator/Uuid'),
 
         Array: require('./condition/content/Array'),
@@ -148,7 +149,8 @@ lewd._wrap = function (spec) {
 lewd.expose = function (prefix) {
     var p = prefix || '',
         exposedFunctions = [
-            'integer', 'isoDateTime', 'uuid', 'isbn',
+            'isbn', 'url', 'uuid',
+            'integer', 'isoDateTime',
             'array', 'len', 'literal', 'object', 'range', 'regex',
             'all', 'any', 'none', 'not', 'some'
         ],
@@ -251,9 +253,19 @@ lewd.isoDateTime = function () {
  * @param {(string|number)=} version
  * @return {lewd.condition.ConsumerCondition}
  */
-lewd.uuid = function (version) {
+lewd.isbn = function (version) {
     assertParameterCount(arguments, 0, 1);
-    return (new conditions.Uuid()).consumer();
+    return (new conditions.Isbn(version)).consumer();
+};
+
+/**
+ * @since 0.4.0
+ * @param {object=} options
+ * @return {lewd.condition.ConsumerCondition}
+ */
+lewd.url = function (options) {
+    assertParameterCount(arguments, 0, 1);
+    return (new conditions.Url(options)).consumer();
 };
 
 /**
@@ -261,9 +273,9 @@ lewd.uuid = function (version) {
  * @param {(string|number)=} version
  * @return {lewd.condition.ConsumerCondition}
  */
-lewd.isbn = function (version) {
+lewd.uuid = function (version) {
     assertParameterCount(arguments, 0, 1);
-    return (new conditions.Isbn()).consumer();
+    return (new conditions.Uuid(version)).consumer();
 };
 
 /**

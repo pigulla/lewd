@@ -7,30 +7,106 @@ var lewd = require('../../src/lewd'),
 
 var refuteValues = helper.refuteValues,
     acceptValues = helper.acceptValues,
-    assertViolationWithMessage = helper.assertViolationWithMessage;
+    assertViolationWithMessage = helper.assertViolationWithMessage,
+    refuteSchemaOptions = helper.refuteSchemaOptions;
 
+// These are just sanity checks. We don't want to re-test validator functionality.
 buster.testCase('validator conditions', {
-    'uuid': function () {
-        refuteValues(lewd.uuid, [], [
-            '', '42', true, [], null, {}, 'bcd', '1a', 'A', 14.3, -0.001,
-            'da77ee54-ecd4-11e3-a98e-82687f4fc15cx',
-            'da77f142-ecd4-11e3-a98e-82687f4fc15',
-            '1e0684a6-ec25-4c8c-9929-6f2b1fd50591'
-        ]);
-        acceptValues(lewd.uuid, [], [
-            'da77ee54-ecd4-11e3-a98e-82687f4fc15c',
-            'da77f142-ecd4-11e3-a98e-1234567890ab'
-        ]);
+    'isbn': {
+        'versions': function () {
+            refuteValues(lewd.isbn, [], [null, true, 32, 17.3, [], {}]);
+            
+            refuteValues(lewd.isbn, [], ['9783836221190']);
+            acceptValues(lewd.isbn, [], ['9784873113685']);
+    
+            refuteValues(lewd.isbn, [10], ['978-3836221191']);
+            refuteValues(lewd.isbn, ['10'], ['978-3836221191']);
+            acceptValues(lewd.isbn, [10], ['3-401-01319-X']);
+            acceptValues(lewd.isbn, ['10'], ['3-401-01319-X']);
+    
+            refuteValues(lewd.isbn, [13], ['3-8362-2119-5']);
+            refuteValues(lewd.isbn, ['13'], ['3-8362-2119-5']);
+            acceptValues(lewd.isbn, [13], ['978-4-87311-368-5']);
+            acceptValues(lewd.isbn, ['13'], ['978-4-87311-368-5']);
+        },
+        'error message': {
+            'type': function () {
+                assertViolationWithMessage(function () {
+                    lewd.isbn()(null);
+                }, _.template(errorMessages.Isbn.type, {}));
+            },
+            'invalid': function () {
+                assertViolationWithMessage(function () {
+                    lewd.isbn()('not an isbn');
+                }, _.template(errorMessages.Isbn.invalid, {}));
+            }
+        },
+        'invalid schema options': function () {
+            refuteSchemaOptions(lewd.isbn, [2]);
+        }
+    },
+    'uuid': {
+        'versions': function () {
+            refuteValues(lewd.uuid, [], [null, true, 17.3, [], {}]);
 
-        refuteValues(lewd.uuid, [4], [
-            '', '42', true, [], null, {}, 'bcd', '1a', 'A', 14.3, -0.001,
-            'da77ee54-ecd4-11e3-a98e-82687f4fc15c',
-            '1e0684a6-ec25-4c8c-9929-6f2b1fd50591x',
-            '1e0684a6-ec25-4c8c-9929-6f2b1fd5059'
-        ]);
-        acceptValues(lewd.uuid, [4], [
-            '1e0684a6-ec25-4c8c-9929-6f2b1fd50591',
-            'e1d17aa0-2255-4efa-871f-1d3fe5e0093a'
-        ]);
+            refuteValues(lewd.uuid, [], ['987FBC9-4BED-3078-CF07A-9141BA07C9F3']);
+            acceptValues(lewd.uuid, [], ['A987FBC9-4BED-3078-CF07-9141BA07C9F3']);
+    
+            refuteValues(lewd.uuid, [3], ['AAAAAAAA-1111-1111-AAAG-111111111111']);
+            refuteValues(lewd.uuid, ['3'], ['AAAAAAAA-1111-1111-AAAG-111111111111']);
+            acceptValues(lewd.uuid, [3], ['A987FBC9-4BED-3078-CF07-9141BA07C9F3']);
+            acceptValues(lewd.uuid, ['3'], ['A987FBC9-4BED-3078-CF07-9141BA07C9F3']);
+    
+            refuteValues(lewd.uuid, [4], ['A987FBC9-4BED-5078-AF07-9141BA07C9F3']);
+            refuteValues(lewd.uuid, ['4'], ['A987FBC9-4BED-5078-AF07-9141BA07C9F3']);
+            acceptValues(lewd.uuid, [4], ['57b73598-8764-4ad0-a76a-679bb6640eb1']);
+            acceptValues(lewd.uuid, ['4'], ['57b73598-8764-4ad0-a76a-679bb6640eb1']);
+    
+            refuteValues(lewd.uuid, [5], ['9c858901-8a57-4791-81fe-4c455b099bc9']);
+            refuteValues(lewd.uuid, ['5'], ['9c858901-8a57-4791-81fe-4c455b099bc9']);
+            acceptValues(lewd.uuid, [5], ['987FBC97-4BED-5078-BF07-9141BA07C9F3']);
+            acceptValues(lewd.uuid, ['5'], ['987FBC97-4BED-5078-BF07-9141BA07C9F3']);
+        },
+        'error message': {
+            'type': function () {
+                assertViolationWithMessage(function () {
+                    lewd.uuid()(null);
+                }, _.template(errorMessages.Uuid.type, {}));
+            },
+            'invalid': function () {
+                assertViolationWithMessage(function () {
+                    lewd.uuid()('not an uuid');
+                }, _.template(errorMessages.Uuid.invalid, {}));
+            }
+        },
+        'invalid schema options': function () {
+            refuteSchemaOptions(lewd.uuid, [2]);
+        }
+    },
+    'url': {
+        'values': function () {
+            refuteValues(lewd.url, [], [null, true, 17.3, 42, '', [], {}]);
+
+            refuteValues(lewd.url, [], ['xyz://foobar.com', 'http://www.foobar.com:70000/']);
+            acceptValues(lewd.url, [], ['http://user:pass@www.foobar.com/', 'valid.au']);
+    
+            refuteValues(lewd.url, [{ protocols: ['rtmp'] }], ['http://foobar.com']);
+            acceptValues(lewd.url, [{ protocols: ['rtmp'] }], ['rtmp://foobar.com']);
+        },
+        'error message': {
+            'type': function () {
+                assertViolationWithMessage(function () {
+                    lewd.url()(null);
+                }, _.template(errorMessages.Url.type, {}));
+            },
+            'invalid': function () {
+                assertViolationWithMessage(function () {
+                    lewd.url()('not a url');
+                }, _.template(errorMessages.Url.invalid, {}));
+            }
+        },
+        'invalid schema options': function () {
+            refuteSchemaOptions(lewd.url, [2]);
+        }
     }
 });

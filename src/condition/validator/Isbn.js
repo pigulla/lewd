@@ -10,13 +10,14 @@ var Condition = require('../Condition'),
  * @class lewd.condition.Uuid.Isbn
  * @extends {lewd.condition.Condition}
  * @constructor
+ * @param {(string|number)?} version
  */
 function IsbnCondition(version) {
-    if (arguments.length > 0 && ['10', '13', 10, 13].indexOf(version) === -1) {
+    if (arguments.length > 0 && (version !== undefined && ['10', '13', 10, 13].indexOf(version) === -1)) {
         throw new IllegalParameterException('Parameter must be valid ISBN version');
     }
 
-    this.version = arguments.length === 0 ? 'all' : arguments[0];
+    this.version = version;
 
     Condition.call(this, 'Isbn');
 }
@@ -31,7 +32,7 @@ IsbnCondition.prototype.validate = function (value, path) {
         this.reject(value, path, errorMessages.type);
     }
 
-    if (!validator.isISBN(value, this.version)) {
+    if (!validator.isISBN(value + '', this.version)) {
         this.reject(value, path, errorMessages.invalid);
     }
 

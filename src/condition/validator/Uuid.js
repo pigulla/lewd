@@ -10,13 +10,14 @@ var Condition = require('../Condition'),
  * @class lewd.condition.validator.Uuid
  * @extends {lewd.condition.Condition}
  * @constructor
+ * @param {(string|number)?} version
  */
 function UuidCondition(version) {
-    if (arguments.length > 0 && ['all', '1', '2', '3', 1, 2, 3].indexOf(version) === -1) {
+    if (arguments.length > 0 && (version !== undefined && ['all', '3', '4', '5', 3, 4, 5].indexOf(version) === -1)) {
         throw new IllegalParameterException('Parameter must be valid UUID version');
     }
     
-    this.version = arguments.length === 0 ? 'all' : arguments[0];
+    this.version = !version ? 'all' : version + '';
 
     Condition.call(this, 'Uuid');
 }

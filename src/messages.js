@@ -35,6 +35,10 @@ module.exports = {
         'type': 'must be an array', 
         'duplicateFound': 'values must be unique'
     },
+    'Url': {
+        'type': 'must be a string',
+        'invalid': 'not a valid URL'
+    },
     'Uuid': {
         'type': 'must be a string',
         'invalid': 'not a valid UUID'
