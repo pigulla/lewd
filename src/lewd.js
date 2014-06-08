@@ -155,6 +155,7 @@ lewd.expose = function (prefix) {
     var p = prefix || '',
         exposedFunctions = [
             'creditcard', 'email', 'ip', 'isbn', 'url', 'uuid',
+            'optional', 'required', 'forbidden',
             'integer', 'isoDateTime',
             'array', 'len', 'literal', 'object', 'range', 'regex',
             'all', 'any', 'none', 'not', 'some'
@@ -212,7 +213,7 @@ lewd.coerce = function (condition) {
 };
 
 /**
- * Allows coercion for an object property (if the corresponding condition supports it).
+ * Marks an object property as optional.
  * 
  * @since 0.2.0
  * @param {*} condition
@@ -221,6 +222,18 @@ lewd.coerce = function (condition) {
 lewd.optional = function (condition) {
     assertParameterCount(arguments, 1);
     return lewd._wrap(condition).optional();
+};
+
+/**
+ * Marks an object property as forbidden.
+ * 
+ * @since 0.5.0
+ * @param {*} condition
+ * @return {lewd.condition.ConsumerCondition}
+ */
+lewd.forbidden = function (condition) {
+    assertParameterCount(arguments, 1);
+    return lewd._wrap(condition).forbidden();
 };
 
 /**

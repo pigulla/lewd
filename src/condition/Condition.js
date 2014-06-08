@@ -4,16 +4,19 @@ var ConditionViolationException = require('../exception/ConditionViolationExcept
     IllegalParameterException = require('../exception/IllegalParameterException');
 
 /**
+ * @abstract
  * @class lewd.condition.Condition 
  * @constructor
- * @param {string} name
+ * @param {string} type
  */
-var Condition = function (name) {
-    this.name = name;
+var Condition = function (type) {
+    this.type = type;
+    this.name = null;
     this.state = null;
     this.default = undefined;
     this.coerce = false;
     this.customError = null;
+    this.wrapper = null;
 };
 
 /**
@@ -23,17 +26,32 @@ var Condition = function (name) {
  */
 Condition.PROPERTY_STATE = {
     UNSPECIFIED: 'unspecified',
+    FORBIDDEN: 'forbidden',
     REQUIRED: 'required',
     OPTIONAL: 'optional'
 };
 
 /* jshint -W030 */
 /**
- * The (hopefully unique) name of the condition.
+ * The (hopefully unique) type of the condition.
  * 
  * @type {string}
  */
+Condition.prototype.type;
+
+/**
+ * The used-defined name of the condition.
+ * 
+ * @type {?string}
+ */
 Condition.prototype.name;
+
+/**
+ * The consumer wrapper.
+ * 
+ * @type {?lewd.condition.ConsumerCondition}
+ */
+Condition.prototype.wrapper;
 
 /**
  * The required/optional state for object properties.
@@ -99,6 +117,17 @@ Condition.prototype.reject = function (value, path, messageTemplate, templateDat
 };
 
 /**
+ * Get a condition by its user-assigned name. Returns an array containing this instance if the name matches and an empty
+ * array otherwise.
+ *  
+ * @param {string} name
+ * @returns {Array.<lewd.condition.ConsumerCondition>}
+ */
+Condition.prototype.find = function (name) {
+    return this.name === name ? [this.consumer()] : [];
+};
+
+/**
  * Set a custom error message.
  * 
  * @param {string} messageTemplate
@@ -153,37 +182,60 @@ Condition.prototype.setDefaultValue = function (value) {
  * @return {lewd.condition.ConsumerCondition}
  */
 Condition.prototype.consumer = function () {
-    var self = this,
-        wrapper = function consumerWrapper(value, path) {
-            // do not use Function.bind() here because it will reset the function's name
-            return self.validate.call(self, value, path || []);
-        };
+    var self = this;
+
+    if (this.wrapper) {
+        return this.wrapper;
+    }
     
-    _.assign(wrapper, {
-        wrapped: this.name,
+    this.wrapper = function consumerWrapper(value, path) {
+        // do not use Function.bind() here because it will reset the function's name
+        return self.validate.call(self, value, path || []);
+    };
+    
+    _.assign(this.wrapper, {
+        wrapped: this.type,
         because: function (reason) {
             self.setCustomMessage(reason);
-            return wrapper;
+            return self.wrapper;
+        },
+        get: function (name) {
+            var result = self.wrapper.find(name);
+            return result.length ? result[0] : null;
+        },
+        find: function (name) {
+            return _.unique(self.find(name));
+        },
+        as: function (name) {
+            self.name = name;
+            return self.wrapper;
         },
         default: function (value) {
             self.setPropertyState(Condition.PROPERTY_STATE.OPTIONAL);
             self.setDefaultValue(value);
-            return wrapper;
+            return self.wrapper;
         },
         getDefault: function () {
             return self.default;
         },
         coerce: function () {
             self.setCoercionEnabled(true);
-            return wrapper;
+            return self.wrapper;
         },
         optional: function () {
             self.setPropertyState(Condition.PROPERTY_STATE.OPTIONAL);
-            return wrapper;
+            return self.wrapper;
+        },
+        forbidden: function () {
+            self.setPropertyState(Condition.PROPERTY_STATE.FORBIDDEN);
+            return self.wrapper;
         },
         required: function () {
             self.setPropertyState(Condition.PROPERTY_STATE.REQUIRED);
-            return wrapper;
+            return self.wrapper;
+        },
+        isForbidden: function () {
+            return self.state === Condition.PROPERTY_STATE.FORBIDDEN;
         },
         isOptional: function () {
             return self.state === Condition.PROPERTY_STATE.OPTIONAL;
@@ -193,7 +245,7 @@ Condition.prototype.consumer = function () {
         }
     });
     
-    return wrapper;
+    return self.wrapper;
 };
 
 module.exports = Condition;

@@ -1,26 +1,19 @@
 var util = require('util');
 
-var Condition = require('../Condition'),
-    ConditionViolationException = require('../../exception/ConditionViolationException'),
-    IllegalParameterException = require('../../exception/IllegalParameterException');
+var NestedCondition = require('../NestedCondition'),
+    ConditionViolationException = require('../../exception/ConditionViolationException');
 
 /**
  * @class lewd.condition.logic.All
- * @extends {lewd.condition.Condition}
+ * @extends {lewd.condition.NestedCondition}
  * @constructor
  * @param {Array.<lewd.condition.ConsumerCondition>} conditions
  */
 function AllCondition(conditions) {
-    Condition.call(this, 'All');
-
-    if (!Array.isArray(conditions)) {
-        throw new IllegalParameterException('Parameter must be an array');
-    }
-
-    this.conditions = conditions;
+    NestedCondition.call(this, 'All', conditions);
 }
 
-util.inherits(AllCondition, Condition);
+util.inherits(AllCondition, NestedCondition);
 
 /**
  * @inheritdoc

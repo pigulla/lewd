@@ -7,8 +7,12 @@ var helper = require('./../helper'),
 
 var refuteValues = helper.refuteValues,
     acceptValues = helper.acceptValues,
+    assertViolationAt = helper.assertViolationAt,
     assertViolationWithMessage = helper.assertViolationWithMessage,
     refuteSchemaOptions = helper.refuteSchemaOptions;
+
+var assert = buster.referee.assert,
+    refute = buster.referee.refute;
 
 var condition = lewd.object;
 
@@ -68,7 +72,25 @@ buster.testCase('"object" condition', {
             ]);
             acceptValues(condition, args, [
                 { s: 'hello' },
-//                { s: '', b: true }
+                { s: '', b: true }
+            ]);
+        },
+        '{ s: String, b: forbidden(Boolean) } (required by default)': function () {
+            var args = [{
+                s: String,
+                b: lewd.forbidden(Boolean)
+            }, { byDefault: 'required' }];
+            
+            refuteValues(condition, args, [
+                { b: true },
+                { s: '', b: 42 },
+                { s: 'hello', x: null },
+                { s: '', b: true, x: 42 },
+                { s: '', b: true }
+            ]);
+            acceptValues(condition, args, [
+                { s: 'hello' },
+                { s: '' }
             ]);
         },
         '{ s: String, b: lewd.required(Boolean) } (optional by default)': function () {
@@ -148,7 +170,7 @@ buster.testCase('"object" condition', {
             ]);
         },
         '{ $k: function } (extras allowed)': function () {
-            buster.referee.assert.exception(function () {
+            assert.exception(function () {
                 condition({ $k: function () { x(); } }, { removeExtra: true })({ n: 0 });  // jshint ignore:line                
             }, 'ReferenceError');
         }
@@ -296,77 +318,115 @@ buster.testCase('"object" condition', {
             var o = { a: 1, b: 2, c: 3 };
             condition({ a: Number, b: Number }, { removeExtra: true })(o);
             
-            buster.referee.assert.equals({ a: 1, b: 2 }, o);
+            assert.equals({ a: 1, b: 2 }, o);
         },
         '{ $k: /^[a-z]+$/i } (with removeExtra}': function () {
             var o = { a: 1, B: 2, $foo: false, 1: 0 };
             condition({ $k: /^[a-z]+$/i }, { removeExtra: true })(o);
             
-            buster.referee.assert.equals({ a: 1, B: 2 }, o);
+            assert.equals({ a: 1, B: 2 }, o);
         },
         '{ $k: /^a/, $v: Number } (with removeExtra}': function () {
             var o = { a: 1, aa: 4, b: 2, $foo: false };
             condition({ $k: /^a/, $v: Number }, { removeExtra: true })(o);
             
-            buster.referee.assert.equals({ a: 1, aa: 4 }, o);
+            assert.equals({ a: 1, aa: 4 }, o);
         }
     },
     'default values': {
         'doesn\'t break anything': function () {
-            buster.referee.refute.exception(function () {
+            refute.exception(function () {
                 condition({ a: lewd.Number().optional().default(42) })({});
             });
         },
         'is applied': function () {
-            buster.referee.assert.equals(
+            assert.equals(
                 condition({ a: lewd.Number().optional().default(42) })({}),
                 { a: 42 }
             );
         },
         'makes the property optional': function () {
-            buster.referee.refute.exception(function () {
+            refute.exception(function () {
                 condition({ a: lewd.Number().default(42) })({});
             });
         },
         'is not applied if not optional': function () {
-            buster.referee.assert.exception(function () {
+            assert.exception(function () {
                 condition({ a: lewd.Number().default(42).required() })({});
             }, 'ConditionViolationException');
         },
         'doesn\'t overwrite the actual value': function () {
-            buster.referee.assert.equals(
+            assert.equals(
                 condition({ a: lewd.Number().optional().default(42) })({ a: 13 }),
                 { a: 13 }
             );
         },
         'is still validated': function () {
-            buster.referee.assert.exception(function () {
+            assert.exception(function () {
                 condition({ a: lewd.Number().optional().default('42') })({});
             }, 'ConditionViolationException');
         }
     },
+    'property states changed between validations': function () {
+        var condC = lewd.forbidden(Number),
+            c = condition({
+                a: lewd.integer(),
+                b: lewd.optional(String),
+                c: condC
+            }, { byDefault: 'required' });
+
+        refute.exception(function () {
+            c({ a: 42, b: '' });
+            c({ a: 42 });
+        });
+        assertViolationAt(function () {
+            c({ a: 42, c: 42 });
+        }, []);
+        
+        condC.optional();
+        refute.exception(function () {
+            c({ a: 42, b: '' });
+            c({ a: 42 });
+            c({ a: 42, c: 42 });
+        });
+        
+        condC.required();
+        refute.exception(function () {
+            c({ a: 42, b: '', c: 42 });
+            c({ a: 42, c: 42 });
+        });
+        assert.exception(function () {
+            c({ a: 42, b: '' });
+        });
+        assert.exception(function () {
+            c({ a: 42 });
+        });
+        assertViolationAt(function () {
+            c({ a: 42, c: '42' });
+        }, ['c']);
+    },
     'passes exceptions through': {
         'value': function () {
-            buster.referee.assert.exception(function () {
+            assert.exception(function () {
                 condition({
                     a: function () { x(); }  // jshint ignore:line
                 })({ a: 0 }); 
             }, 'ReferenceError');
 
-            buster.referee.assert.exception(function () {
+            assert.exception(function () {
                 condition({
                     $v: function () { x(); }  // jshint ignore:line
                 }, { allowExtra: true, removeExtra: true })({ x: 0 });
             }, 'ReferenceError');
         },
         'key': function () {
-            buster.referee.assert.exception(function () {
+            assert.exception(function () {
                 condition({
                     $k: function () { x(); }  // jshint ignore:line
                 })({ a: 42 });
             }, 'ReferenceError');
 
-            buster.referee.assert.exception(function () {
+            assert.exception(function () {
                 condition({
                     a: function () { x(); }  // jshint ignore:line
                 }, { removeExtra: true })({ a: 0 });
@@ -379,10 +439,17 @@ buster.testCase('"object" condition', {
                 condition({})(42);
             }, _.template(errorMessages.Object.type, {}));
         },
-        'unexpectedKey': function () {
-            assertViolationWithMessage(function () {
-                condition({})({ x: null });
-            }, _.template(errorMessages.Object.unexpectedKey, { key: 'x' }));
+        'unexpectedKey': {
+            'extra': function () {
+                assertViolationWithMessage(function () {
+                    condition({})({ x: null });
+                }, _.template(errorMessages.Object.unexpectedKey, { key: 'x' }));
+            },
+            'forbidden': function () {
+                assertViolationWithMessage(function () {
+                    condition({ x: lewd.forbidden(undefined) })({ x: null });
+                }, _.template(errorMessages.Object.unexpectedKey, { key: 'x' }));
+            }
         },
         'missingKey': function () {
             assertViolationWithMessage(function () {

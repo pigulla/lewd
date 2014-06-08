@@ -8,21 +8,19 @@ var Condition = require('../Condition'),
     IllegalParameterException = require('../../exception/IllegalParameterException');
 
 var KEYS_PROPERTY = '$k',
-    VALUES_PROPERTY = '$v',
-    REQUIRED = 'required',
-    OPTIONAL = 'optional';
+    VALUES_PROPERTY = '$v';
 
 function validateOptions(options, allowExtraDefault) {
     var defaults = {
             allowExtra: allowExtraDefault,
-            byDefault: REQUIRED,
+            byDefault: Condition.PROPERTY_STATE.REQUIRED,
             keys: undefined,
             values: undefined,
             removeExtra: false
         },
         opts = _.defaults({}, options, defaults);
 
-    if ([REQUIRED, OPTIONAL].indexOf(opts.byDefault) === -1) {
+    if ([Condition.PROPERTY_STATE.REQUIRED, Condition.PROPERTY_STATE.OPTIONAL].indexOf(opts.byDefault) === -1) {
         throw new IllegalParameterException('invalid value for option "byDefault"');
     }
     if (typeof opts.allowExtra !== 'boolean') {
@@ -55,15 +53,14 @@ function ObjectCondition (spec, options) {
     Condition.call(this, 'Object');
     this.spec = spec;
 
-    var lewd = require('../../lewd');
-
-    var opts = options || {},
+    var lewd = require('../../lewd'),
         allowExtraDefault = false;
-    
+
+    this.opts = options || {};
     this.definedKeys = Object.keys(spec);
 
-    if (opts.hasOwnProperty('keys')) {
-        this.keysCondition = lewd._wrap(opts.keys);
+    if (this.opts.hasOwnProperty('keys')) {
+        this.keysCondition = lewd._wrap(this.opts.keys);
         allowExtraDefault = true;
     } else if (spec.hasOwnProperty(KEYS_PROPERTY)) {
         this.keysCondition = lewd._wrap(spec[KEYS_PROPERTY]);
@@ -73,8 +70,8 @@ function ObjectCondition (spec, options) {
         this.keysCondition = lewd(undefined);
     }
 
-    if (opts.hasOwnProperty('values')) {
-        this.valuesCondition = lewd._wrap(opts.values);
+    if (this.opts.hasOwnProperty('values')) {
+        this.valuesCondition = lewd._wrap(this.opts.values);
         allowExtraDefault = true;
     } else if (spec.hasOwnProperty(VALUES_PROPERTY)) {
         this.valuesCondition = lewd._wrap(spec[VALUES_PROPERTY]);
@@ -84,30 +81,40 @@ function ObjectCondition (spec, options) {
         this.valuesCondition = lewd(undefined);
     }
 
-    this.options = validateOptions(opts, allowExtraDefault);
+    this.options = validateOptions(this.opts, allowExtraDefault);
+}
 
+util.inherits(ObjectCondition, Condition);
+
+ObjectCondition.prototype.prepare = function () {
+    var lewd = require('../../lewd');
+
+    this.forbiddenKeys = [];
     this.optionalKeys = [];
     this.requiredKeys = [];
 
     this.definedKeys.forEach(function (key) {
-        spec[key] = lewd._wrap(spec[key]);
-        
-        if (!spec[key].isOptional() && !spec[key].isRequired() && opts.byDefault === REQUIRED) {
-            spec[key].required();
-        } else if (!spec[key].isOptional() && !spec[key].isRequired() && opts.byDefault === OPTIONAL) {
-            spec[key].optional();
+        this.spec[key] = lewd._wrap(this.spec[key]);
+
+        var hasState = this.spec[key].isOptional() || this.spec[key].isRequired() || this.spec[key].isForbidden();
+
+        if (!hasState && this.opts.byDefault === Condition.PROPERTY_STATE.REQUIRED) {
+            this.spec[key].required();
+        } else if (!hasState && this.opts.byDefault === Condition.PROPERTY_STATE.OPTIONAL) {
+            this.spec[key].optional();
         }
 
-        if (spec[key].isRequired()) {
+        if (this.spec[key].isForbidden()) {
+            this.forbiddenKeys.push(key);
+        }
+        if (this.spec[key].isRequired()) {
             this.requiredKeys.push(key);
         }
-        if (spec[key].isOptional()) {
+        if (this.spec[key].isOptional()) {
             this.optionalKeys.push(key);
         }
     }, this);
-}
-
-util.inherits(ObjectCondition, Condition);
+};
 
 /**
  * @inheritdoc
@@ -116,11 +123,15 @@ ObjectCondition.prototype.validate = function (value, path) {
     if (!_.isPlainObject(value)) {
         this.reject(value, path, errorMessages.Object.type);
     }
+    
+    // We need to do this every time in case the nested conditions' property states have changed
+    this.prepare();
 
     var actualKeys = Object.keys(value),
         extraKeys = _.difference(actualKeys, this.definedKeys),
-        missingKeys = this.options.byDefault === REQUIRED ?
-            _.difference(this.definedKeys, this.optionalKeys, actualKeys) : _.difference(this.requiredKeys, actualKeys),
+        missingKeys = this.options.byDefault === Condition.PROPERTY_STATE.REQUIRED ?
+            _.difference(this.definedKeys, this.optionalKeys, this.forbiddenKeys, actualKeys) :
+            _.difference(this.requiredKeys, actualKeys),
         keysToValidate = _.intersection(this.definedKeys, actualKeys);
 
     if (extraKeys.length > 0 && !this.options.allowExtra) {
@@ -163,10 +174,31 @@ ObjectCondition.prototype.validate = function (value, path) {
     }, this);
 
     keysToValidate.forEach(function (key) {
+        if (this.spec[key].isForbidden()) {
+            this.reject(value, path, errorMessages.Object.unexpectedKey, { key: key });
+        }
+        
         value[key] = this.spec[key](value[key], path.concat(key));
     }, this);
 
     return value;
+};
+
+/**
+ * @inheritdoc
+ */
+ObjectCondition.prototype.find = function (name) {
+    var result = Condition.prototype.find.call(this, name);
+    
+    Array.prototype.push.apply(result, this.keysCondition.find(name));
+    Array.prototype.push.apply(result, this.valuesCondition.find(name));
+
+    this.definedKeys.forEach(function (key) {
+        var found = this.spec[key].find(name);
+        Array.prototype.push.apply(result, found);
+    }.bind(this));
+
+    return result;
 };
 
 module.exports = ObjectCondition;
