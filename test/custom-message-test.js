@@ -1,6 +1,8 @@
-var buster = require('buster');
+var _ = require('lodash'),
+    buster = require('buster');
 
-var lewd = require('../src/lewd');
+var lewd = require('../src/lewd'),
+    errorMessages = require('../src/messages');
 
 function assertFailedWithMessage(condition, value, message) {
     try {
@@ -22,6 +24,13 @@ buster.testCase('custom messages', {
     'nested': function () {
         var condition = lewd.all(String, lewd.all(/^\d/, lewd.regex(/\d$/).because('must start and end with a digit')));
         assertFailedWithMessage(condition, '4x', 'must start and end with a digit');
+    },
+    'reset': function () {
+        var condition = lewd.Boolean().because('X');
+        assertFailedWithMessage(condition, ['x'], 'X');
+        
+        condition.because();
+        assertFailedWithMessage(condition, ['x'], _.template(errorMessages.Type, { type: 'boolean' }));
     },
     'with params': function () {
         var condition;

@@ -131,7 +131,7 @@ Condition.prototype.find = function (name) {
 /**
  * Set a custom error message.
  * 
- * @param {string} messageTemplate
+ * @param {?string} messageTemplate
  * @return {lewd.condition.Condition}
  */
 Condition.prototype.setCustomMessage = function (messageTemplate) {
