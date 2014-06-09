@@ -1,5 +1,10 @@
 ## 0.5.0 (2014-??-??)
 
+##### New features:
+
+ - Conditions can be named via `as` and then retrieved via `find` and `get`.
+ - Object properties can explicitly be disallowed with `.forbidden()`.
+
 ## 0.4.0 (2014-06-06)
 
 ###### Breaking changes:

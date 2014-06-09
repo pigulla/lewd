@@ -1,6 +1,7 @@
 var _ = require('lodash');
 
-var ConditionViolationException = require('../exception/ConditionViolationException'),
+var consumerWrapper = require('./ConsumerWrapper'),
+    ConditionViolationException = require('../exception/ConditionViolationException'),
     IllegalParameterException = require('../exception/IllegalParameterException');
 
 /**
@@ -49,7 +50,7 @@ Condition.prototype.name;
 /**
  * The consumer wrapper.
  * 
- * @type {?lewd.condition.ConsumerCondition}
+ * @type {?lewd.condition.ConsumerWrapper}
  */
 Condition.prototype.wrapper;
 
@@ -121,7 +122,7 @@ Condition.prototype.reject = function (value, path, messageTemplate, templateDat
  * array otherwise.
  *  
  * @param {string} name
- * @returns {Array.<lewd.condition.ConsumerCondition>}
+ * @returns {Array.<lewd.condition.ConsumerWrapper>}
  */
 Condition.prototype.find = function (name) {
     return this.name === name ? [this.consumer()] : [];
@@ -179,73 +180,14 @@ Condition.prototype.setDefaultValue = function (value) {
 /**
  * Returns a "consumer" object of this condition that hides away the internals and provides convenience methods.
  * 
- * @return {lewd.condition.ConsumerCondition}
+ * @return {lewd.condition.ConsumerWrapper}
  */
 Condition.prototype.consumer = function () {
-    var self = this;
-
-    if (this.wrapper) {
-        return this.wrapper;
+    if (!this.wrapper) {
+        this.wrapper = consumerWrapper(this);
     }
     
-    this.wrapper = function consumerWrapper(value, path) {
-        // do not use Function.bind() here because it will reset the function's name
-        return self.validate.call(self, value, path || []);
-    };
-    
-    _.assign(this.wrapper, {
-        wrapped: this.type,
-        because: function (reason) {
-            self.setCustomMessage(reason);
-            return self.wrapper;
-        },
-        get: function (name) {
-            var result = self.wrapper.find(name);
-            return result.length ? result[0] : null;
-        },
-        find: function (name) {
-            return _.unique(self.find(name));
-        },
-        as: function (name) {
-            self.name = name;
-            return self.wrapper;
-        },
-        default: function (value) {
-            self.setPropertyState(Condition.PROPERTY_STATE.OPTIONAL);
-            self.setDefaultValue(value);
-            return self.wrapper;
-        },
-        getDefault: function () {
-            return self.default;
-        },
-        coerce: function () {
-            self.setCoercionEnabled(true);
-            return self.wrapper;
-        },
-        optional: function () {
-            self.setPropertyState(Condition.PROPERTY_STATE.OPTIONAL);
-            return self.wrapper;
-        },
-        forbidden: function () {
-            self.setPropertyState(Condition.PROPERTY_STATE.FORBIDDEN);
-            return self.wrapper;
-        },
-        required: function () {
-            self.setPropertyState(Condition.PROPERTY_STATE.REQUIRED);
-            return self.wrapper;
-        },
-        isForbidden: function () {
-            return self.state === Condition.PROPERTY_STATE.FORBIDDEN;
-        },
-        isOptional: function () {
-            return self.state === Condition.PROPERTY_STATE.OPTIONAL;
-        },
-        isRequired: function () {
-            return self.state === Condition.PROPERTY_STATE.REQUIRED;
-        }
-    });
-    
-    return self.wrapper;
+    return this.wrapper;
 };
 
 module.exports = Condition;

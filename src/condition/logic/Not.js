@@ -8,7 +8,7 @@ var NestedCondition = require('../NestedCondition'),
  * @class lewd.condition.logic.Not
  * @extends {lewd.condition.NestedCondition}
  * @constructor
- * @param {lewd.condition.ConsumerCondition} condition
+ * @param {lewd.condition.ConsumerWrapper} condition
  */
 function NotCondition(condition) {
     NestedCondition.call(this, 'Not', [condition]);

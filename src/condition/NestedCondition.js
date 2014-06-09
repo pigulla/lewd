@@ -9,7 +9,7 @@ var Condition = require('./Condition'),
  * @extends {lewd.condition.Condition}
  * @constructor
  * @param {string} name
- * @param {Array.<lewd.condition.ConsumerCondition>} conditions
+ * @param {Array.<lewd.condition.ConsumerWrapper>} conditions
  */
 function NestedCondition(name, conditions) {
     Condition.call(this, name);
@@ -25,7 +25,7 @@ util.inherits(NestedCondition, Condition);
 
 /**
  * @protected
- * @type {Array.<lewd.Condition.ConsumerCondition>}
+ * @type {Array.<lewd.Condition.ConsumerWrapper>}
  */
 NestedCondition.prototype.conditions = null;
 

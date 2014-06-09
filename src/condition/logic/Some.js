@@ -8,7 +8,7 @@ var NestedCondition = require('../NestedCondition'),
  * @class lewd.condition.logic.Some
  * @extends {lewd.condition.NestedCondition}
  * @constructor
- * @param {Array.<lewd.condition.ConsumerCondition>} conditions
+ * @param {Array.<lewd.condition.ConsumerWrapper>} conditions
  */
 function SomeCondition(conditions) {
     NestedCondition.call(this, 'Some', conditions);

@@ -36,6 +36,7 @@ But they can of course get more complex by logically combining conditions or nes
  - intuitive and concise API
  - supports arbitrarily nested structures
  - optionally remove invalid or unexpected keys from objects
+ - compose larger structures by combining and re-using smaller ones
  - value coercion
  - default values
  - custom validators
