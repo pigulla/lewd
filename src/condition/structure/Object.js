@@ -59,27 +59,21 @@ function ObjectCondition (spec, options) {
     this.opts = options || {};
     this.definedKeys = Object.keys(spec);
 
-    if (this.opts.hasOwnProperty('keys')) {
-        this.keysCondition = lewd._wrap(this.opts.keys);
-        allowExtraDefault = true;
-    } else if (spec.hasOwnProperty(KEYS_PROPERTY)) {
-        this.keysCondition = lewd._wrap(spec[KEYS_PROPERTY]);
-        this.definedKeys = _.without(this.definedKeys, KEYS_PROPERTY);
-        allowExtraDefault = true;
-    } else {
-        this.keysCondition = lewd(undefined);
+    function initProp(key, propName, PROPERTY) {
+        if (this.opts.hasOwnProperty(key)) {
+            this[propName] = lewd._wrap(this.opts[key]);
+            allowExtraDefault = true;
+        } else if (spec.hasOwnProperty(PROPERTY)) {
+            this[propName] = lewd._wrap(spec[PROPERTY]);
+            this.definedKeys = _.without(this.definedKeys, PROPERTY);
+            allowExtraDefault = true;
+        } else {
+            this[propName] = lewd(undefined);
+        }
     }
-
-    if (this.opts.hasOwnProperty('values')) {
-        this.valuesCondition = lewd._wrap(this.opts.values);
-        allowExtraDefault = true;
-    } else if (spec.hasOwnProperty(VALUES_PROPERTY)) {
-        this.valuesCondition = lewd._wrap(spec[VALUES_PROPERTY]);
-        this.definedKeys = _.without(this.definedKeys, VALUES_PROPERTY);
-        allowExtraDefault = true;
-    } else {
-        this.valuesCondition = lewd(undefined);
-    }
+    
+    initProp.call(this, 'keys', 'keysCondition', KEYS_PROPERTY);
+    initProp.call(this, 'values', 'valuesCondition', VALUES_PROPERTY);
 
     this.options = validateOptions(this.opts, allowExtraDefault);
 }
