@@ -17,6 +17,31 @@ var utils = {
     },
     
     /**
+     * Asserts that the given arguments array contains at least `min` and no more than `max` parameters.
+     *
+     * @param {Array} args The arguments array.
+     * @param {number} min The number of required parameters.
+     * @param {number=} max The number of allowed parameters (defaults to `min`).
+     * @throws lewd.exception.IllegalParameterException
+     */
+    assertParameterCount: function (args, min, max) {
+        max = arguments.length === 2 ? min : max;
+    
+        if (args.length > max) {
+            throw new IllegalParameterException(util.format(
+                'Function expected at most %d parameters but was called with %d',
+                max, args.length
+            ));
+        }
+        if (args.length < min) {
+            throw new IllegalParameterException(util.format(
+                'Function expected no more than %d parameters but was called with %d',
+                min, args.length
+            ));
+        }
+    },
+    
+    /**
      * Formats a value in a human readable way.
      * 
      * @param {*} value

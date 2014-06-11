@@ -52,30 +52,6 @@ var ConditionViolationException = require('./exception/ConditionViolationExcepti
         StringType: require('./condition/type/String')
     };
 
-/**
- * Asserts that the given arguments array contains at least `min` and no more than `max` parameters.
- * 
- * @param {Array} args The arguments array.
- * @param {number} min The number of required parameters.
- * @param {number=} max The number of allowed parameters (defaults to `min`).
- * @throws lewd.exception.IllegalParameterException
- */
-function assertParameterCount(args, min, max) {
-    max = arguments.length === 2 ? min : max;
-
-    if (args.length > max) {
-        throw new IllegalParameterException(util.format(
-            'Function expected at most %d parameters but was called with %d',
-            max, args.length
-        ));
-    }
-    if (args.length < min) {
-        throw new IllegalParameterException(util.format(
-            'Function expected no more than %d parameters but was called with %d',
-            min, args.length
-        ));
-    }
-}
 
 /**
  * @param {...*} var_args
@@ -84,7 +60,7 @@ function assertParameterCount(args, min, max) {
  * @throws IllegalParameterException
  */
 var lewd = function () {
-    assertParameterCount(arguments, 1, Infinity);
+    utils.assertParameterCount(arguments, 1, Infinity);
 
     if (arguments.length === 1) {
         return lewd._wrap(arguments[0]);
@@ -187,7 +163,7 @@ lewd.expose = function (prefix) {
  * @return {lewd.condition.ConsumerWrapper}
  */
 lewd.custom = function (fn) {
-    assertParameterCount(arguments, 1);
+    utils.assertParameterCount(arguments, 1);
     
     if (typeof fn === 'function' && fn.name === 'consumerWrapper') {
         return fn;
@@ -208,7 +184,7 @@ lewd.custom = function (fn) {
  * @return {lewd.condition.ConsumerWrapper}
  */
 lewd.coerce = function (condition) {
-    assertParameterCount(arguments, 1);
+    utils.assertParameterCount(arguments, 1);
     return lewd._wrap(condition).coerce();
 };
 
@@ -220,7 +196,7 @@ lewd.coerce = function (condition) {
  * @return {lewd.condition.ConsumerWrapper}
  */
 lewd.optional = function (condition) {
-    assertParameterCount(arguments, 1);
+    utils.assertParameterCount(arguments, 1);
     return lewd._wrap(condition).optional();
 };
 
@@ -232,7 +208,7 @@ lewd.optional = function (condition) {
  * @return {lewd.condition.ConsumerWrapper}
  */
 lewd.forbidden = function (condition) {
-    assertParameterCount(arguments, 1);
+    utils.assertParameterCount(arguments, 1);
     return lewd._wrap(condition).forbidden();
 };
 
@@ -244,7 +220,7 @@ lewd.forbidden = function (condition) {
  * @return {lewd.condition.ConsumerWrapper}
  */
 lewd.required = function (condition) {
-    assertParameterCount(arguments, 1);
+    utils.assertParameterCount(arguments, 1);
     return lewd._wrap(condition).required();
 };
 
@@ -253,7 +229,7 @@ lewd.required = function (condition) {
  * @return {lewd.condition.ConsumerWrapper}
  */
 lewd.integer = function () {
-    assertParameterCount(arguments, 0);
+    utils.assertParameterCount(arguments, 0);
     return (new conditions.Integer()).consumer();
 };
 
@@ -262,7 +238,7 @@ lewd.integer = function () {
  * @return {lewd.condition.ConsumerWrapper}
  */
 lewd.isoDateTime = function () {
-    assertParameterCount(arguments, 0);
+    utils.assertParameterCount(arguments, 0);
     return (new conditions.IsoDateTime()).consumer();
 };
 
@@ -271,7 +247,7 @@ lewd.isoDateTime = function () {
  * @return {lewd.condition.ConsumerWrapper}
  */
 lewd.creditcard = function () {
-    assertParameterCount(arguments, 0);
+    utils.assertParameterCount(arguments, 0);
     return (new conditions.Creditcard()).consumer();
 };
 
@@ -280,7 +256,7 @@ lewd.creditcard = function () {
  * @return {lewd.condition.ConsumerWrapper}
  */
 lewd.email = function () {
-    assertParameterCount(arguments, 0);
+    utils.assertParameterCount(arguments, 0);
     return (new conditions.Email()).consumer();
 };
 
@@ -290,7 +266,7 @@ lewd.email = function () {
  * @return {lewd.condition.ConsumerWrapper}
  */
 lewd.ip = function (version) {
-    assertParameterCount(arguments, 0, 1);
+    utils.assertParameterCount(arguments, 0, 1);
     return (new conditions.Ip(version)).consumer();
 };
 
@@ -300,7 +276,7 @@ lewd.ip = function (version) {
  * @return {lewd.condition.ConsumerWrapper}
  */
 lewd.isbn = function (version) {
-    assertParameterCount(arguments, 0, 1);
+    utils.assertParameterCount(arguments, 0, 1);
     return (new conditions.Isbn(version)).consumer();
 };
 
@@ -310,7 +286,7 @@ lewd.isbn = function (version) {
  * @return {lewd.condition.ConsumerWrapper}
  */
 lewd.url = function (options) {
-    assertParameterCount(arguments, 0, 1);
+    utils.assertParameterCount(arguments, 0, 1);
     return (new conditions.Url(options)).consumer();
 };
 
@@ -320,7 +296,7 @@ lewd.url = function (options) {
  * @return {lewd.condition.ConsumerWrapper}
  */
 lewd.uuid = function (version) {
-    assertParameterCount(arguments, 0, 1);
+    utils.assertParameterCount(arguments, 0, 1);
     return (new conditions.Uuid(version)).consumer();
 };
 
@@ -330,7 +306,7 @@ lewd.uuid = function (version) {
  * @return {lewd.condition.ConsumerWrapper}
  */
 lewd.len = function (options) {
-    assertParameterCount(arguments, 1);
+    utils.assertParameterCount(arguments, 1);
     return (new conditions.Len(options)).consumer();
 };
 
@@ -340,7 +316,7 @@ lewd.len = function (options) {
  * @return {lewd.condition.ConsumerWrapper}
  */
 lewd.literal = function(literal) {
-    assertParameterCount(arguments, 1);
+    utils.assertParameterCount(arguments, 1);
     return (new conditions.Literal(literal)).consumer();
 };
 
@@ -350,7 +326,7 @@ lewd.literal = function(literal) {
  * @return {lewd.condition.ConsumerWrapper}
  */
 lewd.range = function (options) {
-    assertParameterCount(arguments, 1);
+    utils.assertParameterCount(arguments, 1);
     return (new conditions.Range(options)).consumer();
 };
 
@@ -360,7 +336,7 @@ lewd.range = function (options) {
  * @return {lewd.condition.ConsumerWrapper}
  */
 lewd.regex = function (regex) {
-    assertParameterCount(arguments, 1);
+    utils.assertParameterCount(arguments, 1);
     return (new conditions.Regex(regex)).consumer();
 };
 
@@ -369,7 +345,7 @@ lewd.regex = function (regex) {
  * @return {lewd.condition.ConsumerWrapper}
  */
 lewd.unique = function () {
-    assertParameterCount(arguments, 0);
+    utils.assertParameterCount(arguments, 0);
     return (new conditions.Unique()).consumer();
 };
 
@@ -390,7 +366,7 @@ lewd.array = function () {
  * @return {lewd.condition.ConsumerWrapper}
  */
 lewd.object = function (spec, options) {
-    assertParameterCount(arguments, 1, 2);
+    utils.assertParameterCount(arguments, 1, 2);
     return (new conditions.Object(spec, options)).consumer();
 };
 
@@ -399,7 +375,7 @@ lewd.object = function (spec, options) {
  * @return {lewd.condition.ConsumerWrapper}
  */
 lewd.Array = function () {
-    assertParameterCount(arguments, 0);
+    utils.assertParameterCount(arguments, 0);
     return (new conditions.ArrayType()).consumer();
 };
 
@@ -408,7 +384,7 @@ lewd.Array = function () {
  * @return {lewd.condition.ConsumerWrapper}
  */
 lewd.Boolean = function () {
-    assertParameterCount(arguments, 0);
+    utils.assertParameterCount(arguments, 0);
     return (new conditions.BooleanType()).consumer();
 };
 
@@ -417,7 +393,7 @@ lewd.Boolean = function () {
  * @return {lewd.condition.ConsumerWrapper}
  */
 lewd.null = function () {
-    assertParameterCount(arguments, 0);
+    utils.assertParameterCount(arguments, 0);
     return (new conditions.NullType()).consumer();
 };
 
@@ -426,7 +402,7 @@ lewd.null = function () {
  * @return {lewd.condition.ConsumerWrapper}
  */
 lewd.Number = function () {
-    assertParameterCount(arguments, 0);
+    utils.assertParameterCount(arguments, 0);
     return (new conditions.NumberType()).consumer();
 };
 
@@ -435,7 +411,7 @@ lewd.Number = function () {
  * @return {lewd.condition.ConsumerWrapper}
  */
 lewd.Object = function () {
-    assertParameterCount(arguments, 0);
+    utils.assertParameterCount(arguments, 0);
     return (new conditions.ObjectType()).consumer();
 };
 
@@ -444,7 +420,7 @@ lewd.Object = function () {
  * @return {lewd.condition.ConsumerWrapper}
  */
 lewd.String = function () {
-    assertParameterCount(arguments, 0);
+    utils.assertParameterCount(arguments, 0);
     return (new conditions.StringType()).consumer();
 };
 
@@ -453,7 +429,7 @@ lewd.String = function () {
  * @return {lewd.condition.ConsumerWrapper}
  */
 lewd.undefined = function () {
-    assertParameterCount(arguments, 0);
+    utils.assertParameterCount(arguments, 0);
     return (new conditions.Any()).consumer();
 };
 
@@ -483,7 +459,7 @@ lewd.none = function () {
  * @return {lewd.condition.ConsumerWrapper}
  */
 lewd.not = function (value) {
-    assertParameterCount(arguments, 1);
+    utils.assertParameterCount(arguments, 1);
     return (new conditions.Not(lewd._wrap(value))).consumer();
 };
 
