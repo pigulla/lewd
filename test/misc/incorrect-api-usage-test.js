@@ -1,6 +1,6 @@
 var buster = require('buster');
 
-var lewd = require('../src/lewd');
+var lewd = require('../../src/lewd');
 
 /*jshint nonew:false */
 
@@ -43,49 +43,49 @@ buster.testCase('incorrect api usage', {
     },
     'incorrectly instantiated conditions': {
         'all': function () {
-            var All = require('../src/condition/logic/All');
+            var All = require('../../src/condition/logic/All');
             buster.referee.assert.exception(function () {
                 new All('');
             }, 'IllegalParameterException');
         },
         'array': function () {
-            var ArrayC = require('../src/condition/structure/Array');
+            var ArrayC = require('../../src/condition/structure/Array');
             buster.referee.assert.exception(function () {
                 new ArrayC('');
             }, 'IllegalParameterException');
         },
         'object': function () {
-            var ObjectC = require('../src/condition/structure/Object');
+            var ObjectC = require('../../src/condition/structure/Object');
             buster.referee.assert.exception(function () {
                 new ObjectC('');
             }, 'IllegalParameterException');
         },
         'len': function () {
-            var Len = require('../src/condition/content/Len');
+            var Len = require('../../src/condition/content/Len');
             buster.referee.assert.exception(function () {
                 new Len('');
             }, 'IllegalParameterException');
         },
         'none': function () {
-            var None = require('../src/condition/logic/None');
+            var None = require('../../src/condition/logic/None');
             buster.referee.assert.exception(function () {
                 new None('');
             }, 'IllegalParameterException');
         },
         'range': function () {
-            var Range = require('../src/condition/content/Range');
+            var Range = require('../../src/condition/content/Range');
             buster.referee.assert.exception(function () {
                 new Range('');
             }, 'IllegalParameterException');
         },
         'some': function () {
-            var Some = require('../src/condition/logic/Some');
+            var Some = require('../../src/condition/logic/Some');
             buster.referee.assert.exception(function () {
                 new Some('');
             }, 'IllegalParameterException');
         },
         'custom': function () {
-            var Custom = require('../src/condition/Custom');
+            var Custom = require('../../src/condition/Custom');
             buster.referee.assert.exception(function () {
                 new Custom('');
             }, 'IllegalParameterException');

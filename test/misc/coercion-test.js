@@ -3,8 +3,8 @@ var util = require('util');
 var _ = require('lodash'),
     buster = require('buster');
 
-var lewd = require('../src/lewd'),
-    Condition = require('../src/condition/Condition');
+var lewd = require('../../src/lewd'),
+    Condition = require('../../src/condition/Condition');
 
 buster.testCase('coercion', {
     'coercion within objects': function () {

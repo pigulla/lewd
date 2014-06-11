@@ -2,9 +2,9 @@ var util = require('util');
 
 var buster = require('buster');
 
-var lewd = require('../src/lewd'),
-    errorMessages = require('../src/messages'),
-    ConditionViolationException = require('../src/exception/ConditionViolationException');
+var lewd = require('../../src/lewd'),
+    errorMessages = require('../../src/messages'),
+    ConditionViolationException = require('../../src/exception/ConditionViolationException');
 
 function oddNumberConditionWithException(value, path) {
     if ((value % 2) !== 1) {

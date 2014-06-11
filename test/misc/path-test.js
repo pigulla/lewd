@@ -1,7 +1,7 @@
 var buster = require('buster');
 
-var lewd = require('../src/lewd'),
-    helper = require('./helper');
+var lewd = require('../../src/lewd'),
+    helper = require('../helper');
 
 var assertViolationAt = helper.assertViolationAt;
 

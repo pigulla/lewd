@@ -1,8 +1,8 @@
 var _ = require('lodash'),
     buster = require('buster');
 
-var lewd = require('../src/lewd'),
-    errorMessages = require('../src/messages');
+var lewd = require('../../src/lewd'),
+    errorMessages = require('../../src/messages');
 
 function assertFailedWithMessage(condition, value, message) {
     try {

@@ -1,10 +1,10 @@
 var _ = require('lodash'),
     buster = require('buster');
 
-var helper = require('./helper'),
-    errorMessages = require('../src/messages'),
-    lewd = require('../src/lewd'),
-    BooleanTypeCondition = require('../src/condition/type/Boolean');
+var helper = require('../helper'),
+    errorMessages = require('../../src/messages'),
+    lewd = require('../../src/lewd'),
+    BooleanTypeCondition = require('../../src/condition/type/Boolean');
 
 buster.testCase('shorthand syntax', {
     'Boolean': function () {

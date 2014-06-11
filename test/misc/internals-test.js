@@ -1,7 +1,7 @@
 var buster = require('buster');
 
-var lewd = require('../src/lewd'),
-    utils = require('../src/utils');
+var lewd = require('../../src/lewd'),
+    utils = require('../../src/utils');
 
 var assert = buster.referee.assert,
     refute = buster.referee.refute;

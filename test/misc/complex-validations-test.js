@@ -1,9 +1,9 @@
 var _ = require('lodash'),
     buster = require('buster');
 
-var helper = require('./helper'),
-    errorMessages = require('../src/messages'),
-    lewd = require('../src/lewd');
+var helper = require('../helper'),
+    errorMessages = require('../../src/messages'),
+    lewd = require('../../src/lewd');
 
 var refuteValues = helper.refuteValues,
     acceptValues = helper.acceptValues,
