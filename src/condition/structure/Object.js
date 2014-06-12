@@ -51,42 +51,75 @@ function ObjectCondition (spec, options) {
     }
     
     Condition.call(this, 'Object');
-    this.spec = spec;
 
     var lewd = require('../../lewd'),
         allowExtraDefault = false;
 
+    this.spec = spec;
     this.opts = options || {};
     this.definedKeys = Object.keys(spec);
 
-    function initProp(key, propName, PROPERTY) {
+    /**
+     * Normalizes the generic key and value conditions and determines what the default value for the "allowExtra"
+     * option should be.
+     * 
+     * @param {string} key
+     * @param {string} PROPERTY
+     */
+    function initKeyValueConditions(key, PROPERTY) {
+        var propertyName = key + 'Condition';
+
         if (this.opts.hasOwnProperty(key)) {
-            this[propName] = lewd._wrap(this.opts[key]);
+            // If 'keys' or 'values' is specified in the options it takes precedence over the corresponding $key or
+            // $value property in the spec.
+            this[propertyName] = lewd._wrap(this.opts[key]);
             allowExtraDefault = true;
+            
         } else if (spec.hasOwnProperty(PROPERTY)) {
-            this[propName] = lewd._wrap(spec[PROPERTY]);
+            this[propertyName] = lewd._wrap(spec[PROPERTY]);
+            // Remove the special value since its not actually a key.
             this.definedKeys = _.without(this.definedKeys, PROPERTY);
             allowExtraDefault = true;
+            
         } else {
-            this[propName] = lewd(undefined);
+            // No generic constraints are put on the keys or values, so we accept anything.
+            this[propertyName] = lewd(undefined);
         }
     }
     
-    initProp.call(this, 'keys', 'keysCondition', KEYS_PROPERTY);
-    initProp.call(this, 'values', 'valuesCondition', VALUES_PROPERTY);
+    initKeyValueConditions.call(this, 'keys', KEYS_PROPERTY);
+    initKeyValueConditions.call(this, 'values', VALUES_PROPERTY);
 
     this.options = validateOptions(this.opts, allowExtraDefault);
 }
 
 util.inherits(ObjectCondition, Condition);
 
-ObjectCondition.prototype.prepare = function () {
-    var lewd = require('../../lewd');
-
-    this.forbiddenKeys = [];
-    this.optionalKeys = [];
-    this.requiredKeys = [];
-
+/**
+ * Calculate various sets of keys needed to do the actual validation. This calculation needs to be re-done whenever
+ * a value is validated because the underlying property conditions might have changed (e.g., from being optional to now
+ * being required).
+ * 
+ * @private
+ * @param {object} value
+ * @return {object}
+ */
+ObjectCondition.prototype._calculateKeys = function (value) {
+    var lewd = require('../../lewd'),
+        keys = {
+            actual: null,
+            extra: null,
+            missing: null,
+            toValidate: null,
+            forbidden: [],
+            optional: [],
+            required: []
+        };
+    
+    keys.actual = Object.keys(value);
+    keys.extra = _.difference(keys.actual, this.definedKeys);
+    keys.toValidate = _.intersection(this.definedKeys, keys.actual);
+    
     this.definedKeys.forEach(function (key) {
         this.spec[key] = lewd._wrap(this.spec[key]);
 
@@ -99,15 +132,19 @@ ObjectCondition.prototype.prepare = function () {
         }
 
         if (this.spec[key].isForbidden()) {
-            this.forbiddenKeys.push(key);
-        }
-        if (this.spec[key].isRequired()) {
-            this.requiredKeys.push(key);
-        }
-        if (this.spec[key].isOptional()) {
-            this.optionalKeys.push(key);
+            keys.forbidden.push(key);
+        } else if (this.spec[key].isRequired()) {
+            keys.required.push(key);
+        } else if (this.spec[key].isOptional()) {
+            keys.optional.push(key);
         }
     }, this);
+
+    keys.missing = this.options.byDefault === Condition.PROPERTY_STATE.REQUIRED ?
+        _.difference(this.definedKeys, keys.optional, keys.forbidden, keys.actual) :
+        _.difference(keys.required, keys.actual);
+
+    return keys;
 };
 
 /**
@@ -118,30 +155,26 @@ ObjectCondition.prototype.validate = function (value, path) {
         this.reject(value, path, errorMessages.Object.type);
     }
     
-    // We need to do this every time in case the nested conditions' property states have changed
-    this.prepare();
+    var keys = this._calculateKeys(value);
 
-    var actualKeys = Object.keys(value),
-        extraKeys = _.difference(actualKeys, this.definedKeys),
-        missingKeys = this.options.byDefault === Condition.PROPERTY_STATE.REQUIRED ?
-            _.difference(this.definedKeys, this.optionalKeys, this.forbiddenKeys, actualKeys) :
-            _.difference(this.requiredKeys, actualKeys),
-        keysToValidate = _.intersection(this.definedKeys, actualKeys);
-
-    if (extraKeys.length > 0 && !this.options.allowExtra) {
+    // Check unexpected keys and remove them or throw an error depending on the settings.
+    if (keys.extra.length > 0 && !this.options.allowExtra) {
         if (this.options.removeExtra) {
-            extraKeys.forEach(function (key) {
+            keys.extra.forEach(function (key) {
                 delete value[key];
             });
         } else {
-            this.reject(value, path, errorMessages.Object.unexpectedKey, { key: extraKeys[0] });
+            this.reject(value, path, errorMessages.Object.unexpectedKey, { key: keys.extra[0] });
         }
     }
-    if (missingKeys.length > 0) {
-        this.reject(value, path, errorMessages.Object.missingKey, { key: missingKeys[0] });
+    
+    // Check missing keys
+    if (keys.missing.length > 0) {
+        this.reject(value, path, errorMessages.Object.missingKey, { key: keys.missing[0] });
     }
 
-    extraKeys.forEach(function (key) {
+    // Validate extra keys. 
+    keys.extra.forEach(function (key) {
         if (this.options.removeExtra) {
             try {
                 this.keysCondition(key, path.concat(KEYS_PROPERTY + key));
@@ -160,14 +193,18 @@ ObjectCondition.prototype.validate = function (value, path) {
         }
     }, this);
     
-    this.optionalKeys.forEach(function (key) {
-        if (actualKeys.indexOf(key) === -1 && this.spec[key].getDefault() !== undefined) {
-            value[key] = this.spec[key].getDefault();
-            keysToValidate.push(key);
+    // If any of the optional keys with a defined default is missing, assign that default.
+    keys.optional.forEach(function (key) {
+        var defaultValue = this.spec[key].getDefault();
+        
+        if (keys.actual.indexOf(key) === -1 && defaultValue !== undefined) {
+            value[key] = defaultValue;
+            keys.toValidate.push(key);
         }
     }, this);
 
-    keysToValidate.forEach(function (key) {
+    // Do the actual validation of the defined values.
+    keys.toValidate.forEach(function (key) {
         if (this.spec[key].isForbidden()) {
             this.reject(value, path, errorMessages.Object.unexpectedKey, { key: key });
         }

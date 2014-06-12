@@ -7,22 +7,28 @@ var utils = require('../utils');
  * @return {lewd.condition.ConsumerWrapper}
  */
 module.exports = function (condition) {
-    var Condition = require('./Condition'),
-        wrapper = function consumerWrapper(value, path) {
-            // do not use Function.bind() here because it will reset the function's name
-            return condition.validate(value, path || []);
-        };
+    var Condition = require('./Condition');
 
-    _.assign(wrapper, {
+    /**
+     * @class lewd.condition.ConsumerWrapper
+     * @param {*} value
+     * @param {Array.<string>=} path
+     * @return {*}
+     */
+    function consumerWrapper(value, path) {
+        return condition.validate(value, path || []);
+    }
+
+    _.assign(consumerWrapper, {
         wrapped: condition.type,
         because: function (reason) {
             utils.assertParameterCount(arguments, 0, 1);
             condition.setCustomMessage(reason);
-            return wrapper;
+            return consumerWrapper;
         },
         get: function (name) {
             utils.assertParameterCount(arguments, 1);
-            var result = condition.wrapper.find(name);
+            var result = consumerWrapper.find(name);
             return result.length ? result[0] : null;
         },
         find: function (name) {
@@ -32,13 +38,13 @@ module.exports = function (condition) {
         as: function (name) {
             utils.assertParameterCount(arguments, 1);
             condition.name = name;
-            return wrapper;
+            return consumerWrapper;
         },
         default: function (value) {
             utils.assertParameterCount(arguments, 1);
             condition.setPropertyState(Condition.PROPERTY_STATE.OPTIONAL);
             condition.setDefaultValue(value);
-            return wrapper;
+            return consumerWrapper;
         },
         getDefault: function () {
             utils.assertParameterCount(arguments, 0);
@@ -47,22 +53,22 @@ module.exports = function (condition) {
         coerce: function () {
             utils.assertParameterCount(arguments, 0);
             condition.setCoercionEnabled(true);
-            return wrapper;
+            return consumerWrapper;
         },
         optional: function () {
             utils.assertParameterCount(arguments, 0);
             condition.setPropertyState(Condition.PROPERTY_STATE.OPTIONAL);
-            return wrapper;
+            return consumerWrapper;
         },
         forbidden: function () {
             utils.assertParameterCount(arguments, 0);
             condition.setPropertyState(Condition.PROPERTY_STATE.FORBIDDEN);
-            return wrapper;
+            return consumerWrapper;
         },
         required: function () {
             utils.assertParameterCount(arguments, 0);
             condition.setPropertyState(Condition.PROPERTY_STATE.REQUIRED);
-            return wrapper;
+            return consumerWrapper;
         },
         isForbidden: function () {
             utils.assertParameterCount(arguments, 0);
@@ -78,5 +84,5 @@ module.exports = function (condition) {
         }
     });
 
-    return wrapper;
+    return consumerWrapper;
 };
