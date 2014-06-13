@@ -7,8 +7,9 @@ var lewd = require('../src/lewd');
 /*jshint maxparams: 5*/
 function test(condition, args, accept, values, expected) {
     values.forEach(function (value, index) {
+        var result;
+        
         if (accept) {
-            var result;
             buster.referee.refute.exception(function () {
                 result = condition.apply(lewd, args)(value);
             }, null, util.format('Value %s not expected to fail for arguments %s', value, args));

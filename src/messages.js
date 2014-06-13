@@ -34,6 +34,18 @@ module.exports = {
         'unexpectedKey': 'key "${key}" was not expected',
         'missingKey': 'key "${key}" is required'
     },
+    'PasswordStrength': {
+        'type': 'must be a string',
+        'test': {
+            0: 'Test 0 failed',
+            1: 'Test 1 failed',
+            2: 'Test 2 failed',
+            3: 'Test 3 failed',
+            4: 'Test 4 failed',
+            5: 'Test 5 failed',
+            6: 'Test 6 failed'
+        }
+    },
     'Range': {
         'max': 'must not be greater than ${max}',
         'maxInclusive': 'must not be greater than or equal to ${max}',
