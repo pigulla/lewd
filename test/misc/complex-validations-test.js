@@ -31,7 +31,7 @@ buster.testCase('complex validations', {
                 chapters: [
                     { name: 'Chapter 1', pages: 4 },
                     { name: 'Chapter 2', pages: 2, inProgress: true },
-                    { name: 'Chapter 3', pages: 11 },
+                    { name: 'Chapter 3', pages: 11 }
                 ]
             });
             

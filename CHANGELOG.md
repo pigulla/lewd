@@ -1,3 +1,5 @@
+## 0.6.0 (2014-??-??)
+
 ## 0.5.1 (2014-07-11)
 
  - Cleanup release, no code changes.

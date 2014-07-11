@@ -21,7 +21,7 @@ buster.testCase('"isoDateTime" condition', {
             '2014-13-22T07:15:26.692Z  ',
             '2014-01-22T25:15:26.692Z',
             '2014-01-22T25:15:26.692',
-            'Aug 9, 1995',
+            'Aug 9, 1995'
         ]);
         acceptValues(condition, args, [
             '2014-05-22T07:15:26.692Z',

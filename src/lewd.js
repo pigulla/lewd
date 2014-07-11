@@ -2,7 +2,7 @@
  * lewd - an intuitive and easy to use data validation library
  *
  * @class lewd
- * @version 0.5.1
+ * @version 0.6.0-dev
  * @author Raphael Pigulla <pigulla@four66.com>
  * @license BSD-2-Clause
  */
@@ -51,7 +51,6 @@ var ConditionViolationException = require('./exception/ConditionViolationExcepti
         ObjectType: require('./condition/type/Object'),
         StringType: require('./condition/type/String')
     };
-
 
 /**
  * @param {...*} var_args

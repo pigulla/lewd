@@ -17,7 +17,7 @@ buster.testCase('validator conditions', {
             refuteValues(lewd.creditcard, [], [null, true, 32, 17.3, [], {}]);
             
             refuteValues(lewd.creditcard, [], ['foo', '5398228707871528']);
-            acceptValues(lewd.creditcard, [], [ '4716461583322103', '4716-2210-5188-5662', '4929 7226 5379 7141']);
+            acceptValues(lewd.creditcard, [], ['4716461583322103', '4716-2210-5188-5662', '4929 7226 5379 7141']);
         },
         'error message': {
             'type': function () {

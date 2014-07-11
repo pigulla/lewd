@@ -98,8 +98,8 @@ buster.testCase('internals', {
             },
             'NaN/Infinity': function () {
                 assert.equals(utils.smartFormat(NaN), 'NaN');
-                assert.equals(utils.smartFormat(1/0), 'PositiveInfinity');
-                assert.equals(utils.smartFormat(-1/0), 'NegativeInfinity');
+                assert.equals(utils.smartFormat(1 / 0), 'PositiveInfinity');
+                assert.equals(utils.smartFormat(-1 / 0), 'NegativeInfinity');
             },
             'Date': function () {
                 var date = new Date();

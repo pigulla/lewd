@@ -296,7 +296,7 @@ buster.testCase('"object" condition', {
             ]);
             acceptValues(condition, args, [
                 { n: 42 },
-                { n: 42, x: ''}
+                { n: 42, x: '' }
             ]);
         },
         'true by default if $k but can be overridden': function () {

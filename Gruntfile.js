@@ -40,6 +40,20 @@ module.exports = function (grunt) {
                 'pre-push': 'prepush-check'
             }
         },
+        jscs: {
+            source: {
+                src: ['src/**/*.js'],
+                options: {
+                    config: '.jscsrc'
+                }
+            },
+            tests: {
+                src: ['test/**/*.js'],
+                options: {
+                    config: '.jscsrc'
+                }
+            }
+        },
         jshint: {
             src: ['src/**/*.js', 'test/**/*.js'],
             options: {
@@ -66,16 +80,17 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-coveralls');
     grunt.loadNpmTasks('grunt-githooks');
     grunt.loadNpmTasks('grunt-istanbul-coverage');
+    grunt.loadNpmTasks('grunt-jscs');
     grunt.loadNpmTasks('grunt-plato');
     
     grunt.registerTask('prepush-check', [
-        'jshint', 'buster:tests-with-coverage', 'coverage'
+        'jscs', 'jshint', 'buster:tests-with-coverage', 'coverage'
     ]);
     grunt.registerTask('test', [
         'test-local', 'coveralls:tests'
     ]);
     grunt.registerTask('test-local', [
-        'clean:reports', 'jshint', 'buster:tests-with-coverage', 'coverage', 'plato:source'
+        'clean:reports', 'jscs', 'jshint', 'buster:tests-with-coverage', 'coverage', 'plato:source'
     ]);
     grunt.registerTask('default', ['test-local']);
 };

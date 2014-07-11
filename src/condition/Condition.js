@@ -191,4 +191,3 @@ Condition.prototype.consumer = function () {
 };
 
 module.exports = Condition;
-

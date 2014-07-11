@@ -30,7 +30,6 @@ buster.testCase('wiki examples', {
         var cond1 = lewd.all(lewd.unique, [lewd.integer().coerce()]),
             cond2 = lewd.all([lewd.integer().coerce()], lewd.unique);
 
-
         buster.referee.refute.exception(function () {
             cond1([42.13, 42]);
         });
@@ -62,7 +61,7 @@ buster.testCase('wiki examples', {
             condition(data);
         });
         
-        data.push({ timestamp: '2014-05-27T21:37:52.630Z', 'level': 'foo', 'message': 'hackz0rs'});
+        data.push({ timestamp: '2014-05-27T21:37:52.630Z', 'level': 'foo', 'message': 'hackz0rs' });
         assertViolationAt(function () {
             condition(data);
         }, ['#2', 'level']);
