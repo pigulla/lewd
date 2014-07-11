@@ -2,7 +2,7 @@
  * lewd - an intuitive and easy to use data validation library
  *
  * @class lewd
- * @version 0.5.0-dev
+ * @version 0.5.0
  * @author Raphael Pigulla <pigulla@four66.com>
  * @license BSD-2-Clause
  */
@@ -35,7 +35,6 @@ var ConditionViolationException = require('./exception/ConditionViolationExcepti
 
         Len: require('./condition/content/Len'),
         Literal: require('./condition/content/Literal'),
-        PasswordStrength: require('./condition/content/PasswordStrength'),
         Range: require('./condition/content/Range'),
         Regex: require('./condition/content/Regex'),
 
@@ -83,7 +82,7 @@ lewd._wrap = function (spec) {
     var shorthands = [
         lewd.Array, lewd.Boolean, lewd.null, lewd.Number, lewd.Object, lewd.String, lewd.undefined,
         lewd.unique, lewd.isoDateTime, lewd.integer, lewd.ip, lewd.email, lewd.uuid, lewd.url, lewd.isbn,
-        lewd.creditcard, lewd.passwordStrength
+        lewd.creditcard
     ];
     
     /*jshint maxcomplexity:false */
@@ -134,7 +133,7 @@ lewd.expose = function (prefix) {
             'creditcard', 'email', 'ip', 'isbn', 'url', 'uuid',
             'optional', 'required', 'forbidden',
             'integer', 'isoDateTime',
-            'array', 'len', 'literal', 'object', 'range', 'regex', 'passwordStrength',
+            'array', 'len', 'literal', 'object', 'range', 'regex',
             'all', 'any', 'none', 'not', 'some'
         ],
         additionalFunctions = ['Array', 'Boolean', 'null', 'Number', 'Object', 'String', 'undefined'];
@@ -319,15 +318,6 @@ lewd.len = function (options) {
 lewd.literal = function (literal) {
     utils.assertParameterCount(arguments, 1);
     return (new conditions.Literal(literal)).consumer();
-};
-
-/**
- * @since 0.5.0
- * @return {lewd.condition.ConsumerWrapper}
- */
-lewd.passwordStrength = function () {
-    utils.assertParameterCount(arguments, 0);
-    return (new conditions.PasswordStrength()).consumer();
 };
 
 /**
