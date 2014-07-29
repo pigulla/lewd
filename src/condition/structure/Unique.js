@@ -20,9 +20,11 @@ function checkUniqueness(array) {
     
     for (i = 0; i < l; i++) {
         if (!utils.isLiteral(array[i])) {
+            // By definition, objects and arrays are completely ignored.
             continue;
         }
         
+        // We need the "type prefix" here so that 42 and '42' don't end up using the same key.
         key = (typeof array[i]) + ':' + array[i];
         
         if (o[key]) {

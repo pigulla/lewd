@@ -38,7 +38,7 @@
   ],
   "dependencies": {
     "lodash": "^2.4.1",
-    "validator": "^3.13.0"
+    "validator": "^3.16.1"
   },
   "devDependencies": {
     "buster": "^0.7.13",
