@@ -2,6 +2,26 @@
 
 module.exports = function (grunt) {
     grunt.initConfig({
+        browserify: {
+            dist: {
+                files: {
+                    'dist/lewd.js': ['src/lewd.js']
+                },
+                options: {
+                    bundleOptions: {
+                        standalone: 'lewd'
+                    }
+                }
+            },
+            
+            // This is broken, it seems to export lodash instead of lewd O.o
+            // Will need to look into this.
+            'dist-amd': {
+                files: {
+                    'dist/lewd.amd.js': ['src/lewd.js']
+                }
+            }
+        },
         buster: {
             tests: {
                 test: {
@@ -71,12 +91,28 @@ module.exports = function (grunt) {
                     'reports/plato': ['src']
                 }
             }
+        },
+        uglify: {
+            dist: {
+                files: {
+                    'dist/lewd.min.js': ['dist/lewd.js']
+                },
+                options: {
+                    mangle: false,
+                    compress: true,
+                    report: 'min'
+                }
+            }
         }
     });
+    
+    grunt.registerTask('build', ['browserify:dist', 'uglify:dist']);
 
+    grunt.loadNpmTasks('grunt-browserify');
     grunt.loadNpmTasks('grunt-buster');
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-contrib-jshint');
+    grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-coveralls');
     grunt.loadNpmTasks('grunt-githooks');
     grunt.loadNpmTasks('grunt-istanbul-coverage');
