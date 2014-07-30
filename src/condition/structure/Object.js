@@ -64,9 +64,9 @@ function ObjectCondition (spec, options) {
      * option should be.
      * 
      * @param {string} key
-     * @param {string} PROPERTY
+     * @param {string} property
      */
-    function initKeyValueConditions(key, PROPERTY) {
+    function initKeyValueConditions(key, property) {
         var propertyName = key + 'Condition';
 
         if (this.opts.hasOwnProperty(key)) {
@@ -75,10 +75,10 @@ function ObjectCondition (spec, options) {
             this[propertyName] = lewd._wrap(this.opts[key]);
             allowExtraDefault = true;
             
-        } else if (spec.hasOwnProperty(PROPERTY)) {
-            this[propertyName] = lewd._wrap(spec[PROPERTY]);
+        } else if (spec.hasOwnProperty(property)) {
+            this[propertyName] = lewd._wrap(spec[property]);
             // Remove the special value since its not actually a key.
-            this.definedKeys = _.without(this.definedKeys, PROPERTY);
+            this.definedKeys = _.without(this.definedKeys, property);
             allowExtraDefault = true;
             
         } else {
