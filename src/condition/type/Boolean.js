@@ -8,7 +8,7 @@ var Condition = require('../Condition'),
  * @extends {lewd.condition.Condition}
  * @constructor
  */
-function BooleanTypeCondition () {
+function BooleanTypeCondition() {
     Condition.call(this, 'BooleanType');
 
     this.supportsCoercion = true;

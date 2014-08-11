@@ -45,7 +45,7 @@ function validateOptions(options) {
  * @extends {lewd.condition.Condition}
  * @constructor
  */
-function RangeCondition (options) {
+function RangeCondition(options) {
     Condition.call(this, 'Range');
     this.options = validateOptions(options);
 }

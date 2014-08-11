@@ -45,7 +45,7 @@ function validateOptions(options) {
  * @extends {lewd.condition.Condition}
  * @constructor
  */
-function LenCondition (options) {
+function LenCondition(options) {
     Condition.call(this, 'Len');
     this.options = validateOptions(options);
 }

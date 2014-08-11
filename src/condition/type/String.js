@@ -8,7 +8,7 @@ var Condition = require('../Condition'),
  * @extends {lewd.condition.Condition}
  * @constructor
  */
-function StringTypeCondition () {
+function StringTypeCondition() {
     Condition.call(this, 'StringType');
 
     this.supportsCoercion = true;

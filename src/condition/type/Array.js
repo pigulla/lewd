@@ -8,7 +8,7 @@ var Condition = require('../Condition'),
  * @extends {lewd.condition.Condition}
  * @constructor
  */
-function ArrayTypeCondition () {
+function ArrayTypeCondition() {
     Condition.call(this, 'ArrayType');
 }
 

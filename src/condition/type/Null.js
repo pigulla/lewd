@@ -8,7 +8,7 @@ var Condition = require('../Condition'),
  * @extends {lewd.condition.Condition}
  * @constructor
  */
-function NullTypeCondition () {
+function NullTypeCondition() {
     Condition.call(this, 'NullType');
 }
 

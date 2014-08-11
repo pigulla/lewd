@@ -10,7 +10,7 @@ var Condition = require('../Condition'),
  * @extends {lewd.condition.Condition}
  * @constructor
  */
-function ObjectTypeCondition () {
+function ObjectTypeCondition() {
     Condition.call(this, 'ObjectType');
 }
 

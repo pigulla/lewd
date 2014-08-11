@@ -11,7 +11,7 @@ var Condition = require('../Condition'),
  * @constructor
  * @param {(string|number|boolean|null)} literal
  */
-function LiteralCondition (literal) {
+function LiteralCondition(literal) {
     Condition.call(this, 'Literal');
 
     if (!utils.isLiteral(literal)) {

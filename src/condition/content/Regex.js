@@ -9,7 +9,7 @@ var Condition = require('../Condition'),
  * @extends {lewd.condition.Condition}
  * @constructor
  */
-function RegexCondition (regex) {
+function RegexCondition(regex) {
     Condition.call(this, 'Regex');
 
     if (!(regex instanceof RegExp)) {

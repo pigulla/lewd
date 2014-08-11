@@ -52,7 +52,7 @@
     "grunt-coveralls": "^0.3.0",
     "grunt-githooks": "^0.3.1",
     "grunt-istanbul-coverage": "^0.0.5",
-    "grunt-jscs": "^0.6.1",
+    "grunt-jscs": "^0.6.2",
     "grunt-plato": "^1.0.0",
     "plato": "^1.0.1"
   }

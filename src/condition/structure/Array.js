@@ -10,7 +10,7 @@ var NestedCondition = require('../NestedCondition'),
  * @extends {lewd.condition.NestedCondition}
  * @constructor
  */
-function ArrayCondition (conditions) {
+function ArrayCondition(conditions) {
     var lewd = require('../../lewd'),
         condition;
 

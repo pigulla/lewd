@@ -71,5 +71,21 @@
     "disallowKeywordsOnNewLine": ["else"],
     "safeContextKeyword": ["self"],
     "disallowYodaConditions": true,
-    "requireSpaceAfterLineComment": true
+    "requireSpaceAfterLineComment": true,
+    "requireSpacesInAnonymousFunctionExpression": {
+        "beforeOpeningRoundBrace": true,
+        "beforeOpeningCurlyBrace": true
+    },
+    "requireSpacesInNamedFunctionExpression": {
+        "beforeOpeningCurlyBrace": true
+    },
+    "disallowSpacesInNamedFunctionExpression": {
+        "beforeOpeningRoundBrace": true
+    },
+    "requireSpacesInFunctionDeclaration": {
+        "beforeOpeningCurlyBrace": true
+    },
+    "disallowSpacesInFunctionDeclaration": {
+        "beforeOpeningRoundBrace": true
+    }    
 }
