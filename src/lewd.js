@@ -164,7 +164,7 @@ lewd.expose = function (prefix) {
 lewd.custom = function (fn) {
     utils.assertParameterCount(arguments, 1);
     
-    if (typeof fn === 'function' && fn.name === 'consumerWrapper') {
+    if (utils.isConsumerWrapper(fn)) {
         return fn;
     } else if (fn instanceof Condition) {
         return fn.consumer();

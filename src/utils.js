@@ -13,7 +13,8 @@ var utils = {
      * @return {boolean}
      */
     isConsumerWrapper: function (value) {
-        return typeof value === 'function' && value.name === 'consumerWrapper' && value.hasOwnProperty('wrapped');
+        // A heuristic will have to do here.
+        return typeof value === 'function' && value.hasOwnProperty('isOptional') && value.hasOwnProperty('wrapped');
     },
     
     /**
