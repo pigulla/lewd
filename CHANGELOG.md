@@ -1,6 +1,9 @@
 ## 0.6.0 (2014-??-??)
 
+##### New features:
+
  - experimental browser support
+ - added lewd.version property
 
 ## 0.5.1 (2014-07-11)
 

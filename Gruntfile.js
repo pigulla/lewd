@@ -12,14 +12,6 @@ module.exports = function (grunt) {
                         standalone: 'lewd'
                     }
                 }
-            },
-            
-            // This is broken, it seems to export lodash instead of lewd O.o
-            // Will need to look into this.
-            'dist-amd': {
-                files: {
-                    'dist/lewd.amd.js': ['src/lewd.js']
-                }
             }
         },
         buster: {
@@ -98,7 +90,7 @@ module.exports = function (grunt) {
                     'dist/lewd.min.js': ['dist/lewd.js']
                 },
                 options: {
-                    mangle: false,
+                    mangle: true,
                     compress: true,
                     report: 'min'
                 }
