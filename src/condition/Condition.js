@@ -41,7 +41,7 @@ Condition.PROPERTY_STATE = {
 Condition.prototype.type;
 
 /**
- * The used-defined name of the condition.
+ * The user-defined name of the condition.
  * 
  * @type {?string}
  */

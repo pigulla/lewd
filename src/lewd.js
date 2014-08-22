@@ -71,7 +71,8 @@ var lewd = function () {
 
 /**
  * The version string.
- * 
+ *
+ * @since 0.6.0 
  * @readonly
  * @type {string}
  */
@@ -480,6 +481,7 @@ lewd.some = function () {
     return (new conditions.Some(args.map(lewd._wrap))).consumer();
 };
 
+// additional exports
 lewd.ConditionViolationException = ConditionViolationException;
 lewd.Condition = Condition;
 

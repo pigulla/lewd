@@ -110,6 +110,8 @@ util.inherits(ObjectCondition, Condition);
 
 /**
  * Marks all keys properties as being optional.
+ * 
+ * @since 0.7.0
  */
 ObjectCondition.prototype.allOptional = function () {
     Object.keys(this.spec).forEach(function (key) {
@@ -119,6 +121,8 @@ ObjectCondition.prototype.allOptional = function () {
 
 /**
  * Marks all keys properties as being required.
+ *
+ * @since 0.7.0
  */
 ObjectCondition.prototype.allRequired = function () {
     Object.keys(this.spec).forEach(function (key) {
