@@ -10,6 +10,14 @@ var Condition = require('../Condition'),
 var KEYS_PROPERTY = '$k',
     VALUES_PROPERTY = '$v';
 
+/**
+ * Validates the given options.
+ * 
+ * @throws IllegalParameterException
+ * @param {Object} options
+ * @param {boolean} allowExtraDefault
+ * @return {Object}
+ */
 function validateOptions(options, allowExtraDefault) {
     var defaults = {
             allowExtra: allowExtraDefault,
@@ -91,38 +99,58 @@ function ObjectCondition(spec, options) {
     initKeyValueConditions.call(this, 'values', VALUES_PROPERTY);
 
     this.options = validateOptions(this.opts, allowExtraDefault);
+
+    // Auto-wrap where necessary
+    Object.keys(this.spec).forEach(function (key) {
+        this.spec[key] = lewd._wrap(this.spec[key]);
+    }, this);
 }
 
 util.inherits(ObjectCondition, Condition);
 
 /**
+ * Marks all keys properties as being optional.
+ */
+ObjectCondition.prototype.allOptional = function () {
+    Object.keys(this.spec).forEach(function (key) {
+        this.spec[key].optional();
+    }, this);
+};
+
+/**
+ * Marks all keys properties as being required.
+ */
+ObjectCondition.prototype.allRequired = function () {
+    Object.keys(this.spec).forEach(function (key) {
+        this.spec[key].required();
+    }, this);
+};
+
+/**
  * Calculate various sets of keys needed to do the actual validation. This calculation needs to be re-done whenever
- * a value is validated because the underlying property conditions might have changed (e.g., from being optional to now
- * being required).
+ * a value is validated because the underlying property conditions might have changed (e.g., from initially being
+ * optional to now being required).
  * 
  * @private
  * @param {object} value
  * @return {object}
  */
 ObjectCondition.prototype._calculateKeys = function (value) {
-    var lewd = require('../../lewd'),
-        keys = {
-            actual: null,
-            extra: null,
-            missing: null,
-            toValidate: null,
-            forbidden: [],
-            optional: [],
-            required: []
-        };
+    var keys = {
+        actual: null,
+        extra: null,
+        missing: null,
+        toValidate: null,
+        forbidden: [],
+        optional: [],
+        required: []
+    };
     
     keys.actual = Object.keys(value);
     keys.extra = _.difference(keys.actual, this.definedKeys);
     keys.toValidate = _.intersection(this.definedKeys, keys.actual);
     
     this.definedKeys.forEach(function (key) {
-        this.spec[key] = lewd._wrap(this.spec[key]);
-
         var hasState = this.spec[key].isOptional() || this.spec[key].isRequired() || this.spec[key].isForbidden();
 
         if (!hasState && this.opts.byDefault === Condition.PROPERTY_STATE.REQUIRED) {

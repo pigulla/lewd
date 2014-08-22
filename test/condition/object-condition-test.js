@@ -111,6 +111,93 @@ buster.testCase('"object" condition', {
             ]);
         }
     },
+    'allOptional functionality': {
+        'marks all properties optional': function () {
+            var cond = lewd({
+                s: String,
+                o: Object,
+                n: Number
+            }).allOptional();
+            
+            refute.exception(function () {
+                cond({ s: 's', o: {} });
+                cond({ s: 's', n: 42 });
+                cond({ o: {}, n: 42 });
+                cond({});
+            });
+
+            assert.exception(function () {
+                cond({ s: 's', o: {}, n: 42, x: undefined });
+            }, 'ConditionViolationException');
+            assert.exception(function () {
+                cond({ s: 's', o: {}, n: 'not a number' });
+            }, 'ConditionViolationException');
+        },
+        'can be overridden afterwards': function () {
+            var cond = lewd({
+                s: String,
+                n: lewd(Number).as('n')
+            }).allOptional();
+            
+            cond.get('n').required();
+            
+            refute.exception(function () {
+                cond({ s: '', n: 42 });
+                cond({ n: 42 });
+            });
+            
+            assert.exception(function () {
+                cond({ s: '' });
+            }, 'ConditionViolationException');
+        }
+    },
+    'allRequired functionality': {
+        'marks all properties required': function () {
+            var cond = lewd({
+                s: lewd(String).optional(),
+                o: lewd(Object).optional(),
+                n: lewd(Number).optional()
+            }).allRequired();
+            
+            refute.exception(function () {
+                cond({ s: 's', o: {}, n: 42 });
+            });
+
+            assert.exception(function () {
+                cond({ s: 's', o: {} });
+            }, 'ConditionViolationException');
+            assert.exception(function () {
+                cond({ s: 's', n: 42 });
+            }, 'ConditionViolationException');
+            assert.exception(function () {
+                cond({ o: {}, n: 42 });
+            }, 'ConditionViolationException');
+            assert.exception(function () {
+                cond({});
+            }, 'ConditionViolationException');
+        },
+        'can be overridden afterwards': function () {
+            var cond = lewd({
+                s: lewd(String).optional().as('s'),
+                o: lewd(Object).optional().as('o'),
+                n: lewd(Number).optional().as('n')
+            }).allRequired();
+            
+            cond.get('o').optional();
+            
+            refute.exception(function () {
+                cond({ s: '', o: {}, n: 42 });
+                cond({ s: '', n: 42 });
+            });
+            
+            assert.exception(function () {
+                cond({ o: '', n: 42 });
+            }, 'ConditionViolationException');
+            assert.exception(function () {
+                cond({ s: '', o: {} });
+            }, 'ConditionViolationException');
+        }
+    },
     'nested': {
         '{ s: String, o: { a: [String], u: undefined } }': function () {
             var args = [{

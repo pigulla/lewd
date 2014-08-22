@@ -83,6 +83,19 @@ module.exports = function (condition) {
             return condition.state === Condition.PROPERTY_STATE.REQUIRED;
         }
     });
+    
+    if (condition.type === 'Object') {
+        _.assign(consumerWrapper, {
+            allOptional: function () {
+                condition.allOptional();
+                return consumerWrapper;
+            },
+            allRequired: function () {
+                condition.allRequired();
+                return consumerWrapper;
+            }
+        });
+    }
 
     return consumerWrapper;
 };

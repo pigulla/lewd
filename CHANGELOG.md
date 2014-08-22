@@ -1,9 +1,15 @@
+## 0.7.0 (2014-??-??)
+
+##### New features
+
+ - Object properties can now be marked in bulk as required or optional with `allRequired()` and `allOptional`, respectively.
+
 ## 0.6.0 (2014-08-22)
 
 ##### New features:
 
- - experimental browser support
- - added lewd.version property
+ - Experimental browser support.
+ - Added `lewd.version` property.
 
 ## 0.5.1 (2014-07-11)
 
