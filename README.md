@@ -25,7 +25,7 @@ var signUpValidator = lewd({
 var data = JSON.parse(rawData);
 
 try {
-    addressValidator(data);
+    signUpValidator(data);
 } catch (e) {
     console.warn('Data is invalid: ' + e.message);
 }
