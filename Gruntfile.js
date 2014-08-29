@@ -47,11 +47,6 @@ module.exports = function (grunt) {
                 force: true
             }
         },
-        githooks: {
-            dev: {
-                'pre-push': 'prepush-check'
-            }
-        },
         jscs: {
             source: {
                 src: ['src/**/*.js'],
@@ -113,7 +108,6 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-coveralls');
-    grunt.loadNpmTasks('grunt-githooks');
     grunt.loadNpmTasks('grunt-istanbul-coverage');
     grunt.loadNpmTasks('grunt-jscs');
     grunt.loadNpmTasks('grunt-shell');

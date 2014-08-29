@@ -38,7 +38,6 @@
   ],
   "dependencies": {
     "lodash": "^2.4.1",
-    "syntax-error": "1.1.0",
     "validator": "^3.17.1"
   },
   "devDependencies": {
