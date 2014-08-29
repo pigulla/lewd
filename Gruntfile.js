@@ -131,7 +131,7 @@ module.exports = function (grunt) {
         'clean:reports', 'jscs', 'jshint', 'buster:tests-with-coverage', 'coverage'
     ]);
     grunt.registerTask('test-prerelease', [
-        'test', 'audit'
+        'test', 'audit', 'check-version-strings'
     ]);
 
     grunt.registerTask('default', ['test']);
