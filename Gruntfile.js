@@ -72,15 +72,24 @@ module.exports = function (grunt) {
                 jshintrc: true
             }
         },
-        plato: {
-            source: {
-                options : {
-                    title: 'lewd Source Analysis',
-                    recurse: true,
-                    jshint : grunt.file.readJSON('.jshintrc')
-                },
-                files: {
-                    'reports/plato': ['src']
+        shell: {
+            'check-version-strings': {
+                command: '! grep -n -r -i -- "-DEV" src/* package.json CHANGELOG.md',
+                options: {
+                    failOnError: true,
+                    stderr: false,
+                    stdout: true
+                }
+            },
+            'nsp': {
+                command: [
+                    'npm shrinkwrap',
+                    'node_modules/nsp/bin/nspCLI.js audit-shrinkwrap'
+                ].join('&&'),
+                options: {
+                    failOnError: true,
+                    stderr: false,
+                    stdout: true
                 }
             }
         },
@@ -97,8 +106,6 @@ module.exports = function (grunt) {
             }
         }
     });
-    
-    grunt.registerTask('build', ['browserify:dist', 'uglify:dist']);
 
     grunt.loadNpmTasks('grunt-browserify');
     grunt.loadNpmTasks('grunt-buster');
@@ -109,16 +116,23 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-githooks');
     grunt.loadNpmTasks('grunt-istanbul-coverage');
     grunt.loadNpmTasks('grunt-jscs');
-    grunt.loadNpmTasks('grunt-plato');
-    
+    grunt.loadNpmTasks('grunt-shell');
+
+    grunt.registerTask('audit', [
+        'shell:nsp'
+    ]);
+    grunt.registerTask('dist', [
+        'browserify:dist', 'uglify:dist'
+    ]);
     grunt.registerTask('prepush-check', [
         'jscs', 'jshint', 'buster:tests-with-coverage', 'coverage'
     ]);
     grunt.registerTask('test', [
-        'test-local', 'coveralls:tests'
+        'clean:reports', 'jscs', 'jshint', 'buster:tests-with-coverage', 'coverage'
     ]);
-    grunt.registerTask('test-local', [
-        'clean:reports', 'jscs', 'jshint', 'buster:tests-with-coverage', 'coverage', 'plato:source'
+    grunt.registerTask('test-prerelease', [
+        'test', 'audit'
     ]);
-    grunt.registerTask('default', ['test-local']);
+
+    grunt.registerTask('default', ['test']);
 };
