@@ -118,7 +118,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-jscs');
     grunt.loadNpmTasks('grunt-shell');
 
-    grunt.registerTask('audit', [
+    grunt.registerTask('nsp-audit', [
         'shell:nsp'
     ]);
     grunt.registerTask('dist', [
@@ -128,10 +128,10 @@ module.exports = function (grunt) {
         'jscs', 'jshint', 'buster:tests-with-coverage', 'coverage'
     ]);
     grunt.registerTask('test', [
-        'clean:reports', 'jscs', 'jshint', 'buster:tests-with-coverage', 'coverage'
+        'clean:reports', 'jscs', 'jshint', 'buster:tests-with-coverage', 'coverage', 'nsp-audit'
     ]);
     grunt.registerTask('test-prerelease', [
-        'test', 'audit', 'check-version-strings'
+        'test', 'check-version-strings'
     ]);
 
     grunt.registerTask('default', ['test']);
