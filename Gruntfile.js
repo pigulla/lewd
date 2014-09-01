@@ -8,7 +8,7 @@ module.exports = function (grunt) {
                     'dist/lewd.js': ['src/lewd.js']
                 },
                 options: {
-                    bundleOptions: {
+                    browserifyOptions: {
                         standalone: 'lewd'
                     }
                 }
