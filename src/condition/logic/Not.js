@@ -21,7 +21,7 @@ util.inherits(NotCondition, NestedCondition);
  */
 NotCondition.prototype.validate = function (value, path) {
     try {
-        this.conditions[0](value, path);
+        this._conditions[0](value, path);
     } catch (e) {
         if (e instanceof ConditionViolationException) {
             return value;

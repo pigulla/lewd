@@ -21,7 +21,7 @@ util.inherits(AllCondition, NestedCondition);
 AllCondition.prototype.validate = function (value, path) {
     if (this.customError) {
         try {
-            this.conditions.forEach(function (condition) {
+            this._conditions.forEach(function (condition) {
                 value = condition(value, path);
             });
         } catch (e) {
@@ -32,7 +32,7 @@ AllCondition.prototype.validate = function (value, path) {
             }
         }
     } else {
-        this.conditions.forEach(function (condition) {
+        this._conditions.forEach(function (condition) {
             value = condition(value, path);
         });
     }

@@ -13,9 +13,9 @@ function IsoDateTimeCondition() {
     var lewd = require('../../lewd');
     
     this.condition = lewd.all(
-        lewd(String),
-        lewd(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z$/),
-        lewd(function (value) { return !isNaN(Date.parse(value)); })
+        String,
+        /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z$/,
+        function (value) { return !isNaN(Date.parse(value)); }
     );
 
     Condition.call(this, 'IsoDateTime');

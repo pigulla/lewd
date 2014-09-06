@@ -5,6 +5,12 @@ var Condition = require('./Condition'),
     errorMessages = require('../messages'),
     IllegalParameterException = require('../exception/IllegalParameterException');
 
+/**
+ * @class {lewd.condition.Custom}
+ * @extends {lewd.condition.Condition}
+ * @constructor
+ * @param {Function} fn
+ */
 function CustomCondition(fn) {
     Condition.call(this, 'Custom');
     
@@ -12,16 +18,27 @@ function CustomCondition(fn) {
         throw new IllegalParameterException('Parameter must be a function');        
     }
     
-    this.fn = fn;
+    this._fn = fn;
 }
 
 util.inherits(CustomCondition, Condition);
 
+/* jshint -W030 */
+/**
+ * @private
+ * @type {Function}
+ */
+CustomCondition.prototype._fn;
+/* jshint +W030 */
+
+/**
+ * @inheritdoc
+ */
 CustomCondition.prototype.validate = function (value, path) {
     var result;
  
     try {
-        result = this.fn(value, path);
+        result = this._fn(value, path);
     } catch (e) {
         if (e instanceof ConditionViolationException) {
             this.reject(value, path, e.message);

@@ -18,22 +18,30 @@ function LiteralCondition(literal) {
         throw new IllegalParameterException('Value must be a literal');
     }
     
-    this.literal = literal;
+    this._literal = literal;
 }
 
 util.inherits(LiteralCondition, Condition);
+
+/* jshint -W030 */
+/**
+ * @private
+ * @type {(String|Number|Boolean|null))}
+ */
+LiteralCondition.prototype._literal;
+/* jshint +W030 */
 
 /**
  * @inheritdoc
  */
 LiteralCondition.prototype.validate = function (value, path) {
-    if (this.literal === value) {
+    if (this._literal === value) {
         return value;
     }
 
     this.reject(value, path, errorMessages.Literal, {
-        literal: this.literal,
-        literalStr: utils.smartFormat(this.literal)
+        literal: this._literal,
+        literalStr: utils.smartFormat(this._literal)
     });
 };
 

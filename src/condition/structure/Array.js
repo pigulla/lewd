@@ -9,6 +9,7 @@ var NestedCondition = require('../NestedCondition'),
  * @class lewd.condition.content.Array
  * @extends {lewd.condition.NestedCondition}
  * @constructor
+ * @param {Array.<*>} conditions
  */
 function ArrayCondition(conditions) {
     var lewd = require('../../lewd'),
@@ -41,7 +42,7 @@ ArrayCondition.prototype.validate = function (value, path) {
 
     try {
         value.forEach(function (item, index) {
-            value[index] = this.conditions[0](item, path.concat('#' + index));
+            value[index] = this._conditions[0](item, path.concat('#' + index));
         }, this);
     } catch (e) {
         if (e instanceof ConditionViolationException) {

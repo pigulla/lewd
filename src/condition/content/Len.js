@@ -47,6 +47,7 @@ function validateOptions(options) {
  */
 function LenCondition(options) {
     Condition.call(this, 'Len');
+    
     this.options = validateOptions(options);
 }
 

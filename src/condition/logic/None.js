@@ -7,8 +7,8 @@ var NestedCondition = require('../NestedCondition'),
 /**
  * @class lewd.condition.logic.None
  * @extends {lewd.condition.NestedCondition}
- * @param {Array.<lewd.condition.ConsumerWrapper>} conditions
  * @constructor
+ * @param {Array.<lewd.condition.ConsumerWrapper>} conditions
  */
 function NoneCondition(conditions) {
     NestedCondition.call(this, 'None', conditions);
@@ -20,11 +20,11 @@ util.inherits(NoneCondition, NestedCondition);
  * @inheritdoc
  */
 NoneCondition.prototype.validate = function (value, path) {
-    if (this.conditions.length === 0) {
+    if (this._conditions.length === 0) {
         return value;
     }
 
-    if (!this.conditions.every(function (condition) {
+    if (!this._conditions.every(function (condition) {
         try {
             condition(value, path);
             return false;

@@ -18,16 +18,17 @@ function NestedCondition(name, conditions) {
         throw new IllegalParameterException('Parameter must be an array');
     }
 
-    this.conditions = conditions;
+    this._conditions = conditions;
 }
 
 util.inherits(NestedCondition, Condition);
 
 /**
  * @protected
+ * @private
  * @type {Array.<lewd.Condition.ConsumerWrapper>}
  */
-NestedCondition.prototype.conditions = null;
+NestedCondition.prototype._conditions = null;
 
 /**
  * @inheritdoc
@@ -35,7 +36,7 @@ NestedCondition.prototype.conditions = null;
 NestedCondition.prototype.find = function (name) {
     var result = Condition.prototype.find.call(this, name);
 
-    this.conditions.forEach(function (condition) {
+    this._conditions.forEach(function (condition) {
         result = result.concat(condition.find(name));
     });
 

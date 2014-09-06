@@ -20,13 +20,13 @@ util.inherits(SomeCondition, NestedCondition);
  * @inheritdoc
  */
 SomeCondition.prototype.validate = function (value, path) {
-    if (this.conditions.length === 0) {
+    if (this._conditions.length === 0) {
         return value;
     }
 
     var satisfied = false;
 
-    this.conditions.forEach(function (condition) {
+    this._conditions.forEach(function (condition) {
         try {
             condition(value, path);
             satisfied = true;

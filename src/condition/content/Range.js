@@ -47,6 +47,7 @@ function validateOptions(options) {
  */
 function RangeCondition(options) {
     Condition.call(this, 'Range');
+    
     this.options = validateOptions(options);
 }
 
