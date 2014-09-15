@@ -18,7 +18,7 @@
   },
   "main": "src/lewd.js",
   "scripts": {
-    "test": "grunt test"
+    "test": "node_modules/grunt-cli/bin/grunt test"
   },
   "repository": {
     "type": "git",
@@ -46,6 +46,7 @@
     "grunt": "^0.4.5",
     "grunt-browserify": "^3.0.0",
     "grunt-buster": "^0.3.1",
+    "grunt-cli": "^0.1.13",
     "grunt-contrib-clean": "^0.6.0",
     "grunt-contrib-jshint": "^0.10.0",
     "grunt-contrib-uglify": "^0.5.1",
