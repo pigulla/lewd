@@ -5,6 +5,5 @@ branches:
 node_js:
   - "0.10"
   - "0.11"
-before_install: npm install -g grunt-cli
 install: npm install
-after_script: grunt coveralls:tests
+after_script: node_modules/grunt-cli/bin/grunt coveralls:tests
