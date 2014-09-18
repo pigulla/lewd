@@ -1,8 +1,8 @@
 [![Build Status](http://img.shields.io/travis/pigulla/lewd.svg?style=flat-square)](https://travis-ci.org/pigulla/lewd)
 [![NPM version](http://img.shields.io/npm/v/lewd.svg?style=flat-square)](http://badge.fury.io/js/lewd)
 [![Coverage Status](https://img.shields.io/coveralls/pigulla/lewd.svg?style=flat-square)](https://coveralls.io/r/pigulla/lewd)
-[![Dependency Status](https://david-dm.org/pigulla/lewd.svg?style=flat)](https://david-dm.org/pigulla/lewd)
-[![devDependency Status](https://david-dm.org/pigulla/lewd/dev-status.svg?style=flat)](https://david-dm.org/pigulla/lewd#info=devDependencies)
+[![Dependency Status](https://david-dm.org/pigulla/lewd.svg?style=flat-square)](https://david-dm.org/pigulla/lewd)
+[![devDependency Status](https://david-dm.org/pigulla/lewd/dev-status.svg?style=flat-square)](https://david-dm.org/pigulla/lewd#info=devDependencies)
 
 # lewd
 > lewd is an intuitive and easy to use data validation library inspired by Python's [voluptuous](https://github.com/alecthomas/voluptuous).
