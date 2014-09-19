@@ -1,8 +1,16 @@
-## 0.7.0-dev (2014-??-??)
+## 0.7.0-dev (2014-09-19)
 
 ##### New features
 
  - Object properties can now be marked in bulk as required or optional with `allRequired()` and `allOptional`, respectively.
+ 
+##### Breaking changes:
+
+ - A violation's `path` and `pathStr` properties are now using a JSON Pointer-esque syntax.
+ 
+##### Bug fixes:
+
+ - Fixed incorrect paths for failed key validations.
 
 ## 0.6.0 (2014-08-22)
 

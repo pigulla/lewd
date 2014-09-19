@@ -4,16 +4,18 @@ var _ = require('lodash'),
 var lewd = require('../../src/lewd'),
     errorMessages = require('../../src/messages');
 
+var assert = buster.referee.assert;
+
 function assertFailedWithMessage(condition, value, message) {
     try {
         condition(value);
     } catch (e) {
-        buster.referee.assert.equals(e.name, 'ConditionViolationException');
-        buster.referee.assert.equals(e.message, message);
+        assert.equals(e.name, 'ConditionViolationException');
+        assert.equals(e.message, message);
         return;
     }
 
-    buster.referee.assert(false, 'An exception should have been thrown');
+    assert(false, 'An exception should have been thrown');
 }
 
 buster.testCase('custom messages', {
@@ -35,16 +37,16 @@ buster.testCase('custom messages', {
     'with params': function () {
         var condition;
         
-        condition = lewd.Boolean().because('The problem was at ${pathStr}');
-        assertFailedWithMessage(condition, 'x', 'The problem was at .');
+        condition = lewd.Boolean().because('The problem was at "${pathStr}"');
+        assertFailedWithMessage(condition, 'x', 'The problem was at ""');
 
         condition = lewd.array(String).because('at: ${pathStr}');
-        assertFailedWithMessage(condition, ['x', 42], 'at: #1');
+        assertFailedWithMessage(condition, ['x', 42], 'at: /1');
 
         condition = lewd.object({
             a: { b: lewd.all(/^\d/, lewd.regex(/\d$/)).because('${pathStr} must start and end with a digit') }
         });
-        assertFailedWithMessage(condition, { a: { b: '' } }, 'a.b must start and end with a digit');
+        assertFailedWithMessage(condition, { a: { b: '' } }, '/a/b must start and end with a digit');
     },
     'for object keys and values': function () {
         var condition;

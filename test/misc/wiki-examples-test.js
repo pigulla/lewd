@@ -7,7 +7,9 @@ var helper = require('../helper'),
     errorMessages = require('../../src/messages'),
     lewd = require('../../src/lewd');
 
-var refuteValues = helper.refuteValues,
+var assert = buster.referee.assert,
+    refute = buster.referee.refute,
+    refuteValues = helper.refuteValues,
     acceptValues = helper.acceptValues,
     assertViolationAt = helper.assertViolationAt,
     assertViolationWithMessage = helper.assertViolationWithMessage;
@@ -17,34 +19,34 @@ buster.testCase('wiki examples', {
         var condition = lewd.array(lewd.some(lewd.all(String, /^x/), Boolean)),
             data = ['x1', 'x2', true, 'x3'];
 
-        buster.referee.refute.exception(function () {
+        refute.exception(function () {
             condition(data);
         });
 
         data.push('4');
         assertViolationAt(function () {
             condition(data);
-        }, ['#4']);
+        }, [4]);
     },
     'coercion order': function () {
         var cond1 = lewd.all(lewd.unique, [lewd.integer().coerce()]),
             cond2 = lewd.all([lewd.integer().coerce()], lewd.unique);
 
-        buster.referee.refute.exception(function () {
+        refute.exception(function () {
             cond1([42.13, 42]);
         });
         assertViolationAt(function () {
             cond2([42.13, 42]);
-        }, ['#1']);
+        }, [1]);
     },
     'removeExtra': function () {
         var condition = lewd.object({ a: Number, b: String }, { removeExtra: true }),
             data = { a: 1, b: '2', c: 3 };
         
-        buster.referee.refute.exception(function () {
+        refute.exception(function () {
             condition(data);
         });
-        buster.referee.assert.equals({ a: 1, b: '2' }, data);
+        assert.equals({ a: 1, b: '2' }, data);
     },
     'log messages': function () {
         var condition = lewd([{
@@ -57,14 +59,14 @@ buster.testCase('wiki examples', {
                 { 'timestamp': '2014-05-27T20:37:32.190Z', 'level': 'info', 'message': 'System is online' }
             ];
         
-        buster.referee.refute.exception(function () {
+        refute.exception(function () {
             condition(data);
         });
         
         data.push({ timestamp: '2014-05-27T21:37:52.630Z', 'level': 'foo', 'message': 'hackz0rs' });
         assertViolationAt(function () {
             condition(data);
-        }, ['#2', 'level']);
+        }, [2, 'level']);
     },
     'address': function () {
         var condition = lewd.object({
@@ -85,10 +87,10 @@ buster.testCase('wiki examples', {
                 'zip': 12345
             };
 
-        buster.referee.refute.exception(function () {
+        refute.exception(function () {
             condition(data);
         });
-        buster.referee.assert.equals(data.dob.getTime(), Date.parse('1977-06-25T00:00:00.000Z'));
+        assert.equals(data.dob.getTime(), Date.parse('1977-06-25T00:00:00.000Z'));
         
         data.zip = 200;
         data.dob = '1977-06-25T00:00:00.000Z';
@@ -137,7 +139,7 @@ buster.testCase('wiki examples', {
         }, ['chapters']);
 
         data.chapters.push({ title: 'Conclusion', pages: 3 });
-        buster.referee.refute.exception(function () {
+        refute.exception(function () {
             book(data);
         });
     },

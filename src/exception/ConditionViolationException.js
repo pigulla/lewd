@@ -1,5 +1,7 @@
 var util = require('util');
-var _ = require('lodash');
+
+var _ = require('lodash'),
+    pointer = require('json-pointer');
 
 /**
  * @class lewd.exception.ConditionViolationException
@@ -16,7 +18,7 @@ function ConditionViolationException(value, path, template, data) {
     
     this.name = 'ConditionViolationException';
     this.path = path;
-    this.pathStr = this.path.length === 0 ? '.' : this.path.join('.');
+    this.pathStr = pointer.compile(path);
     this.data = data || {};
     this.value = value;
     this.valueStr = smartFormat(this.value);

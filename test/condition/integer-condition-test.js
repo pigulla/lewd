@@ -5,7 +5,8 @@ var lewd = require('../../src/lewd'),
     errorMessages = require('../../src/messages'),
     helper = require('../helper');
 
-var refuteValues = helper.refuteValues,
+var assert = buster.referee.assert,
+    refuteValues = helper.refuteValues,
     acceptValues = helper.acceptValues,
     assertViolationWithMessage = helper.assertViolationWithMessage;
 
@@ -26,12 +27,12 @@ buster.testCase('"integer" condition', {
         try {
             condition().because('i say so')('42');
         } catch (e) {
-            buster.referee.assert.equals(e.name, 'ConditionViolationException');
-            buster.referee.assert.equals(e.message, 'i say so');
+            assert.equals(e.name, 'ConditionViolationException');
+            assert.equals(e.message, 'i say so');
             return;
         }
 
-        buster.referee.assert(false, 'An exception should have been thrown');
+        assert(false, 'An exception should have been thrown');
     },
     'error message': function () {
         assertViolationWithMessage(function () {

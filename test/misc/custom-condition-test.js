@@ -2,6 +2,8 @@ var util = require('util');
 
 var buster = require('buster');
 
+var assert = buster.referee.assert;
+
 var lewd = require('../../src/lewd'),
     errorMessages = require('../../src/messages'),
     ConditionViolationException = require('../../src/exception/ConditionViolationException');
@@ -30,41 +32,41 @@ buster.testCase('custom condition', {
 
         MyCondition.prototype.validate = function (value, path) {};
         
-        buster.referee.assert.equals(lewd.custom(new MyCondition()).wrapped, 'MyCondition');
+        assert.equals(lewd.custom(new MyCondition()).wrapped, 'MyCondition');
     },
     'without custom message': function () {
         try {
             lewd(oddNumberConditionWithException)(4);
         } catch (e) {
-            buster.referee.assert.equals(e.name, 'ConditionViolationException');
-            buster.referee.assert.match(e.message, 'number is not odd');
+            assert.equals(e.name, 'ConditionViolationException');
+            assert.match(e.message, 'number is not odd');
             return;
         }
 
-        buster.referee.assert(false, 'An exception should have been thrown');
+        assert(false, 'An exception should have been thrown');
     },
     'with custom message': function () {
         try {
             lewd(oddNumberConditionWithException).because('i say so')(4);
         } catch (e) {
-            buster.referee.assert.equals(e.name, 'ConditionViolationException');
-            buster.referee.assert.equals(e.message, 'i say so');
+            assert.equals(e.name, 'ConditionViolationException');
+            assert.equals(e.message, 'i say so');
             return;
         }
 
-        buster.referee.assert(false, 'An exception should have been thrown');
+        assert(false, 'An exception should have been thrown');
     },
     'report the correct path': function () {
         try {
             lewd({ x: [lewd(oddNumberConditionWithException)] })({ x: [1, 2] });
         } catch (e) {
-            buster.referee.assert.equals(e.name, 'ConditionViolationException');
-            buster.referee.assert.equals(e.path, ['x', '#1']);
-            buster.referee.assert.equals(e.message, 'number is not odd');
+            assert.equals(e.name, 'ConditionViolationException');
+            assert.equals(e.path, ['x', 1]);
+            assert.equals(e.message, 'number is not odd');
             return;
         }
 
-        buster.referee.assert(false, 'An exception should have been thrown');
+        assert(false, 'An exception should have been thrown');
     },
     'simplified inline condition': {
         'nested with exception': function () {
@@ -74,13 +76,13 @@ buster.testCase('custom condition', {
             try {
                 condition({ a: [42, 13.2, -7, 9] });
             } catch (e) {
-                buster.referee.assert.equals(e.name, 'ConditionViolationException');
-                buster.referee.assert.equals(e.path, ['a', '#2']);
-                buster.referee.assert.equals(e.message, errorMessages.Custom);
+                assert.equals(e.name, 'ConditionViolationException');
+                assert.equals(e.path, ['a', 2]);
+                assert.equals(e.message, errorMessages.Custom);
                 return;
             }
     
-            buster.referee.assert(false, 'An exception should have been thrown');
+            assert(false, 'An exception should have been thrown');
         },
         'nested with reject': function () {
             var inlineCondition = function (value, path) {
@@ -91,13 +93,13 @@ buster.testCase('custom condition', {
             try {
                 condition({ a: [42, 13.2, -7, 9] });
             } catch (e) {
-                buster.referee.assert.equals(e.name, 'ConditionViolationException');
-                buster.referee.assert.equals(e.path, ['a', '#2']);
-                buster.referee.assert.equals(e.message, 'Denied!');
+                assert.equals(e.name, 'ConditionViolationException');
+                assert.equals(e.path, ['a', 2]);
+                assert.equals(e.message, 'Denied!');
                 return;
             }
     
-            buster.referee.assert(false, 'An exception should have been thrown');
+            assert(false, 'An exception should have been thrown');
         },
         'nested with return false': function () {
             var condition = lewd({ a: [Number, oddNumberConditionWithReturnFalse] });
@@ -105,13 +107,13 @@ buster.testCase('custom condition', {
             try {
                 condition({ a: [41, 12, -7] });
             } catch (e) {
-                buster.referee.assert.equals(e.name, 'ConditionViolationException');
-                buster.referee.assert.equals(e.path, ['a', '#1']);
-                buster.referee.assert.equals(e.message, errorMessages.Custom);
+                assert.equals(e.name, 'ConditionViolationException');
+                assert.equals(e.path, ['a', 1]);
+                assert.equals(e.message, errorMessages.Custom);
                 return;
             }
     
-            buster.referee.assert(false, 'An exception should have been thrown');
+            assert(false, 'An exception should have been thrown');
         },
         'nested with return false and custom error': function () {
             var condition = lewd({ a: [Number, lewd(oddNumberConditionWithReturnFalse).because('i say so')] });
@@ -119,13 +121,13 @@ buster.testCase('custom condition', {
             try {
                 condition({ a: [41, 12, -7] });
             } catch (e) {
-                buster.referee.assert.equals(e.name, 'ConditionViolationException');
-                buster.referee.assert.equals(e.path, ['a', '#1']);
-                buster.referee.assert.equals(e.message, 'i say so');
+                assert.equals(e.name, 'ConditionViolationException');
+                assert.equals(e.path, ['a', 1]);
+                assert.equals(e.message, 'i say so');
                 return;
             }
     
-            buster.referee.assert(false, 'An exception should have been thrown');
+            assert(false, 'An exception should have been thrown');
         },
         'nested with returned string': function () {
             var condition = lewd({ a: [Number, oddNumberConditionWithReturnString] });
@@ -133,13 +135,13 @@ buster.testCase('custom condition', {
             try {
                 condition({ a: [41, 12, -7] });
             } catch (e) {
-                buster.referee.assert.equals(e.name, 'ConditionViolationException');
-                buster.referee.assert.equals(e.path, ['a', '#1']);
-                buster.referee.assert.equals(e.message, 'number is not odd');
+                assert.equals(e.name, 'ConditionViolationException');
+                assert.equals(e.path, ['a', 1]);
+                assert.equals(e.message, 'number is not odd');
                 return;
             }
     
-            buster.referee.assert(false, 'An exception should have been thrown');
+            assert(false, 'An exception should have been thrown');
         }
     }
 });

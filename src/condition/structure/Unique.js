@@ -63,7 +63,7 @@ UniqueCondition.prototype.validate = function (value, path) {
     
     if (duplicate) {
         this.reject(
-            value, path.concat('#' + duplicate.index), errorMessages.duplicateFound, {
+            value, path.concat(duplicate.index), errorMessages.duplicateFound, {
                 duplicate: duplicate.value,
                 duplicateStr: utils.smartFormat(duplicate.value)
             }

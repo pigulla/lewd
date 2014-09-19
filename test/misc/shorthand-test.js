@@ -6,51 +6,53 @@ var helper = require('../helper'),
     lewd = require('../../src/lewd'),
     BooleanTypeCondition = require('../../src/condition/type/Boolean');
 
+var assert = buster.referee.assert;
+
 buster.testCase('shorthand syntax', {
     'Boolean': function () {
-        buster.referee.assert.equals(lewd(Boolean).wrapped, 'BooleanType');
+        assert.equals(lewd(Boolean).wrapped, 'BooleanType');
     },
     'Array': function () {
-        buster.referee.assert.equals(lewd(Array).wrapped, 'ArrayType');
+        assert.equals(lewd(Array).wrapped, 'ArrayType');
     },
     'Object': function () {
-        buster.referee.assert.equals(lewd(Object).wrapped, 'ObjectType');
+        assert.equals(lewd(Object).wrapped, 'ObjectType');
     },
     'String': function () {
-        buster.referee.assert.equals(lewd(String).wrapped, 'StringType');
+        assert.equals(lewd(String).wrapped, 'StringType');
     },
     'Number': function () {
-        buster.referee.assert.equals(lewd(Number).wrapped, 'NumberType');
+        assert.equals(lewd(Number).wrapped, 'NumberType');
     },
     'null': function () {
-        buster.referee.assert.equals(lewd(null).wrapped, 'NullType');
+        assert.equals(lewd(null).wrapped, 'NullType');
     },
     'undefined': function () {
-        buster.referee.assert.equals(lewd(undefined).wrapped, 'Any');
+        assert.equals(lewd(undefined).wrapped, 'Any');
     },
     '[1, 2, 3]': function () {
-        buster.referee.assert.equals(lewd([1, 2, 3]).wrapped, 'Array');
+        assert.equals(lewd([1, 2, 3]).wrapped, 'Array');
     },
     '{}': function () {
-        buster.referee.assert.equals(lewd({}).wrapped, 'Object');
+        assert.equals(lewd({}).wrapped, 'Object');
     },
     '/x/': function () {
-        buster.referee.assert.equals(lewd(/x/).wrapped, 'Regex');
+        assert.equals(lewd(/x/).wrapped, 'Regex');
     },
     '"foo"': function () {
-        buster.referee.assert.equals(lewd('foo').wrapped, 'Literal');
+        assert.equals(lewd('foo').wrapped, 'Literal');
     },
     '42': function () {
-        buster.referee.assert.equals(lewd(42).wrapped, 'Literal');
+        assert.equals(lewd(42).wrapped, 'Literal');
     },
     'false': function () {
-        buster.referee.assert.equals(lewd(false).wrapped, 'Literal');
+        assert.equals(lewd(false).wrapped, 'Literal');
     },
     'Number, "foo", 42': function () {
-        buster.referee.assert.equals(lewd(Number, 'foo', 42).wrapped, 'Some');
+        assert.equals(lewd(Number, 'foo', 42).wrapped, 'Some');
     },
     'existing condition': function () {
         var condition = new BooleanTypeCondition();
-        buster.referee.assert.equals(lewd(condition).wrapped, 'BooleanType');
+        assert.equals(lewd(condition).wrapped, 'BooleanType');
     }
 });

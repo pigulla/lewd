@@ -5,7 +5,8 @@ var lewd = require('../../src/lewd'),
     errorMessages = require('../../src/messages'),
     helper = require('./../helper');
 
-var refuteValues = helper.refuteValues,
+var assert = buster.referee.assert,
+    refuteValues = helper.refuteValues,
     acceptValues = helper.acceptValues,
     assertViolationWithMessage = helper.assertViolationWithMessage;
 
@@ -99,7 +100,7 @@ buster.testCase('"array" condition', {
         }
     },
     'passes exceptions through': function () {
-        buster.referee.assert.exception(function () {
+        assert.exception(function () {
             condition(function () { x(); })(['x']);  // jshint ignore:line                
         }, 'ReferenceError');
     },

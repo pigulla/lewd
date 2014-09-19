@@ -5,7 +5,9 @@ var helper = require('../helper'),
     errorMessages = require('../../src/messages'),
     lewd = require('../../src/lewd');
 
-var refuteValues = helper.refuteValues,
+var assert = buster.referee.assert,
+    refute = buster.referee.refute,
+    refuteValues = helper.refuteValues,
     acceptValues = helper.acceptValues,
     assertViolationAt = helper.assertViolationAt,
     assertViolationWithMessage = helper.assertViolationWithMessage;
@@ -25,7 +27,7 @@ buster.testCase('complex validations', {
             }], lewd.len({ min: 3 }).because('a book needs at least three chapters (where: ${path})'))
         });
         
-        buster.referee.refute.exception(function () {
+        refute.exception(function () {
             var result = condition({
                 title: 'My Book',
                 chapters: [
@@ -35,9 +37,9 @@ buster.testCase('complex validations', {
                 ]
             });
             
-            buster.referee.assert.same(result.chapters[0].inProgress, false);
-            buster.referee.assert.same(result.chapters[1].inProgress, true);
-            buster.referee.assert.same(result.chapters[2].inProgress, false);
+            assert.same(result.chapters[0].inProgress, false);
+            assert.same(result.chapters[1].inProgress, true);
+            assert.same(result.chapters[2].inProgress, false);
         });
 
         assertViolationAt(function () {
@@ -71,7 +73,7 @@ buster.testCase('complex validations', {
                     { name: 'Chapter 3', pages: 11 }
                 ]
             });
-        }, ['chapters', '#1']);
+        }, ['chapters', 1]);
 
         assertViolationAt(function () {
             condition({
@@ -82,7 +84,7 @@ buster.testCase('complex validations', {
                     { name: 'Chapter 3', pages: 0 }
                 ]
             });
-        }, ['chapters', '#2', 'pages']);
+        }, ['chapters', 2, 'pages']);
         
         assertViolationAt(function () {
             condition({
@@ -93,7 +95,7 @@ buster.testCase('complex validations', {
                     { name: 'Chapter 3', pages: 3, references: [1, 2, 1] }
                 ]
             });
-        }, ['chapters', '#2', 'references', '#2']);
+        }, ['chapters', 2, 'references', 2]);
 
         assertViolationWithMessage(function () {
             condition({

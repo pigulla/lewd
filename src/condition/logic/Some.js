@@ -31,9 +31,7 @@ SomeCondition.prototype.validate = function (value, path) {
             condition(value, path);
             satisfied = true;
         } catch (e) {
-            if (e instanceof ConditionViolationException) {
-                return e;
-            } else {
+            if (!(e instanceof ConditionViolationException)) {
                 throw e;
             }
         }

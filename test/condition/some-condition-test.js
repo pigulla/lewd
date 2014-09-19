@@ -5,7 +5,8 @@ var lewd = require('../../src/lewd'),
     errorMessages = require('../../src/messages'),
     helper = require('./../helper');
 
-var refuteValues = helper.refuteValues,
+var assert = buster.referee.assert,
+    refuteValues = helper.refuteValues,
     acceptValues = helper.acceptValues,
     assertViolationWithMessage = helper.assertViolationWithMessage;
 
@@ -30,7 +31,7 @@ buster.testCase('"some" condition', {
         acceptValues(condition, args, ['1', '0815', 'awesomesauce', 42, -1.99]);
     },
     'exceptions are passed through': function () {
-        buster.referee.assert.exception(function () {
+        assert.exception(function () {
             var custom = function (value, path) {
                 ''.foo();
             };

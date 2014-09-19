@@ -4,19 +4,22 @@ var buster = require('buster');
 
 var lewd = require('../src/lewd');
 
+var assert = buster.referee.assert,
+    refute = buster.referee.refute;
+
 /*jshint maxparams: 5*/
 function test(condition, args, accept, values, expected) {
     values.forEach(function (value, index) {
         var result;
         
         if (accept) {
-            buster.referee.refute.exception(function () {
+            refute.exception(function () {
                 result = condition.apply(lewd, args)(value);
             }, null, util.format('Value %s not expected to fail for arguments %s', value, args));
             
-            buster.referee.assert.same(result, expected[index]);
+            assert.same(result, expected[index]);
         } else {
-            buster.referee.assert.exception(function () {
+            assert.exception(function () {
                 condition.apply(lewd, args)(value);
             }, 'ConditionViolationException');
         }
@@ -31,7 +34,7 @@ module.exports = {
         test(condition, args, false, values);
     },
     refuteSchemaOptions: function (condition, args) {
-        buster.referee.assert.exception(function () {
+        assert.exception(function () {
             condition.apply(lewd, args);
         }, 'IllegalParameterException');
     },
@@ -39,22 +42,22 @@ module.exports = {
         try {
             fn();
         } catch (e) {
-            buster.referee.assert.equals(e.name, 'ConditionViolationException');
-            buster.referee.assert.equals(e.message, message);
+            assert.equals(e.name, 'ConditionViolationException');
+            assert.equals(e.message, message);
             return;
         }
 
-        buster.referee.assert(false, 'An exception should have been thrown');
+        assert(false, 'An exception should have been thrown');
     },
     assertViolationAt: function (fn, path) {
         try {
             fn();
         } catch (e) {
-            buster.referee.assert.equals(e.name, 'ConditionViolationException');
-            buster.referee.assert.equals(e.path, path);
+            assert.equals(e.name, 'ConditionViolationException');
+            assert.equals(e.path, path);
             return;
         }
     
-        buster.referee.assert(false, 'Condition should have failed');
+        assert(false, 'Condition should have failed');
     }
 };

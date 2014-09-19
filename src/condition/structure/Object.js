@@ -209,7 +209,7 @@ ObjectCondition.prototype.validate = function (value, path) {
     keys.extra.forEach(function (key) {
         if (this.options.removeExtra) {
             try {
-                this.keysCondition(key, path.concat(KEYS_PROPERTY + key));
+                this.keysCondition(key, path.concat('{' + key + '}'));
             } catch (e) {
                 if (e instanceof ConditionViolationException) {
                     delete value[key];
@@ -218,10 +218,10 @@ ObjectCondition.prototype.validate = function (value, path) {
                     throw e;
                 }
             }
-            this.valuesCondition(value[key], path.concat(KEYS_PROPERTY + key));
+            this.valuesCondition(value[key], path.concat(key));
         } else {
-            this.keysCondition(key, path.concat(KEYS_PROPERTY + key));
-            this.valuesCondition(value[key], path.concat(KEYS_PROPERTY + key));
+            this.keysCondition(key, path.concat('{' + key + '}'));
+            this.valuesCondition(value[key], path.concat(key));
         }
     }, this);
     
@@ -240,7 +240,6 @@ ObjectCondition.prototype.validate = function (value, path) {
         if (this.spec[key].isForbidden()) {
             this.reject(value, path, errorMessages.Object.unexpectedKey, { key: key });
         }
-        
         value[key] = this.spec[key](value[key], path.concat(key));
     }, this);
 

@@ -2,7 +2,7 @@
  * lewd - an intuitive and easy to use data validation library
  *
  * @class lewd
- * @version 0.7.0-dev
+ * @version 0.7.0
  * @author Raphael Pigulla <pigulla@four66.com>
  * @license BSD-2-Clause
  */
@@ -76,7 +76,7 @@ var lewd = function () {
  * @readonly
  * @type {string}
  */
-lewd.version = '0.7.0-dev';
+lewd.version = '0.7.0';
 
 /**
  * Wraps an arbitrary value in its appropriate condition wrapper (or returns the argument if it is already wrapped).

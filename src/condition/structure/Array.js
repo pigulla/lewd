@@ -42,7 +42,7 @@ ArrayCondition.prototype.validate = function (value, path) {
 
     try {
         value.forEach(function (item, index) {
-            value[index] = this._conditions[0](item, path.concat('#' + index));
+            value[index] = this._conditions[0](item, path.concat(index));
         }, this);
     } catch (e) {
         if (e instanceof ConditionViolationException) {
