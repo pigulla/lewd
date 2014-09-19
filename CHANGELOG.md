@@ -1,3 +1,9 @@
+## 0.7.1 (2014-09-20)
+
+##### New features:
+
+ - Added condition wrapper for validator.js' `isFQDN` check. 
+
 ## 0.7.0 (2014-09-19)
 
 ##### New features:

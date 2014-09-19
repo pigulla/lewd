@@ -8358,7 +8358,7 @@ Condition.prototype.consumer = function () {
 
 module.exports = Condition;
 
-},{"../exception/ConditionViolationException":39,"../exception/IllegalParameterException":40,"./ConsumerWrapper":10,"lodash":7}],10:[function(require,module,exports){
+},{"../exception/ConditionViolationException":40,"../exception/IllegalParameterException":41,"./ConsumerWrapper":10,"lodash":7}],10:[function(require,module,exports){
 var _ = require('lodash');
 
 var utils = require('../utils');
@@ -8461,7 +8461,7 @@ module.exports = function (condition) {
     return consumerWrapper;
 };
 
-},{"../utils":43,"./Condition":9,"lodash":7}],11:[function(require,module,exports){
+},{"../utils":44,"./Condition":9,"lodash":7}],11:[function(require,module,exports){
 var util = require('util');
 
 var Condition = require('./Condition'),
@@ -8522,7 +8522,7 @@ CustomCondition.prototype.validate = function (value, path) {
 
 module.exports = CustomCondition;
 
-},{"../exception/ConditionViolationException":39,"../exception/IllegalParameterException":40,"../messages":42,"./Condition":9,"util":4}],12:[function(require,module,exports){
+},{"../exception/ConditionViolationException":40,"../exception/IllegalParameterException":41,"../messages":43,"./Condition":9,"util":4}],12:[function(require,module,exports){
 var util = require('util');
 
 var Condition = require('./Condition'),
@@ -8570,7 +8570,7 @@ NestedCondition.prototype.find = function (name) {
 
 module.exports = NestedCondition;
 
-},{"../exception/IllegalParameterException":40,"./Condition":9,"util":4}],13:[function(require,module,exports){
+},{"../exception/IllegalParameterException":41,"./Condition":9,"util":4}],13:[function(require,module,exports){
 var util = require('util');
 
 var Condition = require('../Condition'),
@@ -8610,7 +8610,7 @@ IntegerCondition.prototype.validate = function (value, path) {
 
 module.exports = IntegerCondition;
 
-},{"../../messages":42,"../Condition":9,"util":4}],14:[function(require,module,exports){
+},{"../../messages":43,"../Condition":9,"util":4}],14:[function(require,module,exports){
 var util = require('util');
 
 var Condition = require('../Condition'),
@@ -8658,7 +8658,7 @@ IsoDateTimeCondition.prototype.validate = function (value, path) {
 
 module.exports = IsoDateTimeCondition;
 
-},{"../../exception/ConditionViolationException":39,"../../lewd":41,"../../messages":42,"../Condition":9,"util":4}],15:[function(require,module,exports){
+},{"../../exception/ConditionViolationException":40,"../../lewd":42,"../../messages":43,"../Condition":9,"util":4}],15:[function(require,module,exports){
 var util = require('util');
 
 var _ = require('lodash');
@@ -8738,7 +8738,7 @@ LenCondition.prototype.validate = function (value, path) {
 
 module.exports = LenCondition;
 
-},{"../../exception/IllegalParameterException":40,"../../messages":42,"../Condition":9,"lodash":7,"util":4}],16:[function(require,module,exports){
+},{"../../exception/IllegalParameterException":41,"../../messages":43,"../Condition":9,"lodash":7,"util":4}],16:[function(require,module,exports){
 var util = require('util');
 
 var Condition = require('../Condition'),
@@ -8788,7 +8788,7 @@ LiteralCondition.prototype.validate = function (value, path) {
 
 module.exports = LiteralCondition;
 
-},{"../../exception/IllegalParameterException":40,"../../messages":42,"../../utils":43,"../Condition":9,"util":4}],17:[function(require,module,exports){
+},{"../../exception/IllegalParameterException":41,"../../messages":43,"../../utils":44,"../Condition":9,"util":4}],17:[function(require,module,exports){
 var util = require('util');
 
 var _ = require('lodash');
@@ -8864,7 +8864,7 @@ RangeCondition.prototype.validate = function (value, path) {
 
 module.exports = RangeCondition;
 
-},{"../../exception/IllegalParameterException":40,"../../messages":42,"../Condition":9,"lodash":7,"util":4}],18:[function(require,module,exports){
+},{"../../exception/IllegalParameterException":41,"../../messages":43,"../Condition":9,"lodash":7,"util":4}],18:[function(require,module,exports){
 var util = require('util');
 
 var Condition = require('../Condition'),
@@ -8901,7 +8901,7 @@ RegexCondition.prototype.validate = function (value, path) {
 
 module.exports = RegexCondition;
 
-},{"../../exception/IllegalParameterException":40,"../../messages":42,"../Condition":9,"util":4}],19:[function(require,module,exports){
+},{"../../exception/IllegalParameterException":41,"../../messages":43,"../Condition":9,"util":4}],19:[function(require,module,exports){
 var util = require('util');
 
 var NestedCondition = require('../NestedCondition'),
@@ -8946,7 +8946,7 @@ AllCondition.prototype.validate = function (value, path) {
 
 module.exports = AllCondition;
 
-},{"../../exception/ConditionViolationException":39,"../NestedCondition":12,"util":4}],20:[function(require,module,exports){
+},{"../../exception/ConditionViolationException":40,"../NestedCondition":12,"util":4}],20:[function(require,module,exports){
 var util = require('util');
 
 var Condition = require('../Condition'),
@@ -8972,7 +8972,7 @@ AnyCondition.prototype.validate = function (value, path) {
 
 module.exports = AnyCondition;
 
-},{"../../messages":42,"../Condition":9,"util":4}],21:[function(require,module,exports){
+},{"../../messages":43,"../Condition":9,"util":4}],21:[function(require,module,exports){
 var util = require('util');
 
 var NestedCondition = require('../NestedCondition'),
@@ -9019,7 +9019,7 @@ NoneCondition.prototype.validate = function (value, path) {
 
 module.exports = NoneCondition;
 
-},{"../../exception/ConditionViolationException":39,"../../messages":42,"../NestedCondition":12,"util":4}],22:[function(require,module,exports){
+},{"../../exception/ConditionViolationException":40,"../../messages":43,"../NestedCondition":12,"util":4}],22:[function(require,module,exports){
 var util = require('util');
 
 var NestedCondition = require('../NestedCondition'),
@@ -9057,7 +9057,7 @@ NotCondition.prototype.validate = function (value, path) {
 
 module.exports = NotCondition;
 
-},{"../../exception/ConditionViolationException":39,"../../messages":42,"../NestedCondition":12,"util":4}],23:[function(require,module,exports){
+},{"../../exception/ConditionViolationException":40,"../../messages":43,"../NestedCondition":12,"util":4}],23:[function(require,module,exports){
 var util = require('util');
 
 var NestedCondition = require('../NestedCondition'),
@@ -9106,7 +9106,7 @@ SomeCondition.prototype.validate = function (value, path) {
 
 module.exports = SomeCondition;
 
-},{"../../exception/ConditionViolationException":39,"../../messages":42,"../NestedCondition":12,"util":4}],24:[function(require,module,exports){
+},{"../../exception/ConditionViolationException":40,"../../messages":43,"../NestedCondition":12,"util":4}],24:[function(require,module,exports){
 var util = require('util');
 
 var NestedCondition = require('../NestedCondition'),
@@ -9166,7 +9166,7 @@ ArrayCondition.prototype.validate = function (value, path) {
 
 module.exports = ArrayCondition;
 
-},{"../../exception/ConditionViolationException":39,"../../exception/IllegalParameterException":40,"../../lewd":41,"../../messages":42,"../NestedCondition":12,"util":4}],25:[function(require,module,exports){
+},{"../../exception/ConditionViolationException":40,"../../exception/IllegalParameterException":41,"../../lewd":42,"../../messages":43,"../NestedCondition":12,"util":4}],25:[function(require,module,exports){
 var util = require('util');
 
 var _ = require('lodash');
@@ -9434,7 +9434,7 @@ ObjectCondition.prototype.find = function (name) {
 
 module.exports = ObjectCondition;
 
-},{"../../exception/ConditionViolationException":39,"../../exception/IllegalParameterException":40,"../../lewd":41,"../../messages":42,"../Condition":9,"lodash":7,"util":4}],26:[function(require,module,exports){
+},{"../../exception/ConditionViolationException":40,"../../exception/IllegalParameterException":41,"../../lewd":42,"../../messages":43,"../Condition":9,"lodash":7,"util":4}],26:[function(require,module,exports){
 var util = require('util');
 
 var Condition = require('../Condition'),
@@ -9512,7 +9512,7 @@ UniqueCondition.prototype.validate = function (value, path) {
 
 module.exports = UniqueCondition;
 
-},{"../../exception/ConditionViolationException":39,"../../exception/IllegalParameterException":40,"../../messages":42,"../../utils":43,"../Condition":9,"util":4}],27:[function(require,module,exports){
+},{"../../exception/ConditionViolationException":40,"../../exception/IllegalParameterException":41,"../../messages":43,"../../utils":44,"../Condition":9,"util":4}],27:[function(require,module,exports){
 var util = require('util');
 
 var Condition = require('../Condition'),
@@ -9542,7 +9542,7 @@ ArrayTypeCondition.prototype.validate = function (value, path) {
 
 module.exports = ArrayTypeCondition;
 
-},{"../../messages":42,"../Condition":9,"util":4}],28:[function(require,module,exports){
+},{"../../messages":43,"../Condition":9,"util":4}],28:[function(require,module,exports){
 var util = require('util');
 
 var Condition = require('../Condition'),
@@ -9578,7 +9578,7 @@ BooleanTypeCondition.prototype.validate = function (value, path) {
 
 module.exports = BooleanTypeCondition;
 
-},{"../../messages":42,"../Condition":9,"util":4}],29:[function(require,module,exports){
+},{"../../messages":43,"../Condition":9,"util":4}],29:[function(require,module,exports){
 var util = require('util');
 
 var Condition = require('../Condition'),
@@ -9608,7 +9608,7 @@ NullTypeCondition.prototype.validate = function (value, path) {
 
 module.exports = NullTypeCondition;
 
-},{"../../messages":42,"../Condition":9,"util":4}],30:[function(require,module,exports){
+},{"../../messages":43,"../Condition":9,"util":4}],30:[function(require,module,exports){
 var util = require('util');
 
 var Condition = require('../Condition'),
@@ -9640,7 +9640,7 @@ NumberTypeCondition.prototype.validate = function (value, path) {
 
 module.exports = NumberTypeCondition;
 
-},{"../../messages":42,"../Condition":9,"util":4}],31:[function(require,module,exports){
+},{"../../messages":43,"../Condition":9,"util":4}],31:[function(require,module,exports){
 var util = require('util');
 
 var _ = require('lodash');
@@ -9672,7 +9672,7 @@ ObjectTypeCondition.prototype.validate = function (value, path) {
 
 module.exports = ObjectTypeCondition;
 
-},{"../../messages":42,"../Condition":9,"lodash":7,"util":4}],32:[function(require,module,exports){
+},{"../../messages":43,"../Condition":9,"lodash":7,"util":4}],32:[function(require,module,exports){
 var util = require('util');
 
 var Condition = require('../Condition'),
@@ -9708,7 +9708,7 @@ StringTypeCondition.prototype.validate = function (value, path) {
 
 module.exports = StringTypeCondition;
 
-},{"../../messages":42,"../Condition":9,"util":4}],33:[function(require,module,exports){
+},{"../../messages":43,"../Condition":9,"util":4}],33:[function(require,module,exports){
 var util = require('util');
 
 var validator = require('validator');
@@ -9745,7 +9745,7 @@ CreditcardCondition.prototype.validate = function (value, path) {
 
 module.exports = CreditcardCondition;
 
-},{"../../exception/IllegalParameterException":40,"../../messages":42,"../Condition":9,"util":4,"validator":8}],34:[function(require,module,exports){
+},{"../../exception/IllegalParameterException":41,"../../messages":43,"../Condition":9,"util":4,"validator":8}],34:[function(require,module,exports){
 var util = require('util');
 
 var validator = require('validator');
@@ -9782,7 +9782,51 @@ EmailCondition.prototype.validate = function (value, path) {
 
 module.exports = EmailCondition;
 
-},{"../../exception/IllegalParameterException":40,"../../messages":42,"../Condition":9,"util":4,"validator":8}],35:[function(require,module,exports){
+},{"../../exception/IllegalParameterException":41,"../../messages":43,"../Condition":9,"util":4,"validator":8}],35:[function(require,module,exports){
+var util = require('util');
+
+var validator = require('validator');
+
+var Condition = require('../Condition'),
+    IllegalParameterException = require('../../exception/IllegalParameterException'),
+    errorMessages = require('../../messages').Fqdn;
+
+/**
+ * @class lewd.condition.validator.Fqdn
+ * @extends {lewd.condition.Condition}
+ * @constructor
+ * @param {object=} options
+ */
+function FqdnCondition(options) {
+    if (options && typeof options !== 'object') {
+        throw new IllegalParameterException('Parameter must be an object');
+    }
+
+    this.options = options || {};
+
+    Condition.call(this, 'Fqdn');
+}
+
+util.inherits(FqdnCondition, Condition);
+
+/**
+ * @inheritdoc
+ */
+FqdnCondition.prototype.validate = function (value, path) {
+    if (typeof value !== 'string') {
+        this.reject(value, path, errorMessages.type);
+    }
+
+    if (!validator.isFQDN(value, this.options)) {
+        this.reject(value, path, errorMessages.invalid);
+    }
+
+    return value;
+};
+
+module.exports = FqdnCondition;
+
+},{"../../exception/IllegalParameterException":41,"../../messages":43,"../Condition":9,"util":4,"validator":8}],36:[function(require,module,exports){
 var util = require('util');
 
 var validator = require('validator');
@@ -9826,7 +9870,7 @@ IpCondition.prototype.validate = function (value, path) {
 
 module.exports = IpCondition;
 
-},{"../../exception/IllegalParameterException":40,"../../messages":42,"../Condition":9,"util":4,"validator":8}],36:[function(require,module,exports){
+},{"../../exception/IllegalParameterException":41,"../../messages":43,"../Condition":9,"util":4,"validator":8}],37:[function(require,module,exports){
 var util = require('util');
 
 var validator = require('validator');
@@ -9870,7 +9914,7 @@ IsbnCondition.prototype.validate = function (value, path) {
 
 module.exports = IsbnCondition;
 
-},{"../../exception/IllegalParameterException":40,"../../messages":42,"../Condition":9,"util":4,"validator":8}],37:[function(require,module,exports){
+},{"../../exception/IllegalParameterException":41,"../../messages":43,"../Condition":9,"util":4,"validator":8}],38:[function(require,module,exports){
 var util = require('util');
 
 var validator = require('validator');
@@ -9914,7 +9958,7 @@ UrlCondition.prototype.validate = function (value, path) {
 
 module.exports = UrlCondition;
 
-},{"../../exception/IllegalParameterException":40,"../../messages":42,"../Condition":9,"util":4,"validator":8}],38:[function(require,module,exports){
+},{"../../exception/IllegalParameterException":41,"../../messages":43,"../Condition":9,"util":4,"validator":8}],39:[function(require,module,exports){
 var util = require('util');
 
 var validator = require('validator');
@@ -9958,7 +10002,7 @@ UuidCondition.prototype.validate = function (value, path) {
 
 module.exports = UuidCondition;
 
-},{"../../exception/IllegalParameterException":40,"../../messages":42,"../Condition":9,"util":4,"validator":8}],39:[function(require,module,exports){
+},{"../../exception/IllegalParameterException":41,"../../messages":43,"../Condition":9,"util":4,"validator":8}],40:[function(require,module,exports){
 var util = require('util');
 
 var _ = require('lodash'),
@@ -10005,7 +10049,7 @@ ConditionViolationException.prototype._getTemplateVariables = function () {
 
 module.exports = ConditionViolationException;
 
-},{"../utils":43,"json-pointer":5,"lodash":7,"util":4}],40:[function(require,module,exports){
+},{"../utils":44,"json-pointer":5,"lodash":7,"util":4}],41:[function(require,module,exports){
 var util = require('util');
 
 /**
@@ -10024,7 +10068,7 @@ util.inherits(IllegalParameterException, Error);
 
 module.exports = IllegalParameterException;
 
-},{"util":4}],41:[function(require,module,exports){
+},{"util":4}],42:[function(require,module,exports){
 /**
  * lewd - an intuitive and easy to use data validation library
  *
@@ -10051,6 +10095,7 @@ var ConditionViolationException = require('./exception/ConditionViolationExcepti
 
         Creditcard: require('./condition/validator/Creditcard'),
         Email: require('./condition/validator/Email'),
+        Fqdn: require('./condition/validator/Fqdn'),
         Ip: require('./condition/validator/Ip'),
         Isbn: require('./condition/validator/Isbn'),
         Url: require('./condition/validator/Url'),
@@ -10103,7 +10148,7 @@ var lewd = function () {
  * @readonly
  * @type {string}
  */
-lewd.version = '0.7.0';
+lewd.version = '0.7.1';
 
 /**
  * Wraps an arbitrary value in its appropriate condition wrapper (or returns the argument if it is already wrapped).
@@ -10116,7 +10161,7 @@ lewd.version = '0.7.0';
 lewd._wrap = function (spec) {
     var shorthands = [
         lewd.Array, lewd.Boolean, lewd.null, lewd.Number, lewd.Object, lewd.String, lewd.undefined,
-        lewd.unique, lewd.isoDateTime, lewd.integer, lewd.ip, lewd.email, lewd.uuid, lewd.url, lewd.isbn,
+        lewd.unique, lewd.isoDateTime, lewd.integer, lewd.ip, lewd.email, lewd.uuid, lewd.url, lewd.fqdn, lewd.isbn,
         lewd.creditcard
     ];
     
@@ -10165,7 +10210,7 @@ lewd._wrap = function (spec) {
 lewd.expose = function (prefix) {
     var p = prefix || '',
         exposedFunctions = [
-            'creditcard', 'email', 'ip', 'isbn', 'url', 'uuid',
+            'creditcard', 'email', 'ip', 'isbn', 'url', 'fqdn', 'uuid',
             'optional', 'required', 'forbidden',
             'integer', 'isoDateTime',
             'array', 'len', 'literal', 'object', 'range', 'regex',
@@ -10323,6 +10368,16 @@ lewd.isbn = function (version) {
 lewd.url = function (options) {
     utils.assertParameterCount(arguments, 0, 1);
     return (new conditions.Url(options)).consumer();
+};
+
+/**
+ * @since 0.7.1
+ * @param {object=} options
+ * @return {lewd.condition.ConsumerWrapper}
+ */
+lewd.fqdn = function (options) {
+    utils.assertParameterCount(arguments, 0, 1);
+    return (new conditions.Fqdn(options)).consumer();
 };
 
 /**
@@ -10514,7 +10569,7 @@ lewd.Condition = Condition;
 
 module.exports = lewd;
 
-},{"./condition/Condition":9,"./condition/Custom":11,"./condition/composite/Integer":13,"./condition/composite/IsoDateTime":14,"./condition/content/Len":15,"./condition/content/Literal":16,"./condition/content/Range":17,"./condition/content/Regex":18,"./condition/logic/All":19,"./condition/logic/Any":20,"./condition/logic/None":21,"./condition/logic/Not":22,"./condition/logic/Some":23,"./condition/structure/Array":24,"./condition/structure/Object":25,"./condition/structure/Unique":26,"./condition/type/Array":27,"./condition/type/Boolean":28,"./condition/type/Null":29,"./condition/type/Number":30,"./condition/type/Object":31,"./condition/type/String":32,"./condition/validator/Creditcard":33,"./condition/validator/Email":34,"./condition/validator/Ip":35,"./condition/validator/Isbn":36,"./condition/validator/Url":37,"./condition/validator/Uuid":38,"./exception/ConditionViolationException":39,"./exception/IllegalParameterException":40,"./messages":42,"./utils":43,"lodash":7,"util":4}],42:[function(require,module,exports){
+},{"./condition/Condition":9,"./condition/Custom":11,"./condition/composite/Integer":13,"./condition/composite/IsoDateTime":14,"./condition/content/Len":15,"./condition/content/Literal":16,"./condition/content/Range":17,"./condition/content/Regex":18,"./condition/logic/All":19,"./condition/logic/Any":20,"./condition/logic/None":21,"./condition/logic/Not":22,"./condition/logic/Some":23,"./condition/structure/Array":24,"./condition/structure/Object":25,"./condition/structure/Unique":26,"./condition/type/Array":27,"./condition/type/Boolean":28,"./condition/type/Null":29,"./condition/type/Number":30,"./condition/type/Object":31,"./condition/type/String":32,"./condition/validator/Creditcard":33,"./condition/validator/Email":34,"./condition/validator/Fqdn":35,"./condition/validator/Ip":36,"./condition/validator/Isbn":37,"./condition/validator/Url":38,"./condition/validator/Uuid":39,"./exception/ConditionViolationException":40,"./exception/IllegalParameterException":41,"./messages":43,"./utils":44,"lodash":7,"util":4}],43:[function(require,module,exports){
 module.exports = {
     'Array': 'must be an array',
     'Custom': 'custom condition failed',
@@ -10534,6 +10589,10 @@ module.exports = {
     'Ip': {
         'type': 'must be a string',
         'invalid': 'not a valid IP'
+    },
+    'Fqdn': {
+        'type': 'must be a string',
+        'invalid': 'not a valid fully qualified domain name'
     },
     'IsoDateTime': 'not a valid ISO 8601 datetime string',
     'Len': {
@@ -10574,7 +10633,7 @@ module.exports = {
     }
 };
 
-},{}],43:[function(require,module,exports){
+},{}],44:[function(require,module,exports){
 var util = require('util');
 
 var _ = require('lodash');
@@ -10690,5 +10749,5 @@ var utils = {
 
 module.exports = utils;
 
-},{"./exception/ConditionViolationException":39,"./exception/IllegalParameterException":40,"lodash":7,"util":4}]},{},[41])(41)
+},{"./exception/ConditionViolationException":40,"./exception/IllegalParameterException":41,"lodash":7,"util":4}]},{},[42])(42)
 });

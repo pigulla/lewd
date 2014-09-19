@@ -150,6 +150,33 @@ buster.testCase('validator conditions', {
             refuteSchemaOptions(lewd.url, [2]);
         }
     },
+    'fqdn': {
+        'values': function () {
+            refuteValues(lewd.fqdn, [], [null, true, 17.3, 42, '', [], {}]);
+
+            refuteValues(lewd.fqdn, [],
+                ['abc', '256.0.0.0', '_.com', '*.some.com', 's!ome.com', 'domain.com/', '/more.com']);
+            acceptValues(lewd.fqdn, [], [
+                'domain.com', 'dom.plato', 'a.domain.co', 'foo--bar.com', 'xn--froschgrn-x9a.com',
+                'rebecca.blackfriday'
+            ]);
+        },
+        'error message': {
+            'type': function () {
+                assertViolationWithMessage(function () {
+                    lewd.fqdn()(null);
+                }, _.template(errorMessages.Fqdn.type, {}));
+            },
+            'invalid': function () {
+                assertViolationWithMessage(function () {
+                    lewd.fqdn()('not a fqdn');
+                }, _.template(errorMessages.Fqdn.invalid, {}));
+            }
+        },
+        'invalid schema options': function () {
+            refuteSchemaOptions(lewd.fqdn, [2]);
+        }
+    },
     'uuid': {
         'versions': function () {
             refuteValues(lewd.uuid, [], [null, true, 17.3, [], {}]);

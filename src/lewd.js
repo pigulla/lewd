@@ -24,6 +24,7 @@ var ConditionViolationException = require('./exception/ConditionViolationExcepti
 
         Creditcard: require('./condition/validator/Creditcard'),
         Email: require('./condition/validator/Email'),
+        Fqdn: require('./condition/validator/Fqdn'),
         Ip: require('./condition/validator/Ip'),
         Isbn: require('./condition/validator/Isbn'),
         Url: require('./condition/validator/Url'),
@@ -76,7 +77,7 @@ var lewd = function () {
  * @readonly
  * @type {string}
  */
-lewd.version = '0.7.0';
+lewd.version = '0.7.1';
 
 /**
  * Wraps an arbitrary value in its appropriate condition wrapper (or returns the argument if it is already wrapped).
@@ -89,7 +90,7 @@ lewd.version = '0.7.0';
 lewd._wrap = function (spec) {
     var shorthands = [
         lewd.Array, lewd.Boolean, lewd.null, lewd.Number, lewd.Object, lewd.String, lewd.undefined,
-        lewd.unique, lewd.isoDateTime, lewd.integer, lewd.ip, lewd.email, lewd.uuid, lewd.url, lewd.isbn,
+        lewd.unique, lewd.isoDateTime, lewd.integer, lewd.ip, lewd.email, lewd.uuid, lewd.url, lewd.fqdn, lewd.isbn,
         lewd.creditcard
     ];
     
@@ -138,7 +139,7 @@ lewd._wrap = function (spec) {
 lewd.expose = function (prefix) {
     var p = prefix || '',
         exposedFunctions = [
-            'creditcard', 'email', 'ip', 'isbn', 'url', 'uuid',
+            'creditcard', 'email', 'ip', 'isbn', 'url', 'fqdn', 'uuid',
             'optional', 'required', 'forbidden',
             'integer', 'isoDateTime',
             'array', 'len', 'literal', 'object', 'range', 'regex',
@@ -296,6 +297,16 @@ lewd.isbn = function (version) {
 lewd.url = function (options) {
     utils.assertParameterCount(arguments, 0, 1);
     return (new conditions.Url(options)).consumer();
+};
+
+/**
+ * @since 0.7.1
+ * @param {object=} options
+ * @return {lewd.condition.ConsumerWrapper}
+ */
+lewd.fqdn = function (options) {
+    utils.assertParameterCount(arguments, 0, 1);
+    return (new conditions.Fqdn(options)).consumer();
 };
 
 /**

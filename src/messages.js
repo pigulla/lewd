@@ -18,6 +18,10 @@ module.exports = {
         'type': 'must be a string',
         'invalid': 'not a valid IP'
     },
+    'Fqdn': {
+        'type': 'must be a string',
+        'invalid': 'not a valid fully qualified domain name'
+    },
     'IsoDateTime': 'not a valid ISO 8601 datetime string',
     'Len': {
         'max': 'must not be longer than ${max}',
