@@ -1,6 +1,6 @@
-## 0.7.0-dev (2014-09-19)
+## 0.7.0 (2014-09-19)
 
-##### New features
+##### New features:
 
  - Object properties can now be marked in bulk as required or optional with `allRequired()` and `allOptional`, respectively.
  
