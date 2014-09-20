@@ -1,6 +1,6 @@
 {
   "name": "lewd",
-  "version": "0.7.1",
+  "version": "0.8.0-dev",
   "license": [
     {
       "type": "BSD-2-Clause",
@@ -37,7 +37,7 @@
     "check"
   ],
   "dependencies": {
-    "json-pointer": "^0.2.1",
+    "json-pointer": "^0.2.2",
     "lodash": "^2.4.1",
     "validator": "^3.18.1"
   },
