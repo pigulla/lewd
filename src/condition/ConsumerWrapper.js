@@ -12,7 +12,7 @@ module.exports = function (condition) {
     /**
      * @class lewd.condition.ConsumerWrapper
      * @param {*} value
-     * @param {Array.<string>=} path
+     * @param {Array.<(string|number)>=} path
      * @return {*}
      */
     function consumerWrapper(value, path) {

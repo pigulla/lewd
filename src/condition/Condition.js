@@ -88,7 +88,7 @@ Condition.prototype.customError;
  * 
  * @abstract
  * @param {*} value
- * @param {Array.<string>} path
+ * @param {Array.<(string|number)>} path
  * @return {*}
  * @throws {lewd.exception.ConditionViolationException}
  */
@@ -101,7 +101,7 @@ Condition.prototype.validate = function (value, path) {
  * Takes care of overriding the passed message with the custom message if needed.
  * 
  * @param {*} value
- * @param {Array.<string>} path
+ * @param {Array.<(string|number)>} path
  * @param {string} messageTemplate
  * @param {Object.<string, *>=} templateData
  * @throws {lewd.exception.ConditionViolationException}

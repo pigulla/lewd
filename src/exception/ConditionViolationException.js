@@ -7,7 +7,7 @@ var _ = require('lodash'),
  * @class lewd.exception.ConditionViolationException
  * @extends Error
  * @param {*} value 
- * @param {Array.<string>} path 
+ * @param {Array.<(string|number)>} path 
  * @param {string} template 
  * @param {Object=} data
  */
