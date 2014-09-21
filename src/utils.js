@@ -7,17 +7,6 @@ var ConditionViolationException = require('./exception/ConditionViolationExcepti
 
 var utils = {
     /**
-     * Checks if the given value is the consumer wrapper of a condition.
-     *
-     * @param {*} value
-     * @return {boolean}
-     */
-    isConsumerWrapper: function (value) {
-        // A heuristic will have to do here.
-        return typeof value === 'function' && value.hasOwnProperty('isOptional') && value.hasOwnProperty('wrapped');
-    },
-    
-    /**
      * Asserts that the given arguments array contains at least `min` and no more than `max` parameters.
      *
      * @param {Array} args The arguments array.
@@ -49,7 +38,7 @@ var utils = {
      * @return {string}
      */
     smartFormat: function (value) {
-        /*jshint maxcomplexity:false */
+        /* jshint maxcomplexity:false */
         if (value === null) {
             return 'null';
         } else if (value === undefined) {

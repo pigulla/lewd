@@ -49,6 +49,9 @@ buster.testCase('internals', {
                 'isbn': function () {
                     assert.equals(lewd._wrap(lewd.isbn).wrapped, 'Isbn');
                 },
+                'fqdn': function () {
+                    assert.equals(lewd._wrap(lewd.fqdn).wrapped, 'Fqdn');
+                },
                 'unique': function () {
                     assert.equals(lewd._wrap(lewd.unique).wrapped, 'Unique');
                 },

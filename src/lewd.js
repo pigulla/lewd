@@ -11,7 +11,8 @@ var _ = require('lodash');
 
 var util = require('util');
 
-var ConditionViolationException = require('./exception/ConditionViolationException'),
+var ConsumerWrapper = require('./condition/ConsumerWrapper'),
+    ConditionViolationException = require('./exception/ConditionViolationException'),
     IllegalParameterException = require('./exception/IllegalParameterException'),
     utils = require('./utils'),
     errorMessages = require('./messages'),
@@ -94,7 +95,7 @@ lewd._wrap = function (spec) {
         lewd.creditcard
     ];
     
-    /*jshint maxcomplexity:false */
+    /* jshint maxcomplexity:false */
     if (spec === Array) {
         return (new conditions.ArrayType()).consumer();
     } else if (spec === Boolean) {
@@ -122,7 +123,7 @@ lewd._wrap = function (spec) {
     } else if (shorthands.indexOf(spec) !== -1) {
         return spec();
     } else if (typeof spec === 'function') {
-        return utils.isConsumerWrapper(spec) ? spec : lewd.custom(spec);
+        return ConsumerWrapper.isWrapper(spec) ? spec : lewd.custom(spec);
     } else {
         throw new IllegalParameterException('Invalid specification');
     }
@@ -174,7 +175,7 @@ lewd.expose = function (prefix) {
 lewd.custom = function (fn) {
     utils.assertParameterCount(arguments, 1);
     
-    if (utils.isConsumerWrapper(fn)) {
+    if (ConsumerWrapper.isWrapper(fn)) {
         return fn;
     } else if (fn instanceof Condition) {
         return fn.consumer();

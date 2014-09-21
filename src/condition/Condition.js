@@ -1,7 +1,6 @@
 var _ = require('lodash');
 
-var consumerWrapper = require('./ConsumerWrapper'),
-    ConditionLockedException = require('../exception/ConditionLockedException'),
+var ConditionLockedException = require('../exception/ConditionLockedException'),
     ConditionViolationException = require('../exception/ConditionViolationException'),
     IllegalParameterException = require('../exception/IllegalParameterException');
 
@@ -11,7 +10,7 @@ var consumerWrapper = require('./ConsumerWrapper'),
  * @constructor
  * @param {string} type
  */
-var Condition = function (type) {
+function Condition(type) {
     this._coerce = false;
     this._customError = null;
     this._default = undefined;
@@ -20,7 +19,7 @@ var Condition = function (type) {
     this._state = null;
     this._type = type;
     this._wrapper = null;
-};
+}
 
 /**
  * Constants used by `setPropertyState`.
@@ -282,7 +281,7 @@ Condition.prototype.setDefaultValue = function (value) {
  */
 Condition.prototype.consumer = function () {
     if (!this._wrapper) {
-        this._wrapper = consumerWrapper(this);
+        this._wrapper = require('./ConsumerWrapper').wrap(this);
     }
     
     return this._wrapper;

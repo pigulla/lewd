@@ -108,7 +108,7 @@ function ObjectCondition(spec, options) {
 
 util.inherits(ObjectCondition, Condition);
 
-/*jshint -W030*/
+/* jshint -W030 */
 /**
  * The condition for generic key validation ($k). Initialized in initKeyValueConditions().
  * 
@@ -122,7 +122,7 @@ ObjectCondition.prototype.keysCondition;
  * @type {lewd.condition.ConsumerWrapper}
  */
 ObjectCondition.prototype.valuesCondition;
-/*jshint +W030*/
+/* jshint +W030 */
 
 /**
  * Marks all keys properties as being optional.
