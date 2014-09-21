@@ -1,6 +1,8 @@
 var _ = require('lodash');
 
-var utils = require('../utils');
+var assertParameterCount = require('../utils').assertParameterCount;
+
+var ConditionLockedException = require('../exception/ConditionLockedException');
 
 /**
  * @param {lewd.condition.Condition} condition
@@ -20,71 +22,75 @@ module.exports = function (condition) {
     }
 
     _.assign(consumerWrapper, {
-        wrapped: condition.type,
+        wrapped: condition.getType(),
         because: function (reason) {
-            utils.assertParameterCount(arguments, 0, 1);
+            assertParameterCount(arguments, 0, 1);
             condition.setCustomMessage(reason);
             return consumerWrapper;
         },
+        lock: function () {
+            condition.lock();
+            return consumerWrapper;
+        },
         get: function (name) {
-            utils.assertParameterCount(arguments, 1);
+            assertParameterCount(arguments, 1);
             var result = consumerWrapper.find(name);
             return result.length ? result[0] : null;
         },
         find: function (name) {
-            utils.assertParameterCount(arguments, 1);
+            assertParameterCount(arguments, 1);
             return _.unique(condition.find(name));
         },
         as: function (name) {
-            utils.assertParameterCount(arguments, 1);
-            condition.name = name;
+            assertParameterCount(arguments, 1);
+            condition.setName(name);
             return consumerWrapper;
         },
         default: function (value) {
-            utils.assertParameterCount(arguments, 1);
+            assertParameterCount(arguments, 1);
             condition.setPropertyState(Condition.PROPERTY_STATE.OPTIONAL);
             condition.setDefaultValue(value);
             return consumerWrapper;
         },
         getDefault: function () {
-            utils.assertParameterCount(arguments, 0);
-            return condition.default;
+            assertParameterCount(arguments, 0);
+            return condition.getDefaultValue();
         },
         coerce: function () {
-            utils.assertParameterCount(arguments, 0);
+            assertParameterCount(arguments, 0);
             condition.setCoercionEnabled(true);
             return consumerWrapper;
         },
         optional: function () {
-            utils.assertParameterCount(arguments, 0);
+            assertParameterCount(arguments, 0);
             condition.setPropertyState(Condition.PROPERTY_STATE.OPTIONAL);
             return consumerWrapper;
         },
         forbidden: function () {
-            utils.assertParameterCount(arguments, 0);
+            assertParameterCount(arguments, 0);
             condition.setPropertyState(Condition.PROPERTY_STATE.FORBIDDEN);
             return consumerWrapper;
         },
         required: function () {
-            utils.assertParameterCount(arguments, 0);
+            assertParameterCount(arguments, 0);
             condition.setPropertyState(Condition.PROPERTY_STATE.REQUIRED);
             return consumerWrapper;
         },
         isForbidden: function () {
-            utils.assertParameterCount(arguments, 0);
-            return condition.state === Condition.PROPERTY_STATE.FORBIDDEN;
+            assertParameterCount(arguments, 0);
+            return condition.getPropertyState() === Condition.PROPERTY_STATE.FORBIDDEN;
         },
         isOptional: function () {
-            utils.assertParameterCount(arguments, 0);
-            return condition.state === Condition.PROPERTY_STATE.OPTIONAL;
+            assertParameterCount(arguments, 0);
+            return condition.getPropertyState() === Condition.PROPERTY_STATE.OPTIONAL;
         },
         isRequired: function () {
-            utils.assertParameterCount(arguments, 0);
-            return condition.state === Condition.PROPERTY_STATE.REQUIRED;
+            assertParameterCount(arguments, 0);
+            return condition.getPropertyState() === Condition.PROPERTY_STATE.REQUIRED;
         }
     });
     
-    if (condition.type === 'Object') {
+    if (condition.getType() === 'Object') {
         _.assign(consumerWrapper, {
             allOptional: function () {
                 condition.allOptional();

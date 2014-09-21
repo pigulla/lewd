@@ -2,7 +2,8 @@ var util = require('util');
 
 var buster = require('buster');
 
-var lewd = require('../src/lewd');
+var lewd = require('../src/lewd'),
+    utils = require('../src/utils');
 
 var assert = buster.referee.assert,
     refute = buster.referee.refute;
@@ -15,7 +16,7 @@ function test(condition, args, accept, values, expected) {
         if (accept) {
             refute.exception(function () {
                 result = condition.apply(lewd, args)(value);
-            }, null, util.format('Value %s not expected to fail for arguments %s', value, args));
+            }, null, util.format('Value %s not expected to fail for arguments %s', utils.smartFormat(value), args));
             
             assert.same(result, expected[index]);
         } else {

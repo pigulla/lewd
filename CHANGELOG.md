@@ -1,5 +1,13 @@
 ## 0.8.0-dev (2014-??-??)
 
+##### New features:
+
+ - Conditions can now be prevented from being modified by calling `lock()`.
+ 
+##### Breaking changes:
+
+ - Custom conditions must now call `this.isCoercionEnabled()` instead of accessing `this.coerce` directly. 
+
 ## 0.7.1 (2014-09-20)
 
 ##### New features:

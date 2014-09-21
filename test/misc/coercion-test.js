@@ -9,7 +9,7 @@ var lewd = require('../../src/lewd'),
 var assert = buster.referee.assert;
 
 buster.testCase('coercion', {
-    'coercion within objects': function () {
+    'within objects': function () {
         var condition = lewd.object({ a: lewd(Boolean).coerce() }),
             obj = { a: 1 },
             result = condition(obj); 
@@ -17,7 +17,7 @@ buster.testCase('coercion', {
         assert.same(result, obj);
         assert.equals(result, { a: true });
     },
-    'coercion within arrays': function () {
+    'within arrays': function () {
         var condition = lewd([lewd.integer().coerce()]),
             array = [42, 1.3, 0],
             result = condition(array);

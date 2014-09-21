@@ -19,14 +19,14 @@ util.inherits(AllCondition, NestedCondition);
  * @inheritdoc
  */
 AllCondition.prototype.validate = function (value, path) {
-    if (this.customError) {
+    if (this._customError) {
         try {
             this._conditions.forEach(function (condition) {
                 value = condition(value, path);
             });
         } catch (e) {
             if (e instanceof ConditionViolationException) {
-                throw new ConditionViolationException(value, path, this.customError);
+                throw new ConditionViolationException(value, path, this._customError);
             } else {
                 throw e;
             }

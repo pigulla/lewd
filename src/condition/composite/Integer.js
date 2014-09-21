@@ -24,7 +24,7 @@ IntegerCondition.prototype.validate = function (value, path) {
         this.reject(value, path, errorMessage);
     }
     
-    if (this.coerce) {
+    if (this._coerce) {
         return Math.round(value);
     }
     

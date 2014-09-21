@@ -33,6 +33,16 @@ NestedCondition.prototype._conditions = null;
 /**
  * @inheritdoc
  */
+NestedCondition.prototype.lock = function () {
+    this._conditions.forEach(function (condition) {
+        condition.lock();
+    });
+    return this;
+};
+
+/**
+ * @inheritdoc
+ */
 NestedCondition.prototype.find = function (name) {
     var result = Condition.prototype.find.call(this, name);
 

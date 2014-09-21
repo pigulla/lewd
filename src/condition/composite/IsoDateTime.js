@@ -40,7 +40,7 @@ IsoDateTimeCondition.prototype.validate = function (value, path) {
         }
     }
     
-    return this.coerce ? new Date(Date.parse(value)) : value;
+    return this._coerce ? new Date(Date.parse(value)) : value;
 };
 
 module.exports = IsoDateTimeCondition;

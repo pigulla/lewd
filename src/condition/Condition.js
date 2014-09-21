@@ -1,6 +1,7 @@
 var _ = require('lodash');
 
 var consumerWrapper = require('./ConsumerWrapper'),
+    ConditionLockedException = require('../exception/ConditionLockedException'),
     ConditionViolationException = require('../exception/ConditionViolationException'),
     IllegalParameterException = require('../exception/IllegalParameterException');
 
@@ -11,13 +12,14 @@ var consumerWrapper = require('./ConsumerWrapper'),
  * @param {string} type
  */
 var Condition = function (type) {
-    this.type = type;
-    this.name = null;
-    this.state = null;
-    this.default = undefined;
-    this.coerce = false;
-    this.customError = null;
-    this.wrapper = null;
+    this._coerce = false;
+    this._customError = null;
+    this._default = undefined;
+    this._locked = false;
+    this._name = null;
+    this._state = null;
+    this._type = type;
+    this._wrapper = null;
 };
 
 /**
@@ -34,54 +36,91 @@ Condition.PROPERTY_STATE = {
 
 /* jshint -W030 */
 /**
- * The (hopefully unique) type of the condition.
+ * Internal flag to indicate whether coercion is enabled.
  * 
- * @type {string}
+ * @protected
+ * @type {boolean}
  */
-Condition.prototype.type;
+Condition.prototype._coerce;
+
+/**
+ * The custom error message or `null` if the default message is to be used.
+ *
+ * @protected
+ * @type {(string|null)}
+ */
+Condition.prototype._customError;
+
+/**
+ * The default value for object properties.
+ *
+ * @private
+ * @type {*}
+ */
+Condition.prototype._default;
+
+/**
+ * The "locked" flag.
+ *
+ * @private
+ * @type {boolean}
+ */
+Condition.prototype._locked;
 
 /**
  * The user-defined name of the condition.
- * 
+ *
+ * @private
  * @type {?string}
  */
-Condition.prototype.name;
-
-/**
- * The consumer wrapper.
- * 
- * @type {?lewd.condition.ConsumerWrapper}
- */
-Condition.prototype.wrapper;
+Condition.prototype._name;
 
 /**
  * The required/optional state for object properties.
  * 
+ * @private
  * @type {string}
  */
-Condition.prototype.state;
+Condition.prototype._state;
 
 /**
- * The default value for object properties.
- * 
- * @type {*}
+ * The (hopefully unique) type of the condition.
+ *
+ * @readonly
+ * @protected
+ * @type {string}
  */
-Condition.prototype.default;
+Condition.prototype._type;
 
 /**
- * Internal flag to indicate whether coercion is enabled.
- * 
- * @type {boolean}
+ * The consumer wrapper.
+ *
+ * @private
+ * @type {?lewd.condition.ConsumerWrapper}
  */
-Condition.prototype.coerce;
-
-/**
- * The custom error message or `null` if the default message is to be used.
- * 
- * @type {(string|null)}
- */
-Condition.prototype.customError;
+Condition.prototype._wrapper;
 /* jshint +W030 */
+
+/**
+ * Asserts that the condition has not been locked.
+ * 
+ * @private
+ * @throws {lewd.exception.ConditionLockedException}
+ */
+Condition.prototype._assertNotLocked = function () {
+    if (this._locked) {
+        throw new ConditionLockedException();
+    }
+};
+
+/**
+ * Returns this condition's internal type.
+ * 
+ * @return {string}
+ */
+Condition.prototype.getType = function () {
+    return this._type;
+};
 
 /**
  * The actual validation function. Must return the input value (or its coerced version).
@@ -108,9 +147,9 @@ Condition.prototype.validate = function (value, path) {
  */
 Condition.prototype.reject = function (value, path, messageTemplate, templateData) {
     var data = templateData || {},
-        error = this.customError ? this.customError : messageTemplate;
+        error = this._customError ? this._customError : messageTemplate;
     
-    if (this.customError) {
+    if (this._customError) {
         data.originalMessage = messageTemplate;
     }
     
@@ -122,10 +161,20 @@ Condition.prototype.reject = function (value, path, messageTemplate, templateDat
  * array otherwise.
  *  
  * @param {string} name
- * @returns {Array.<lewd.condition.ConsumerWrapper>}
+ * @return {Array.<lewd.condition.ConsumerWrapper>}
  */
 Condition.prototype.find = function (name) {
-    return this.name === name ? [this.consumer()] : [];
+    return this._name === name ? [this.consumer()] : [];
+};
+
+/**
+ * Locks the condition to prevent it or its nested conditions from being modified (e.g., changing the default value).
+ *  
+ * @return {lewd.condition.Condition}
+ */
+Condition.prototype.lock = function () {
+    this._locked = true;
+    return this;
 };
 
 /**
@@ -133,10 +182,34 @@ Condition.prototype.find = function (name) {
  * 
  * @param {?string} messageTemplate
  * @return {lewd.condition.Condition}
+ * @throws {lewd.exception.ConditionLockedException}
  */
 Condition.prototype.setCustomMessage = function (messageTemplate) {
-    this.customError = messageTemplate;
+    this._assertNotLocked();
+    this._customError = messageTemplate;
     return this;
+};
+
+/**
+ * Sets the conditions user-defined name.
+ * 
+ * @param {string} name
+ * @return {lewd.condition.Condition}
+ * @throws {lewd.exception.ConditionLockedException}
+ */
+Condition.prototype.setName = function (name) {
+    this._assertNotLocked();
+    this._name = name;
+    return this;
+};
+
+/**
+ * Check whether coercion is enabled.
+ * 
+ * @return {boolean}
+ */
+Condition.prototype.isCoercionEnabled = function () {
+    return this._coerce;
 };
 
 /**
@@ -144,14 +217,26 @@ Condition.prototype.setCustomMessage = function (messageTemplate) {
  * 
  * @param {boolean} enabled
  * @return {lewd.condition.Condition}
+ * @throws {lewd.exception.ConditionLockedException}
  */
 Condition.prototype.setCoercionEnabled = function (enabled) {
+    this._assertNotLocked();
+
     if (!this.supportsCoercion) {
         throw new IllegalParameterException('Condition does not support coercion');
     }
     
-    this.coerce = !!enabled;
+    this._coerce = !!enabled;
     return this;
+};
+
+/**
+ * Gets the property state.
+ * 
+ * @return {string}
+ */
+Condition.prototype.getPropertyState = function () {
+    return this._state;
 };
 
 /**
@@ -160,10 +245,21 @@ Condition.prototype.setCoercionEnabled = function (enabled) {
  * 
  * @param {string} state
  * @return {lewd.condition.Condition}
+ * @throws {lewd.exception.ConditionLockedException}
  */
 Condition.prototype.setPropertyState = function (state) {
-    this.state = state;
+    this._assertNotLocked();
+    this._state = state;
     return this;
+};
+
+/**
+ * Gets the default value when used as an object property.
+ * 
+ * @return {*}
+ */
+Condition.prototype.getDefaultValue = function () {
+    return this._default;
 };
 
 /**
@@ -171,9 +267,11 @@ Condition.prototype.setPropertyState = function (state) {
  * 
  * @param {*} value
  * @return {lewd.condition.Condition}
+ * @throws {lewd.exception.ConditionLockedException}
  */
 Condition.prototype.setDefaultValue = function (value) {
-    this.default = value;
+    this._assertNotLocked();
+    this._default = value;
     return this;
 };
 
@@ -183,11 +281,11 @@ Condition.prototype.setDefaultValue = function (value) {
  * @return {lewd.condition.ConsumerWrapper}
  */
 Condition.prototype.consumer = function () {
-    if (!this.wrapper) {
-        this.wrapper = consumerWrapper(this);
+    if (!this._wrapper) {
+        this._wrapper = consumerWrapper(this);
     }
     
-    return this.wrapper;
+    return this._wrapper;
 };
 
 module.exports = Condition;

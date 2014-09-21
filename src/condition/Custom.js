@@ -9,7 +9,7 @@ var Condition = require('./Condition'),
  * @class {lewd.condition.Custom}
  * @extends {lewd.condition.Condition}
  * @constructor
- * @param {Function} fn
+ * @param {function} fn
  */
 function CustomCondition(fn) {
     Condition.call(this, 'Custom');
@@ -26,7 +26,7 @@ util.inherits(CustomCondition, Condition);
 /* jshint -W030 */
 /**
  * @private
- * @type {Function}
+ * @type {function}
  */
 CustomCondition.prototype._fn;
 /* jshint +W030 */

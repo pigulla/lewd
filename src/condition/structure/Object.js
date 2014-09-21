@@ -108,6 +108,22 @@ function ObjectCondition(spec, options) {
 
 util.inherits(ObjectCondition, Condition);
 
+/*jshint -W030*/
+/**
+ * The condition for generic key validation ($k). Initialized in initKeyValueConditions().
+ * 
+ * @type {lewd.condition.ConsumerWrapper} 
+ */
+ObjectCondition.prototype.keysCondition;
+
+/**
+ * The condition for generic value validation ($v). Initialized in initKeyValueConditions().
+ * 
+ * @type {lewd.condition.ConsumerWrapper}
+ */
+ObjectCondition.prototype.valuesCondition;
+/*jshint +W030*/
+
 /**
  * Marks all keys properties as being optional.
  * 
@@ -249,6 +265,20 @@ ObjectCondition.prototype.validate = function (value, path) {
 /**
  * @inheritdoc
  */
+ObjectCondition.prototype.lock = function () {
+    this.keysCondition.lock();
+    this.valuesCondition.lock();
+
+    this.definedKeys.forEach(function (key) {
+        this.spec[key].lock();
+    }, this);
+
+    return this;
+};
+
+/**
+ * @inheritdoc
+ */
 ObjectCondition.prototype.find = function (name) {
     var result = Condition.prototype.find.call(this, name);
     
@@ -258,7 +288,7 @@ ObjectCondition.prototype.find = function (name) {
     this.definedKeys.forEach(function (key) {
         var found = this.spec[key].find(name);
         Array.prototype.push.apply(result, found);
-    }.bind(this));
+    }, this);
 
     return result;
 };

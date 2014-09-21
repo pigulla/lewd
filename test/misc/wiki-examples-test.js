@@ -156,7 +156,7 @@ buster.testCase('wiki examples', {
                 return value;
             }
             
-            if (typeof value === 'string' && this.coerce) {
+            if (typeof value === 'string' && this.isCoercionEnabled()) {
                 if (value === 'true' || value === 'false') {
                     return value === 'true';
                 }

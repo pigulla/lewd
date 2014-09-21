@@ -17,6 +17,20 @@ var assert = buster.referee.assert,
 var condition = lewd.object;
 
 buster.testCase('"object" condition', {
+    '{}': function () {
+        var args = [
+            {}
+        ];
+
+        refuteValues(condition, args, [
+            '', [], { b: 42 }
+        ]);
+        acceptValues(condition, args, [
+            /*jshint -W010*/
+            {}, new Object(), Object.create(null)
+            /*jshint +W010*/
+        ]);
+    },
     'simple': {
         '{ b: Boolean }': function () {
             var args = [

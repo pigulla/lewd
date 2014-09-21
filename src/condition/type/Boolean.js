@@ -24,7 +24,7 @@ BooleanTypeCondition.prototype.validate = function (value, path) {
         return value;
     }
     
-    if (this.coerce) {
+    if (this._coerce) {
         return !!value;
     }
 
