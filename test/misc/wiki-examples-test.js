@@ -173,5 +173,15 @@ buster.testCase('wiki examples', {
         helper.refuteValues(lewd.custom, [coercingCondition], [42, 'TRUE', 0, null]);
         helper.acceptValues(lewd.custom, [coercingCondition],
             [true, false, 'true', 'false'], [true, false, true, false]);
+    },
+    'locking': function () {
+        assert.exception(function () {
+            var post = lewd({
+                id: Number,
+                text: String
+            }).lock();
+
+            post.allOptional();
+        }, 'ConditionLockedException');
     }
 });
