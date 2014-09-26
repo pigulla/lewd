@@ -55,9 +55,9 @@ var utils = {
         } else if (_.isDate(value)) {
             return '<date>' + value.toISOString();
         } else if (value === Infinity) {
-            return 'PositiveInfinity';
+            return 'Infinity';
         } else if (value === -Infinity) {
-            return 'NegativeInfinity';
+            return '-Infinity';
         } else if (typeof value === 'number') {
             return '<number>' + value;
         } else if (_.isRegExp(value)) {
@@ -71,6 +71,7 @@ var utils = {
         } else /* istanbul ignore else */ if (typeof value === 'object') {
             return 'object';
         } else {
+            // Could be a host object.
             return '<unknown>' + value;
         }
     },
