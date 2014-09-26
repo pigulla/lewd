@@ -8,6 +8,7 @@ var lewd = require('../../src/lewd'),
 var assert = buster.referee.assert,
     refuteValues = helper.refuteValues,
     acceptValues = helper.acceptValues,
+    assertExceptionWithName = helper.assertExceptionWithName,
     assertViolationWithMessage = helper.assertViolationWithMessage;
 
 var condition = lewd.none;
@@ -31,7 +32,7 @@ buster.testCase('"none" condition', {
         acceptValues(condition, args, [false, null, [], {}, ['foo'], -7.5]);
     },
     'passes exceptions through': function () {
-        assert.exception(function () {
+        assertExceptionWithName(function () {
             condition(function () { x(); }).because('oh noes')('x');  // jshint ignore:line                
         }, 'ReferenceError');
     },

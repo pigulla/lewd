@@ -9,6 +9,7 @@ var helper = require('./../helper'),
 
 var refuteValues = helper.refuteValues,
     acceptValues = helper.acceptValues,
+    assertExceptionWithName = helper.assertExceptionWithName,
     assertViolationAt = helper.assertViolationAt,
     assertViolationWithMessage = helper.assertViolationWithMessage,
     refuteSchemaOptions = helper.refuteSchemaOptions;
@@ -142,10 +143,10 @@ buster.testCase('"object" condition', {
                 cond({});
             });
 
-            assert.exception(function () {
+            assertExceptionWithName(function () {
                 cond({ s: 's', o: {}, n: 42, x: undefined });
             }, 'ConditionViolationException');
-            assert.exception(function () {
+            assertExceptionWithName(function () {
                 cond({ s: 's', o: {}, n: 'not a number' });
             }, 'ConditionViolationException');
         },
@@ -162,7 +163,7 @@ buster.testCase('"object" condition', {
                 cond({ n: 42 });
             });
             
-            assert.exception(function () {
+            assertExceptionWithName(function () {
                 cond({ s: '' });
             }, 'ConditionViolationException');
         }
@@ -179,16 +180,16 @@ buster.testCase('"object" condition', {
                 cond({ s: 's', o: {}, n: 42 });
             });
 
-            assert.exception(function () {
+            assertExceptionWithName(function () {
                 cond({ s: 's', o: {} });
             }, 'ConditionViolationException');
-            assert.exception(function () {
+            assertExceptionWithName(function () {
                 cond({ s: 's', n: 42 });
             }, 'ConditionViolationException');
-            assert.exception(function () {
+            assertExceptionWithName(function () {
                 cond({ o: {}, n: 42 });
             }, 'ConditionViolationException');
-            assert.exception(function () {
+            assertExceptionWithName(function () {
                 cond({});
             }, 'ConditionViolationException');
         },
@@ -206,10 +207,10 @@ buster.testCase('"object" condition', {
                 cond({ s: '', n: 42 });
             });
             
-            assert.exception(function () {
+            assertExceptionWithName(function () {
                 cond({ o: '', n: 42 });
             }, 'ConditionViolationException');
-            assert.exception(function () {
+            assertExceptionWithName(function () {
                 cond({ s: '', o: {} });
             }, 'ConditionViolationException');
         }
@@ -286,7 +287,7 @@ buster.testCase('"object" condition', {
             ]);
         },
         '{ $k: function } (extras allowed)': function () {
-            assert.exception(function () {
+            assertExceptionWithName(function () {
                 condition({ $k: function () { x(); } }, { removeExtra: true })({ n: 0 });  // jshint ignore:line                
             }, 'ReferenceError');
         }
@@ -467,7 +468,7 @@ buster.testCase('"object" condition', {
             });
         },
         'is not applied if not optional': function () {
-            assert.exception(function () {
+            assertExceptionWithName(function () {
                 condition({ a: lewd.Number().default(42).required() })({});
             }, 'ConditionViolationException');
         },
@@ -478,7 +479,7 @@ buster.testCase('"object" condition', {
             );
         },
         'is still validated': function () {
-            assert.exception(function () {
+            assertExceptionWithName(function () {
                 condition({ a: lewd.Number().optional().default('42') })({});
             }, 'ConditionViolationException');
         }
@@ -523,26 +524,26 @@ buster.testCase('"object" condition', {
     },
     'passes exceptions through': {
         'value': function () {
-            assert.exception(function () {
+            assertExceptionWithName(function () {
                 condition({
                     a: function () { x(); }  // jshint ignore:line
                 })({ a: 0 }); 
             }, 'ReferenceError');
 
-            assert.exception(function () {
+            assertExceptionWithName(function () {
                 condition({
                     $v: function () { x(); }  // jshint ignore:line
                 }, { allowExtra: true, removeExtra: true })({ x: 0 });
             }, 'ReferenceError');
         },
         'key': function () {
-            assert.exception(function () {
+            assertExceptionWithName(function () {
                 condition({
                     $k: function () { x(); }  // jshint ignore:line
                 })({ a: 42 });
             }, 'ReferenceError');
 
-            assert.exception(function () {
+            assertExceptionWithName(function () {
                 condition({
                     a: function () { x(); }  // jshint ignore:line
                 }, { removeExtra: true })({ a: 0 });

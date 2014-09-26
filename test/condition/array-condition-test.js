@@ -8,6 +8,7 @@ var lewd = require('../../src/lewd'),
 var assert = buster.referee.assert,
     refuteValues = helper.refuteValues,
     acceptValues = helper.acceptValues,
+    assertExceptionWithName = helper.assertExceptionWithName,
     assertViolationWithMessage = helper.assertViolationWithMessage;
 
 var condition = lewd.array;
@@ -100,7 +101,7 @@ buster.testCase('"array" condition', {
         }
     },
     'passes exceptions through': function () {
-        assert.exception(function () {
+        assertExceptionWithName(function () {
             condition(function () { x(); })(['x']);  // jshint ignore:line                
         }, 'ReferenceError');
     },

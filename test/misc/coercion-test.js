@@ -3,10 +3,13 @@ var util = require('util');
 var _ = require('lodash'),
     buster = require('buster');
 
-var lewd = require('../../src/lewd'),
+var helper = require('./../helper'),
+    lewd = require('../../src/lewd'),
     Condition = require('../../src/condition/Condition');
 
-var assert = buster.referee.assert;
+var assert = buster.referee.assert,
+    assertExceptionWithName = helper.assertExceptionWithName;
+    
 
 buster.testCase('coercion', {
     'within objects': function () {
@@ -31,10 +34,10 @@ buster.testCase('coercion', {
             assert.same(lewd.integer().coerce()(42.3), 42);
         },
         failed: function () {
-            assert.exception(function () {
+            assertExceptionWithName(function () {
                 lewd.integer().coerce()('42');
             }, 'ConditionViolationException');
-            assert.exception(function () {
+            assertExceptionWithName(function () {
                 lewd.integer().coerce()('42x');
             }, 'ConditionViolationException');
         }
@@ -48,7 +51,7 @@ buster.testCase('coercion', {
             assert.same(value.getTime(), date.getTime());
         },
         failed: function () {
-            assert.exception(function () {
+            assertExceptionWithName(function () {
                 lewd.isoDateTime().coerce()('1234');
             }, 'ConditionViolationException');
         }

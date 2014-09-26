@@ -1,4 +1,4 @@
-## 0.8.0-dev (2014-??-??)
+## 0.8.0 (2014-09-26)
 
 ##### New features:
 
@@ -8,6 +8,10 @@
 
  - Custom conditions must now call `this.isCoercionEnabled()` instead of accessing `this.coerce` directly.
  - `lewd.Object()` and `lewd.object(9` now accept all kinds of objects with the exception of the built-in types `RegExp`, `Date` and `Array` (fixes #3).
+
+###### Improvements:
+
+ - Exception now provide a more helpful default message when serialized via `toString()`.
 
 ##### Bug Fixes:
 

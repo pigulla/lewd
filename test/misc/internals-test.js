@@ -77,6 +77,16 @@ buster.testCase('internals', {
             }, 'Error');
         }
     },
+    'Exception': {
+        'ConditionViolationException': function () {
+            var exception = new lewd.ConditionViolationException(42, ['foo', 'bar'], '');
+            
+            assert.match(
+                exception.toString(),
+                'Condition violation at "/foo/bar":'
+            );
+        }
+    },
     'utils': {
         'smartFormat': {
             'true/false': function () {

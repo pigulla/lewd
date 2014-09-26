@@ -22,7 +22,9 @@ function test(condition, args, accept, values, expected) {
         } else {
             assert.exception(function () {
                 condition.apply(lewd, args)(value);
-            }, 'ConditionViolationException');
+            }, function (exception) {
+                return exception.name === 'ConditionViolationException';
+            });
         }
     });
 }
@@ -37,7 +39,14 @@ module.exports = {
     refuteSchemaOptions: function (condition, args) {
         assert.exception(function () {
             condition.apply(lewd, args);
-        }, 'IllegalParameterException');
+        }, function (exception) {
+            return exception.name === 'IllegalParameterException';
+        });
+    },
+    assertExceptionWithName: function (fn, name) {
+        assert.exception(fn, function (exception) {
+            return exception.name === name;
+        });
     },
     assertViolationWithMessage: function (fn, message) {
         try {

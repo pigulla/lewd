@@ -42,4 +42,11 @@ ConditionViolationException.prototype._getTemplateVariables = function () {
     });
 };
 
+/**
+ * @inheritdoc
+ */
+ConditionViolationException.prototype.toString = function () {
+    return util.format('Condition violation at "%s": %s', this.pathStr, this.message);
+};
+
 module.exports = ConditionViolationException;
