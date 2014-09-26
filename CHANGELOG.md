@@ -7,13 +7,13 @@
 ##### Breaking changes:
 
  - Custom conditions must now call `this.isCoercionEnabled()` instead of accessing `this.coerce` directly.
- - `lewd.Object()` and `lewd.object(9` now accept all kinds of objects with the exception of the built-in types `RegExp`, `Date` and `Array` (fixes #3).
+ - `lewd.Object()` and `lewd.object()` now accept all kinds of objects with the exception of the built-in types `RegExp`, `Date` and `Array` (fixes #3).
 
-###### Improvements:
+##### Improvements:
 
- - Exception now provide a more helpful default message when serialized via `toString()`.
+ - Exception now provide a more helpful error message when serialized via `toString()`.
 
-##### Bug Fixes:
+##### Bug fixes:
 
  - `lewd.object()` now properly checks all enumerable properties (including those in the prototype chain). 
 
