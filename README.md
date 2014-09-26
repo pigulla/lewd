@@ -27,7 +27,7 @@ var data = JSON.parse(rawData);
 try {
     signUpValidator(data);
 } catch (e) {
-    console.warn('Data is invalid: ' + e.message);
+    console.warn(e.toString());
 }
 ```
 But they can of course get more complex by logically combining conditions or nesting validation structures. Please take a look at our [wiki](https://github.com/pigulla/lewd/wiki) for a thorough introduction how to use lewd and its many features.
@@ -45,7 +45,7 @@ But they can of course get more complex by logically combining conditions or nes
  - runs in browsers as an [UMD](https://github.com/umdjs/umd) module (experimental)
 
 ### Contributing
-You found a bug, fixed a typo or came up with a cool new feature? Feel free to open issues or send pull requests and I'll do my best to merge them. Please make sure you add tests as needed and reference the issue number in your commit (please open one if necessary). Bonus points are awarded for not breaking any JSHint and JSCS rules (`grunt test-local` is your friend).
+You found a bug, fixed a typo or came up with a cool new feature? Feel free to open issues or send pull requests and I'll do my best to merge them. Please make sure you add tests as needed and reference the issue number in your commit (please open one if necessary). Pull requests must not break any JSHint and JSCS rules or let the test coverage drop below 100% (`npm test` is your friend).
 
 ### License
 lewd is licensed under the BSD 2-Clause License. You can find it in the [LICENSE](LICENSE) file.

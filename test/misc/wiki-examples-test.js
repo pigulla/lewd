@@ -183,5 +183,17 @@ buster.testCase('wiki examples', {
 
             post.allOptional();
         }, 'ConditionLockedException');
+    },
+    'default values in FAQ': function () {
+        var condition = lewd({
+            x: lewd(Array).optional().default([])
+        });
+
+        var value1 = condition({});
+        value1.x.push(42);
+        assert.equals(value1, { x: [42] });
+
+        var value2 = condition({});
+        assert.equals(value2, { x: [42] });
     }
 });
