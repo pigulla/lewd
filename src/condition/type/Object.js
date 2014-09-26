@@ -3,7 +3,8 @@ var util = require('util');
 var _ = require('lodash');
 
 var Condition = require('../Condition'),
-    errorMessage = require('../../messages').Type;
+    errorMessage = require('../../messages').Type,
+    utils = require('../../utils');
 
 /**
  * @class lewd.condition.type.Object
@@ -20,7 +21,7 @@ util.inherits(ObjectTypeCondition, Condition);
  * @inheritdoc
  */
 ObjectTypeCondition.prototype.validate = function (value, path) {
-    if (_.isPlainObject(value)) {
+    if (utils.isBasicObject(value)) {
         return value;
     }
 

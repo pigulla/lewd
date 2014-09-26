@@ -1,3 +1,5 @@
+var util = require('util');
+
 var _ = require('lodash'),
     buster = require('buster');
 
@@ -235,6 +237,19 @@ buster.testCase('"object" condition', {
                 { s: '', o: { a: ['x', 'y'], u: [] } }
             ]);
         }
+    },
+    'prototype chain': function () {
+        function A() {}
+        A.prototype.a = 42;
+
+        function B() {}
+        util.inherits(B, A);
+        B.prototype.b = 'foo';
+        
+        acceptValues(condition, [{
+            a: Number,
+            b: String
+        }], [new B()]);
     },
     'keys': {
         '{ $k: /^[a-z]+$/ }': function () {

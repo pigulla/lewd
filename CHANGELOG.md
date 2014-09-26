@@ -6,7 +6,12 @@
  
 ##### Breaking changes:
 
- - Custom conditions must now call `this.isCoercionEnabled()` instead of accessing `this.coerce` directly. 
+ - Custom conditions must now call `this.isCoercionEnabled()` instead of accessing `this.coerce` directly.
+ - `lewd.Object()` and `lewd.object(9` now accept all kinds of objects with the exception of the built-in types `RegExp`, `Date` and `Array` (fixes #3).
+
+##### Bug Fixes:
+
+ - `lewd.object()` now properly checks all enumerable properties (including those in the prototype chain). 
 
 ## 0.7.1 (2014-09-20)
 

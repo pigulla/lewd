@@ -5,7 +5,8 @@ var _ = require('lodash');
 var Condition = require('../Condition'),
     errorMessages = require('../../messages'),
     ConditionViolationException = require('../../exception/ConditionViolationException'),
-    IllegalParameterException = require('../../exception/IllegalParameterException');
+    IllegalParameterException = require('../../exception/IllegalParameterException'),
+    utils = require('../../utils');
 
 var KEYS_PROPERTY = '$k',
     VALUES_PROPERTY = '$v';
@@ -166,7 +167,7 @@ ObjectCondition.prototype._calculateKeys = function (value) {
         required: []
     };
     
-    keys.actual = Object.keys(value);
+    keys.actual = utils.getEnumerableProperties(value);
     keys.extra = _.difference(keys.actual, this.definedKeys);
     keys.toValidate = _.intersection(this.definedKeys, keys.actual);
     
@@ -199,7 +200,7 @@ ObjectCondition.prototype._calculateKeys = function (value) {
  * @inheritdoc
  */
 ObjectCondition.prototype.validate = function (value, path) {
-    if (!_.isPlainObject(value)) {
+    if (!utils.isBasicObject(value)) {
         this.reject(value, path, errorMessages.Object.type);
     }
     

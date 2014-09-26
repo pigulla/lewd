@@ -125,12 +125,15 @@ buster.testCase('internals', {
                 assert.equals(utils.smartFormat(anonymous), '<function>anonymous');
             }
         },
-        'isJsonType': function () {
-            [null, String, Number, Object, Boolean].forEach(function (value) {
-                assert(utils.isJsonType(value));
+        'isBasicObject': function () {
+            [{}, Object.create(null), Object.create(function () {})].forEach(function (value) {
+                assert(utils.isBasicObject(value));
             });
-            [true, 42, 'x', new Date(), /x/, undefined, function () {}, NaN, Infinity].forEach(function (value) {
-                refute(utils.isJsonType(value));
+            [String, Number, Array, Boolean, Date, RegExp, Object,
+                'foo', 42, [], true, false, new Date(), /x/,
+                null, undefined, NaN, Infinity, function () {}
+            ].forEach(function (value) {
+                refute(utils.isBasicObject(value));
             });
         },
         'isLiteral': function () {

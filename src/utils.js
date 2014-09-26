@@ -74,17 +74,37 @@ var utils = {
             return '<unknown>' + value;
         }
     },
-    
+
     /**
-     * Checks if the given value is a constructor for a native JSON type (i.e. Number, String, Boolean, Object,
-     * Array or null). 
-     *
+     * Checks if the given value is a "basic object", i.e. an object that is not actually one of JavaScript's built-in
+     * object-like types.
+     * 
+     * This function does not detect "subclasses" of built-in types, e.g. `Object.create(Date)`.
+     * 
      * @param {*} value
      * @return {boolean}
      */
-    isJsonType: function  (value) {
-        return value === Array || value === Number || value === String || value === Boolean || value === Object ||
-            value === null;
+    isBasicObject: function (value) {
+        return (!!value && typeof value === 'object' &&
+            !(Array.isArray(value) || value instanceof RegExp || value instanceof Date));
+    },
+
+    /**
+     * Returns all enumerable keys of the given object.
+     * 
+     * @param {Object} value
+     * @return {Array.<string>}
+     */
+    getEnumerableProperties: function (value) {
+        var keys = [],
+            k;
+        
+        /* jshint forin:false */
+        for (k in value) {
+            keys.push(k);
+        }
+        
+        return keys;
     },
 
     /**

@@ -23,7 +23,9 @@ buster.testCase('basic types', {
         acceptValues(lewd.String, [], ['', 'foo', '0']);
     }, 
     'Object': function () {
+        /*jshint supernew:true*/
         refuteValues(lewd.Object, [], [0, 42, 17.3, '', 'foo', [], ['19'], null, true, false]);
+        acceptValues(lewd.Object, [], [new (function () {})(), Object.create(function () {})]);
         acceptValues(lewd.Object, [], [{}, { x: 42 }]);
     },
     'null': function () {

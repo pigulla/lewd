@@ -27,7 +27,8 @@ module.exports = function (grunt) {
             }
         },
         clean: {
-            reports: ['reports']
+            reports: ['reports'],
+            shrinkwrap: ['npm-shrinkwrap.json']
         },
         coverage: {
             options: {
@@ -113,7 +114,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-shell');
 
     grunt.registerTask('nsp-audit', [
-        'shell:nsp'
+        'shell:nsp', 'clean:shrinkwrap'
     ]);
     grunt.registerTask('dist', [
         'browserify:dist', 'uglify:dist'
