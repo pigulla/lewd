@@ -25,7 +25,8 @@ function validateOptions(options, allowExtraDefault) {
             byDefault: Condition.PROPERTY_STATE.REQUIRED,
             keys: undefined,
             values: undefined,
-            removeExtra: false
+            removeExtra: false,
+            ignoreExtraFunctions: false
         },
         opts = _.defaults({}, options, defaults);
 
@@ -213,7 +214,13 @@ ObjectCondition.prototype.validate = function (value, path) {
                 delete value[key];
             });
         } else {
-            this.reject(value, path, errorMessages.Object.unexpectedKey, { key: keys.extra[0] });
+            var extraFiltered = keys.extra.filter(function (key) {
+                return !this.options.ignoreExtraFunctions || typeof value[key] !== 'function';
+            }, this);
+            
+            if (extraFiltered.length) { 
+                this.reject(value, path, errorMessages.Object.unexpectedKey, { key: extraFiltered[0] });
+            }
         }
     }
     
@@ -224,6 +231,10 @@ ObjectCondition.prototype.validate = function (value, path) {
 
     // Validate extra keys. 
     keys.extra.forEach(function (key) {
+        if (this.options.ignoreExtraFunctions && typeof value[key] === 'function') {
+            return;
+        }
+        
         if (this.options.removeExtra) {
             try {
                 this.keysCondition(key, path.concat('{' + key + '}'));

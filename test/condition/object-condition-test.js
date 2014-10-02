@@ -1,7 +1,8 @@
 var util = require('util');
 
 var _ = require('lodash'),
-    buster = require('buster');
+    buster = require('buster'),
+    fkt = require('fkt');
 
 var helper = require('./../helper'),
     errorMessages = require('../../src/messages'),
@@ -305,6 +306,53 @@ buster.testCase('"object" condition', {
             ]);
             acceptValues(condition, args, [
                 { x: 42 }
+            ]);
+        }
+    },
+    'ignoreExtraFunctions option': {
+        '{ y: Number } with ignoreExtraFunctions': function () {
+            var args = [{
+                y: Number 
+            }, { ignoreExtraFunctions: true }];
+            
+            refuteValues(condition, args, [
+                { y: 'foo' },
+                { y: fkt.noop },
+                { y: 42, x: null }
+            ]);
+            acceptValues(condition, args, [
+                { y: 42 },
+                { y: 42, x: fkt.noop }
+            ]);
+        },
+        '{ y: Number } without ignoreExtraFunctions': function () {
+            var args = [{
+                y: Number 
+            }, { ignoreExtraFunctions: false }];
+            
+            refuteValues(condition, args, [
+                { y: 'foo' },
+                { y: fkt.noop },
+                { y: 42, x: null },
+                { y: 42, x: fkt.noop }
+            ]);
+            acceptValues(condition, args, [
+                { y: 42 }
+            ]);
+        },
+        '{ y: Number, $v: String } with ignoreExtraFunctions': function () {
+            var args = [{
+                y: Number, $v: String
+            }, { ignoreExtraFunctions: true }];
+            
+            refuteValues(condition, args, [
+                { y: 'foo' },
+                { y: fkt.noop },
+                { y: 42, x: true }
+            ]);
+            acceptValues(condition, args, [
+                { y: 42 },
+                { y: 42, x: 'foo', z: fkt.noop }
             ]);
         }
     },

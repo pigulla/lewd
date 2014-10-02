@@ -7741,7 +7741,7 @@ module.exports = function forEach (obj, fn, ctx) {
 
     'use strict';
 
-    validator = { version: '3.18.1' };
+    validator = { version: '3.19.0' };
 
     var email = /^((([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+(\.([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+)*)|((\x22)((((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(([\x01-\x08\x0b\x0c\x0e-\x1f\x7f]|\x21|[\x23-\x5b]|[\x5d-\x7e]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(\\([\x01-\x09\x0b\x0c\x0d-\x7f]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))))*(((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(\x22)))@((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))$/i;
 
@@ -7870,14 +7870,27 @@ module.exports = function forEach (obj, fn, ctx) {
         var protocol = '(?:(?:' + options.protocols.join('|') + ')://)' + (options.require_protocol ? '' : '?')
           , auth = '(?:\\S+(?::\\S*)?@)?'
           , ipv4 = '(?:' + ipv4_url_parts.join('') + ')'
-          , hostname = '(?:' + ipv4 + '|' + domain(options) + '|localhost)'
+          , hostname = '(' + ipv4 + '|' + domain(options) + '|localhost)'
           , port = '(\\d{1,5})'
           , host = hostname + '(?::' + port + ')?'
           , path_query_anchor = '(?:(?:/|\\?|#)[^\\s]*)?';
-        var is_url = new RegExp('^(?!mailto:)' + protocol + auth + host + path_query_anchor + '$', 'i');
-        var match = str.match(is_url)
-          , port_match = match ? match[1] : 0;
-        return !!(match && (!port_match || (port_match > 0 && port_match <= 65535)));
+        var is_url = new RegExp('^(?!mailto:)' + protocol + auth + host + path_query_anchor + '$', 'i')
+          , match = str.match(is_url);
+        if (!match) {
+            return false;
+        }
+        host = match[1];
+        port = match[2];
+        if (port && !(port > 0 && port <= 65535)) {
+            return false;
+        }
+        if (options.host_whitelist && options.host_whitelist.indexOf(host) === -1) {
+            return false;
+        }
+        if (options.host_blacklist && options.host_blacklist.indexOf(host) !== -1) {
+            return false;
+        }
+        return true;
     };
 
     validator.isIP = function (str, version) {
@@ -8166,7 +8179,7 @@ module.exports = function forEach (obj, fn, ctx) {
 },{}],9:[function(require,module,exports){
 var _ = require('lodash');
 
-var consumerWrapper = require('./ConsumerWrapper'),
+var ConditionLockedException = require('../exception/ConditionLockedException'),
     ConditionViolationException = require('../exception/ConditionViolationException'),
     IllegalParameterException = require('../exception/IllegalParameterException');
 
@@ -8176,15 +8189,16 @@ var consumerWrapper = require('./ConsumerWrapper'),
  * @constructor
  * @param {string} type
  */
-var Condition = function (type) {
-    this.type = type;
-    this.name = null;
-    this.state = null;
-    this.default = undefined;
-    this.coerce = false;
-    this.customError = null;
-    this.wrapper = null;
-};
+function Condition(type) {
+    this._coerce = false;
+    this._customError = null;
+    this._default = undefined;
+    this._locked = false;
+    this._name = null;
+    this._state = null;
+    this._type = type;
+    this._wrapper = null;
+}
 
 /**
  * Constants used by `setPropertyState`.
@@ -8200,61 +8214,98 @@ Condition.PROPERTY_STATE = {
 
 /* jshint -W030 */
 /**
- * The (hopefully unique) type of the condition.
+ * Internal flag to indicate whether coercion is enabled.
  * 
- * @type {string}
+ * @protected
+ * @type {boolean}
  */
-Condition.prototype.type;
+Condition.prototype._coerce;
+
+/**
+ * The custom error message or `null` if the default message is to be used.
+ *
+ * @protected
+ * @type {(string|null)}
+ */
+Condition.prototype._customError;
+
+/**
+ * The default value for object properties.
+ *
+ * @private
+ * @type {*}
+ */
+Condition.prototype._default;
+
+/**
+ * The "locked" flag.
+ *
+ * @private
+ * @type {boolean}
+ */
+Condition.prototype._locked;
 
 /**
  * The user-defined name of the condition.
- * 
+ *
+ * @private
  * @type {?string}
  */
-Condition.prototype.name;
-
-/**
- * The consumer wrapper.
- * 
- * @type {?lewd.condition.ConsumerWrapper}
- */
-Condition.prototype.wrapper;
+Condition.prototype._name;
 
 /**
  * The required/optional state for object properties.
  * 
+ * @private
  * @type {string}
  */
-Condition.prototype.state;
+Condition.prototype._state;
 
 /**
- * The default value for object properties.
- * 
- * @type {*}
+ * The (hopefully unique) type of the condition.
+ *
+ * @readonly
+ * @protected
+ * @type {string}
  */
-Condition.prototype.default;
+Condition.prototype._type;
 
 /**
- * Internal flag to indicate whether coercion is enabled.
- * 
- * @type {boolean}
+ * The consumer wrapper.
+ *
+ * @private
+ * @type {?lewd.condition.ConsumerWrapper}
  */
-Condition.prototype.coerce;
-
-/**
- * The custom error message or `null` if the default message is to be used.
- * 
- * @type {(string|null)}
- */
-Condition.prototype.customError;
+Condition.prototype._wrapper;
 /* jshint +W030 */
+
+/**
+ * Asserts that the condition has not been locked.
+ * 
+ * @private
+ * @throws {lewd.exception.ConditionLockedException}
+ */
+Condition.prototype._assertNotLocked = function () {
+    if (this._locked) {
+        throw new ConditionLockedException();
+    }
+};
+
+/**
+ * Returns this condition's internal type.
+ * 
+ * @return {string}
+ */
+Condition.prototype.getType = function () {
+    return this._type;
+};
 
 /**
  * The actual validation function. Must return the input value (or its coerced version).
  * 
  * @abstract
  * @param {*} value
- * @param {Array.<string>} path
+ * @param {Array.<(string|number)>} path
  * @return {*}
  * @throws {lewd.exception.ConditionViolationException}
  */
@@ -8267,16 +8318,16 @@ Condition.prototype.validate = function (value, path) {
  * Takes care of overriding the passed message with the custom message if needed.
  * 
  * @param {*} value
- * @param {Array.<string>} path
+ * @param {Array.<(string|number)>} path
  * @param {string} messageTemplate
  * @param {Object.<string, *>=} templateData
  * @throws {lewd.exception.ConditionViolationException}
  */
 Condition.prototype.reject = function (value, path, messageTemplate, templateData) {
     var data = templateData || {},
-        error = this.customError ? this.customError : messageTemplate;
+        error = this._customError ? this._customError : messageTemplate;
     
-    if (this.customError) {
+    if (this._customError) {
         data.originalMessage = messageTemplate;
     }
     
@@ -8288,10 +8339,20 @@ Condition.prototype.reject = function (value, path, messageTemplate, templateDat
  * array otherwise.
  *  
  * @param {string} name
- * @returns {Array.<lewd.condition.ConsumerWrapper>}
+ * @return {Array.<lewd.condition.ConsumerWrapper>}
  */
 Condition.prototype.find = function (name) {
-    return this.name === name ? [this.consumer()] : [];
+    return this._name === name ? [this.consumer()] : [];
+};
+
+/**
+ * Locks the condition to prevent it or its nested conditions from being modified (e.g., changing the default value).
+ *  
+ * @return {lewd.condition.Condition}
+ */
+Condition.prototype.lock = function () {
+    this._locked = true;
+    return this;
 };
 
 /**
@@ -8299,10 +8360,34 @@ Condition.prototype.find = function (name) {
  * 
  * @param {?string} messageTemplate
  * @return {lewd.condition.Condition}
+ * @throws {lewd.exception.ConditionLockedException}
  */
 Condition.prototype.setCustomMessage = function (messageTemplate) {
-    this.customError = messageTemplate;
+    this._assertNotLocked();
+    this._customError = messageTemplate;
     return this;
+};
+
+/**
+ * Sets the conditions user-defined name.
+ * 
+ * @param {string} name
+ * @return {lewd.condition.Condition}
+ * @throws {lewd.exception.ConditionLockedException}
+ */
+Condition.prototype.setName = function (name) {
+    this._assertNotLocked();
+    this._name = name;
+    return this;
+};
+
+/**
+ * Check whether coercion is enabled.
+ * 
+ * @return {boolean}
+ */
+Condition.prototype.isCoercionEnabled = function () {
+    return this._coerce;
 };
 
 /**
@@ -8310,14 +8395,26 @@ Condition.prototype.setCustomMessage = function (messageTemplate) {
  * 
  * @param {boolean} enabled
  * @return {lewd.condition.Condition}
+ * @throws {lewd.exception.ConditionLockedException}
  */
 Condition.prototype.setCoercionEnabled = function (enabled) {
+    this._assertNotLocked();
+
     if (!this.supportsCoercion) {
         throw new IllegalParameterException('Condition does not support coercion');
     }
     
-    this.coerce = !!enabled;
+    this._coerce = !!enabled;
     return this;
+};
+
+/**
+ * Gets the property state.
+ * 
+ * @return {string}
+ */
+Condition.prototype.getPropertyState = function () {
+    return this._state;
 };
 
 /**
@@ -8326,10 +8423,21 @@ Condition.prototype.setCoercionEnabled = function (enabled) {
  * 
  * @param {string} state
  * @return {lewd.condition.Condition}
+ * @throws {lewd.exception.ConditionLockedException}
  */
 Condition.prototype.setPropertyState = function (state) {
-    this.state = state;
+    this._assertNotLocked();
+    this._state = state;
     return this;
+};
+
+/**
+ * Gets the default value when used as an object property.
+ * 
+ * @return {*}
+ */
+Condition.prototype.getDefaultValue = function () {
+    return this._default;
 };
 
 /**
@@ -8337,9 +8445,11 @@ Condition.prototype.setPropertyState = function (state) {
  * 
  * @param {*} value
  * @return {lewd.condition.Condition}
+ * @throws {lewd.exception.ConditionLockedException}
  */
 Condition.prototype.setDefaultValue = function (value) {
-    this.default = value;
+    this._assertNotLocked();
+    this._default = value;
     return this;
 };
 
@@ -8349,119 +8459,256 @@ Condition.prototype.setDefaultValue = function (value) {
  * @return {lewd.condition.ConsumerWrapper}
  */
 Condition.prototype.consumer = function () {
-    if (!this.wrapper) {
-        this.wrapper = consumerWrapper(this);
+    if (!this._wrapper) {
+        this._wrapper = require('./ConsumerWrapper').wrap(this);
     }
     
-    return this.wrapper;
+    return this._wrapper;
 };
 
 module.exports = Condition;
 
-},{"../exception/ConditionViolationException":40,"../exception/IllegalParameterException":41,"./ConsumerWrapper":10,"lodash":7}],10:[function(require,module,exports){
+},{"../exception/ConditionLockedException":40,"../exception/ConditionViolationException":41,"../exception/IllegalParameterException":42,"./ConsumerWrapper":10,"lodash":7}],10:[function(require,module,exports){
 var _ = require('lodash');
 
-var utils = require('../utils');
+var assertParameterCount = require('../utils').assertParameterCount;
+
+var Condition = require('./Condition');
+
+var MARKER_PROPERTY = '__lewd__invokable__';
+
+/*
+ * Implementation details:
+ * 
+ * The idea behind the construct below is to make a condition immediately callable while at the same time minimizing
+ * the API surface exposed to the consumer (i.e., the user).
+ * 
+ * If we were to use a construct like "wrapper = new ConsumerWrapper(condition)" the user couldn't do "wrapper(42)".
+ * This is why the "wrapInvokable" function creates a closure and has to proxy the methods provided by the
+ * ConsumerWrapper class.
+ */
 
 /**
+ * @class lewd.condition.ConsumerWrapper
+ * @constructor
  * @param {lewd.condition.Condition} condition
- * @return {lewd.condition.ConsumerWrapper}
+ * @param {function} invokable
  */
-module.exports = function (condition) {
-    var Condition = require('./Condition');
+function ConsumerWrapper(condition, invokable) {
+    this.condition = condition;
+    this.invokable = invokable;
+}
+ 
+/**
+ * The condition being wrapped.
+ * 
+ * @type {lewd.condition.Condition}
+ */
+ConsumerWrapper.prototype.condition; // jshint ignore:line
 
-    /**
-     * @class lewd.condition.ConsumerWrapper
-     * @param {*} value
-     * @param {Array.<string>=} path
-     * @return {*}
-     */
-    function consumerWrapper(value, path) {
-        return condition.validate(value, path || []);
-    }
+/**
+ * The invokable function created by wrapInvokable which most methods will need to return to allow for proper chaining.
+ * 
+ * @type {function}
+ */
+ConsumerWrapper.prototype.invokable; // jshint ignore:line
 
-    _.assign(consumerWrapper, {
-        wrapped: condition.type,
-        because: function (reason) {
-            utils.assertParameterCount(arguments, 0, 1);
-            condition.setCustomMessage(reason);
-            return consumerWrapper;
-        },
-        get: function (name) {
-            utils.assertParameterCount(arguments, 1);
-            var result = consumerWrapper.find(name);
-            return result.length ? result[0] : null;
-        },
-        find: function (name) {
-            utils.assertParameterCount(arguments, 1);
-            return _.unique(condition.find(name));
-        },
-        as: function (name) {
-            utils.assertParameterCount(arguments, 1);
-            condition.name = name;
-            return consumerWrapper;
-        },
-        default: function (value) {
-            utils.assertParameterCount(arguments, 1);
-            condition.setPropertyState(Condition.PROPERTY_STATE.OPTIONAL);
-            condition.setDefaultValue(value);
-            return consumerWrapper;
-        },
-        getDefault: function () {
-            utils.assertParameterCount(arguments, 0);
-            return condition.default;
-        },
-        coerce: function () {
-            utils.assertParameterCount(arguments, 0);
-            condition.setCoercionEnabled(true);
-            return consumerWrapper;
-        },
-        optional: function () {
-            utils.assertParameterCount(arguments, 0);
-            condition.setPropertyState(Condition.PROPERTY_STATE.OPTIONAL);
-            return consumerWrapper;
-        },
-        forbidden: function () {
-            utils.assertParameterCount(arguments, 0);
-            condition.setPropertyState(Condition.PROPERTY_STATE.FORBIDDEN);
-            return consumerWrapper;
-        },
-        required: function () {
-            utils.assertParameterCount(arguments, 0);
-            condition.setPropertyState(Condition.PROPERTY_STATE.REQUIRED);
-            return consumerWrapper;
-        },
-        isForbidden: function () {
-            utils.assertParameterCount(arguments, 0);
-            return condition.state === Condition.PROPERTY_STATE.FORBIDDEN;
-        },
-        isOptional: function () {
-            utils.assertParameterCount(arguments, 0);
-            return condition.state === Condition.PROPERTY_STATE.OPTIONAL;
-        },
-        isRequired: function () {
-            utils.assertParameterCount(arguments, 0);
-            return condition.state === Condition.PROPERTY_STATE.REQUIRED;
-        }
-    });
-    
-    if (condition.type === 'Object') {
-        _.assign(consumerWrapper, {
-            allOptional: function () {
-                condition.allOptional();
-                return consumerWrapper;
-            },
-            allRequired: function () {
-                condition.allRequired();
-                return consumerWrapper;
-            }
-        });
-    }
-
-    return consumerWrapper;
+/**
+ * @since 0.8.0
+ * @static
+ * @param {*} value
+ * @return {boolean}
+ */
+ConsumerWrapper.isWrapper = function (value) {
+    return typeof value === 'function' && value[MARKER_PROPERTY];
 };
 
-},{"../utils":44,"./Condition":9,"lodash":7}],11:[function(require,module,exports){
+/**
+ * @since 0.8.0
+ * @static
+ * @param {lewd.condition.Condition} condition
+ * @return {function}
+ */
+ConsumerWrapper.wrapInvokable = function (condition) {
+    function invokableWrapper(value, path) {
+        return condition.validate(value, path || []);
+    }
+    invokableWrapper[MARKER_PROPERTY] = true;
+    invokableWrapper.wrapped = condition.getType();
+
+    var wrapper = new ConsumerWrapper(condition, invokableWrapper);
+
+    Object.keys(ConsumerWrapper.prototype).forEach(function (property) {
+        /* istanbul ignore else */
+        if (typeof ConsumerWrapper.prototype[property] === 'function') {
+            invokableWrapper[property] = wrapper[property].bind(wrapper);
+        }
+    });
+
+    return invokableWrapper;
+};
+
+/**
+ * @since 0.1.0
+ * @return {lewd.condition.ConsumerWrapper}
+ */
+ConsumerWrapper.prototype.because = function (reason) {
+    assertParameterCount(arguments, 0, 1);
+    this.condition.setCustomMessage(reason);
+    return this.invokable;
+};
+
+/**
+ * @since 0.8.0
+ * @return {lewd.condition.ConsumerWrapper}
+ */
+ConsumerWrapper.prototype.lock = function () {
+    this.condition.lock();
+    return this.invokable;
+};
+
+/**
+ * @since 0.5.0
+ * @return {lewd.condition.ConsumerWrapper}
+ */
+ConsumerWrapper.prototype.get = function (name) {
+    assertParameterCount(arguments, 1);
+    var result = this.find(name);
+    return result.length ? result[0] : null;
+};
+
+/**
+ * @since 0.5.0
+ * @return {lewd.condition.ConsumerWrapper}
+ */
+ConsumerWrapper.prototype.find = function (name) {
+    assertParameterCount(arguments, 1);
+    return _.unique(this.condition.find(name));
+};
+
+/**
+ * @since 0.5.0
+ * @return {lewd.condition.ConsumerWrapper}
+ */
+ConsumerWrapper.prototype.as = function (name) {
+    assertParameterCount(arguments, 1);
+    this.condition.setName(name);
+    return this.invokable;
+};
+
+/**
+ * @since 0.3.0
+ * @return {lewd.condition.ConsumerWrapper}
+ */
+ConsumerWrapper.prototype.default = function (value) {
+    assertParameterCount(arguments, 1);
+    this.condition.setPropertyState(Condition.PROPERTY_STATE.OPTIONAL);
+    this.condition.setDefaultValue(value);
+    return this.invokable;
+};
+
+/**
+ * @since 0.3.0
+ * @return {*}
+ */
+ConsumerWrapper.prototype.getDefault = function () {
+    assertParameterCount(arguments, 0);
+    return this.condition.getDefaultValue();
+};
+
+/**
+ * @since 0.3.0
+ * @return {lewd.condition.ConsumerWrapper}
+ */
+ConsumerWrapper.prototype.coerce = function () {
+    assertParameterCount(arguments, 0);
+    this.condition.setCoercionEnabled(true);
+    return this.invokable;
+};
+
+/**
+ * @since 0.2.0
+ * @return {lewd.condition.ConsumerWrapper}
+ */
+ConsumerWrapper.prototype.optional = function () {
+    assertParameterCount(arguments, 0);
+    this.condition.setPropertyState(Condition.PROPERTY_STATE.OPTIONAL);
+    return this.invokable;
+};
+
+/**
+ * @since 0.7.0
+ * @return {lewd.condition.ConsumerWrapper}
+ */
+ConsumerWrapper.prototype.allOptional = function () {
+    assertParameterCount(arguments, 0);
+    this.condition.allOptional();
+    return this.invokable;
+};
+
+/**
+ * @since 0.5.0
+ * @return {lewd.condition.ConsumerWrapper}
+ */
+ConsumerWrapper.prototype.forbidden = function () {
+    assertParameterCount(arguments, 0);
+    this.condition.setPropertyState(Condition.PROPERTY_STATE.FORBIDDEN);
+    return this.invokable;
+};
+
+/**
+ * @since 0.2.0
+ * @return {lewd.condition.ConsumerWrapper}
+ */
+ConsumerWrapper.prototype.required = function () {
+    assertParameterCount(arguments, 0);
+    this.condition.setPropertyState(Condition.PROPERTY_STATE.REQUIRED);
+    return this.invokable;
+};
+
+/**
+ * @since 0.7.0
+ * @return {lewd.condition.ConsumerWrapper}
+ */
+ConsumerWrapper.prototype.allRequired = function () {
+    assertParameterCount(arguments, 0);
+    this.condition.allRequired();
+    return this.invokable;
+};
+
+/**
+ * @since 0.5.0
+ * @return {boolean}
+ */
+ConsumerWrapper.prototype.isForbidden = function () {
+    assertParameterCount(arguments, 0);
+    return this.condition.getPropertyState() === Condition.PROPERTY_STATE.FORBIDDEN;
+};
+
+/**
+ * @since 0.3.0
+ * @returns {boolean}
+ */
+ConsumerWrapper.prototype.isOptional = function () {
+    assertParameterCount(arguments, 0);
+    return this.condition.getPropertyState() === Condition.PROPERTY_STATE.OPTIONAL;
+};
+
+/**
+ * @since 0.3.0
+ * @return {boolean}
+ */
+ConsumerWrapper.prototype.isRequired = function () {
+    assertParameterCount(arguments, 0);
+    return this.condition.getPropertyState() === Condition.PROPERTY_STATE.REQUIRED;
+};
+
+module.exports = {
+    wrap: ConsumerWrapper.wrapInvokable,
+    isWrapper: ConsumerWrapper.isWrapper
+};
+
+},{"../utils":45,"./Condition":9,"lodash":7}],11:[function(require,module,exports){
 var util = require('util');
 
 var Condition = require('./Condition'),
@@ -8473,7 +8720,7 @@ var Condition = require('./Condition'),
  * @class {lewd.condition.Custom}
  * @extends {lewd.condition.Condition}
  * @constructor
- * @param {Function} fn
+ * @param {function} fn
  */
 function CustomCondition(fn) {
     Condition.call(this, 'Custom');
@@ -8490,7 +8737,7 @@ util.inherits(CustomCondition, Condition);
 /* jshint -W030 */
 /**
  * @private
- * @type {Function}
+ * @type {function}
  */
 CustomCondition.prototype._fn;
 /* jshint +W030 */
@@ -8522,7 +8769,7 @@ CustomCondition.prototype.validate = function (value, path) {
 
 module.exports = CustomCondition;
 
-},{"../exception/ConditionViolationException":40,"../exception/IllegalParameterException":41,"../messages":43,"./Condition":9,"util":4}],12:[function(require,module,exports){
+},{"../exception/ConditionViolationException":41,"../exception/IllegalParameterException":42,"../messages":44,"./Condition":9,"util":4}],12:[function(require,module,exports){
 var util = require('util');
 
 var Condition = require('./Condition'),
@@ -8558,6 +8805,16 @@ NestedCondition.prototype._conditions = null;
 /**
  * @inheritdoc
  */
+NestedCondition.prototype.lock = function () {
+    this._conditions.forEach(function (condition) {
+        condition.lock();
+    });
+    return this;
+};
+
+/**
+ * @inheritdoc
+ */
 NestedCondition.prototype.find = function (name) {
     var result = Condition.prototype.find.call(this, name);
 
@@ -8570,7 +8827,7 @@ NestedCondition.prototype.find = function (name) {
 
 module.exports = NestedCondition;
 
-},{"../exception/IllegalParameterException":41,"./Condition":9,"util":4}],13:[function(require,module,exports){
+},{"../exception/IllegalParameterException":42,"./Condition":9,"util":4}],13:[function(require,module,exports){
 var util = require('util');
 
 var Condition = require('../Condition'),
@@ -8597,7 +8854,7 @@ IntegerCondition.prototype.validate = function (value, path) {
         this.reject(value, path, errorMessage);
     }
     
-    if (this.coerce) {
+    if (this._coerce) {
         return Math.round(value);
     }
     
@@ -8610,7 +8867,7 @@ IntegerCondition.prototype.validate = function (value, path) {
 
 module.exports = IntegerCondition;
 
-},{"../../messages":43,"../Condition":9,"util":4}],14:[function(require,module,exports){
+},{"../../messages":44,"../Condition":9,"util":4}],14:[function(require,module,exports){
 var util = require('util');
 
 var Condition = require('../Condition'),
@@ -8653,12 +8910,12 @@ IsoDateTimeCondition.prototype.validate = function (value, path) {
         }
     }
     
-    return this.coerce ? new Date(Date.parse(value)) : value;
+    return this._coerce ? new Date(Date.parse(value)) : value;
 };
 
 module.exports = IsoDateTimeCondition;
 
-},{"../../exception/ConditionViolationException":40,"../../lewd":42,"../../messages":43,"../Condition":9,"util":4}],15:[function(require,module,exports){
+},{"../../exception/ConditionViolationException":41,"../../lewd":43,"../../messages":44,"../Condition":9,"util":4}],15:[function(require,module,exports){
 var util = require('util');
 
 var _ = require('lodash');
@@ -8738,7 +8995,7 @@ LenCondition.prototype.validate = function (value, path) {
 
 module.exports = LenCondition;
 
-},{"../../exception/IllegalParameterException":41,"../../messages":43,"../Condition":9,"lodash":7,"util":4}],16:[function(require,module,exports){
+},{"../../exception/IllegalParameterException":42,"../../messages":44,"../Condition":9,"lodash":7,"util":4}],16:[function(require,module,exports){
 var util = require('util');
 
 var Condition = require('../Condition'),
@@ -8788,7 +9045,7 @@ LiteralCondition.prototype.validate = function (value, path) {
 
 module.exports = LiteralCondition;
 
-},{"../../exception/IllegalParameterException":41,"../../messages":43,"../../utils":44,"../Condition":9,"util":4}],17:[function(require,module,exports){
+},{"../../exception/IllegalParameterException":42,"../../messages":44,"../../utils":45,"../Condition":9,"util":4}],17:[function(require,module,exports){
 var util = require('util');
 
 var _ = require('lodash');
@@ -8864,7 +9121,7 @@ RangeCondition.prototype.validate = function (value, path) {
 
 module.exports = RangeCondition;
 
-},{"../../exception/IllegalParameterException":41,"../../messages":43,"../Condition":9,"lodash":7,"util":4}],18:[function(require,module,exports){
+},{"../../exception/IllegalParameterException":42,"../../messages":44,"../Condition":9,"lodash":7,"util":4}],18:[function(require,module,exports){
 var util = require('util');
 
 var Condition = require('../Condition'),
@@ -8901,7 +9158,7 @@ RegexCondition.prototype.validate = function (value, path) {
 
 module.exports = RegexCondition;
 
-},{"../../exception/IllegalParameterException":41,"../../messages":43,"../Condition":9,"util":4}],19:[function(require,module,exports){
+},{"../../exception/IllegalParameterException":42,"../../messages":44,"../Condition":9,"util":4}],19:[function(require,module,exports){
 var util = require('util');
 
 var NestedCondition = require('../NestedCondition'),
@@ -8923,14 +9180,14 @@ util.inherits(AllCondition, NestedCondition);
  * @inheritdoc
  */
 AllCondition.prototype.validate = function (value, path) {
-    if (this.customError) {
+    if (this._customError) {
         try {
             this._conditions.forEach(function (condition) {
                 value = condition(value, path);
             });
         } catch (e) {
             if (e instanceof ConditionViolationException) {
-                throw new ConditionViolationException(value, path, this.customError);
+                throw new ConditionViolationException(value, path, this._customError);
             } else {
                 throw e;
             }
@@ -8946,7 +9203,7 @@ AllCondition.prototype.validate = function (value, path) {
 
 module.exports = AllCondition;
 
-},{"../../exception/ConditionViolationException":40,"../NestedCondition":12,"util":4}],20:[function(require,module,exports){
+},{"../../exception/ConditionViolationException":41,"../NestedCondition":12,"util":4}],20:[function(require,module,exports){
 var util = require('util');
 
 var Condition = require('../Condition'),
@@ -8972,7 +9229,7 @@ AnyCondition.prototype.validate = function (value, path) {
 
 module.exports = AnyCondition;
 
-},{"../../messages":43,"../Condition":9,"util":4}],21:[function(require,module,exports){
+},{"../../messages":44,"../Condition":9,"util":4}],21:[function(require,module,exports){
 var util = require('util');
 
 var NestedCondition = require('../NestedCondition'),
@@ -9019,7 +9276,7 @@ NoneCondition.prototype.validate = function (value, path) {
 
 module.exports = NoneCondition;
 
-},{"../../exception/ConditionViolationException":40,"../../messages":43,"../NestedCondition":12,"util":4}],22:[function(require,module,exports){
+},{"../../exception/ConditionViolationException":41,"../../messages":44,"../NestedCondition":12,"util":4}],22:[function(require,module,exports){
 var util = require('util');
 
 var NestedCondition = require('../NestedCondition'),
@@ -9057,7 +9314,7 @@ NotCondition.prototype.validate = function (value, path) {
 
 module.exports = NotCondition;
 
-},{"../../exception/ConditionViolationException":40,"../../messages":43,"../NestedCondition":12,"util":4}],23:[function(require,module,exports){
+},{"../../exception/ConditionViolationException":41,"../../messages":44,"../NestedCondition":12,"util":4}],23:[function(require,module,exports){
 var util = require('util');
 
 var NestedCondition = require('../NestedCondition'),
@@ -9106,7 +9363,7 @@ SomeCondition.prototype.validate = function (value, path) {
 
 module.exports = SomeCondition;
 
-},{"../../exception/ConditionViolationException":40,"../../messages":43,"../NestedCondition":12,"util":4}],24:[function(require,module,exports){
+},{"../../exception/ConditionViolationException":41,"../../messages":44,"../NestedCondition":12,"util":4}],24:[function(require,module,exports){
 var util = require('util');
 
 var NestedCondition = require('../NestedCondition'),
@@ -9166,7 +9423,7 @@ ArrayCondition.prototype.validate = function (value, path) {
 
 module.exports = ArrayCondition;
 
-},{"../../exception/ConditionViolationException":40,"../../exception/IllegalParameterException":41,"../../lewd":42,"../../messages":43,"../NestedCondition":12,"util":4}],25:[function(require,module,exports){
+},{"../../exception/ConditionViolationException":41,"../../exception/IllegalParameterException":42,"../../lewd":43,"../../messages":44,"../NestedCondition":12,"util":4}],25:[function(require,module,exports){
 var util = require('util');
 
 var _ = require('lodash');
@@ -9174,7 +9431,8 @@ var _ = require('lodash');
 var Condition = require('../Condition'),
     errorMessages = require('../../messages'),
     ConditionViolationException = require('../../exception/ConditionViolationException'),
-    IllegalParameterException = require('../../exception/IllegalParameterException');
+    IllegalParameterException = require('../../exception/IllegalParameterException'),
+    utils = require('../../utils');
 
 var KEYS_PROPERTY = '$k',
     VALUES_PROPERTY = '$v';
@@ -9193,7 +9451,8 @@ function validateOptions(options, allowExtraDefault) {
             byDefault: Condition.PROPERTY_STATE.REQUIRED,
             keys: undefined,
             values: undefined,
-            removeExtra: false
+            removeExtra: false,
+            ignoreExtraFunctions: false
         },
         opts = _.defaults({}, options, defaults);
 
@@ -9277,6 +9536,22 @@ function ObjectCondition(spec, options) {
 
 util.inherits(ObjectCondition, Condition);
 
+/* jshint -W030 */
+/**
+ * The condition for generic key validation ($k). Initialized in initKeyValueConditions().
+ * 
+ * @type {lewd.condition.ConsumerWrapper} 
+ */
+ObjectCondition.prototype.keysCondition;
+
+/**
+ * The condition for generic value validation ($v). Initialized in initKeyValueConditions().
+ * 
+ * @type {lewd.condition.ConsumerWrapper}
+ */
+ObjectCondition.prototype.valuesCondition;
+/* jshint +W030 */
+
 /**
  * Marks all keys properties as being optional.
  * 
@@ -9319,7 +9594,7 @@ ObjectCondition.prototype._calculateKeys = function (value) {
         required: []
     };
     
-    keys.actual = Object.keys(value);
+    keys.actual = utils.getEnumerableProperties(value);
     keys.extra = _.difference(keys.actual, this.definedKeys);
     keys.toValidate = _.intersection(this.definedKeys, keys.actual);
     
@@ -9352,7 +9627,7 @@ ObjectCondition.prototype._calculateKeys = function (value) {
  * @inheritdoc
  */
 ObjectCondition.prototype.validate = function (value, path) {
-    if (!_.isPlainObject(value)) {
+    if (!utils.isBasicObject(value)) {
         this.reject(value, path, errorMessages.Object.type);
     }
     
@@ -9365,7 +9640,13 @@ ObjectCondition.prototype.validate = function (value, path) {
                 delete value[key];
             });
         } else {
-            this.reject(value, path, errorMessages.Object.unexpectedKey, { key: keys.extra[0] });
+            var extraFiltered = keys.extra.filter(function (key) {
+                return !this.options.ignoreExtraFunctions || typeof value[key] !== 'function';
+            }, this);
+            
+            if (extraFiltered.length) { 
+                this.reject(value, path, errorMessages.Object.unexpectedKey, { key: extraFiltered[0] });
+            }
         }
     }
     
@@ -9376,6 +9657,10 @@ ObjectCondition.prototype.validate = function (value, path) {
 
     // Validate extra keys. 
     keys.extra.forEach(function (key) {
+        if (this.options.ignoreExtraFunctions && typeof value[key] === 'function') {
+            return;
+        }
+        
         if (this.options.removeExtra) {
             try {
                 this.keysCondition(key, path.concat('{' + key + '}'));
@@ -9418,6 +9703,20 @@ ObjectCondition.prototype.validate = function (value, path) {
 /**
  * @inheritdoc
  */
+ObjectCondition.prototype.lock = function () {
+    this.keysCondition.lock();
+    this.valuesCondition.lock();
+
+    this.definedKeys.forEach(function (key) {
+        this.spec[key].lock();
+    }, this);
+
+    return this;
+};
+
+/**
+ * @inheritdoc
+ */
 ObjectCondition.prototype.find = function (name) {
     var result = Condition.prototype.find.call(this, name);
     
@@ -9427,14 +9726,14 @@ ObjectCondition.prototype.find = function (name) {
     this.definedKeys.forEach(function (key) {
         var found = this.spec[key].find(name);
         Array.prototype.push.apply(result, found);
-    }.bind(this));
+    }, this);
 
     return result;
 };
 
 module.exports = ObjectCondition;
 
-},{"../../exception/ConditionViolationException":40,"../../exception/IllegalParameterException":41,"../../lewd":42,"../../messages":43,"../Condition":9,"lodash":7,"util":4}],26:[function(require,module,exports){
+},{"../../exception/ConditionViolationException":41,"../../exception/IllegalParameterException":42,"../../lewd":43,"../../messages":44,"../../utils":45,"../Condition":9,"lodash":7,"util":4}],26:[function(require,module,exports){
 var util = require('util');
 
 var Condition = require('../Condition'),
@@ -9512,7 +9811,7 @@ UniqueCondition.prototype.validate = function (value, path) {
 
 module.exports = UniqueCondition;
 
-},{"../../exception/ConditionViolationException":40,"../../exception/IllegalParameterException":41,"../../messages":43,"../../utils":44,"../Condition":9,"util":4}],27:[function(require,module,exports){
+},{"../../exception/ConditionViolationException":41,"../../exception/IllegalParameterException":42,"../../messages":44,"../../utils":45,"../Condition":9,"util":4}],27:[function(require,module,exports){
 var util = require('util');
 
 var Condition = require('../Condition'),
@@ -9542,7 +9841,7 @@ ArrayTypeCondition.prototype.validate = function (value, path) {
 
 module.exports = ArrayTypeCondition;
 
-},{"../../messages":43,"../Condition":9,"util":4}],28:[function(require,module,exports){
+},{"../../messages":44,"../Condition":9,"util":4}],28:[function(require,module,exports){
 var util = require('util');
 
 var Condition = require('../Condition'),
@@ -9569,7 +9868,7 @@ BooleanTypeCondition.prototype.validate = function (value, path) {
         return value;
     }
     
-    if (this.coerce) {
+    if (this._coerce) {
         return !!value;
     }
 
@@ -9578,7 +9877,7 @@ BooleanTypeCondition.prototype.validate = function (value, path) {
 
 module.exports = BooleanTypeCondition;
 
-},{"../../messages":43,"../Condition":9,"util":4}],29:[function(require,module,exports){
+},{"../../messages":44,"../Condition":9,"util":4}],29:[function(require,module,exports){
 var util = require('util');
 
 var Condition = require('../Condition'),
@@ -9608,7 +9907,7 @@ NullTypeCondition.prototype.validate = function (value, path) {
 
 module.exports = NullTypeCondition;
 
-},{"../../messages":43,"../Condition":9,"util":4}],30:[function(require,module,exports){
+},{"../../messages":44,"../Condition":9,"util":4}],30:[function(require,module,exports){
 var util = require('util');
 
 var Condition = require('../Condition'),
@@ -9640,13 +9939,14 @@ NumberTypeCondition.prototype.validate = function (value, path) {
 
 module.exports = NumberTypeCondition;
 
-},{"../../messages":43,"../Condition":9,"util":4}],31:[function(require,module,exports){
+},{"../../messages":44,"../Condition":9,"util":4}],31:[function(require,module,exports){
 var util = require('util');
 
 var _ = require('lodash');
 
 var Condition = require('../Condition'),
-    errorMessage = require('../../messages').Type;
+    errorMessage = require('../../messages').Type,
+    utils = require('../../utils');
 
 /**
  * @class lewd.condition.type.Object
@@ -9663,7 +9963,7 @@ util.inherits(ObjectTypeCondition, Condition);
  * @inheritdoc
  */
 ObjectTypeCondition.prototype.validate = function (value, path) {
-    if (_.isPlainObject(value)) {
+    if (utils.isBasicObject(value)) {
         return value;
     }
 
@@ -9672,7 +9972,7 @@ ObjectTypeCondition.prototype.validate = function (value, path) {
 
 module.exports = ObjectTypeCondition;
 
-},{"../../messages":43,"../Condition":9,"lodash":7,"util":4}],32:[function(require,module,exports){
+},{"../../messages":44,"../../utils":45,"../Condition":9,"lodash":7,"util":4}],32:[function(require,module,exports){
 var util = require('util');
 
 var Condition = require('../Condition'),
@@ -9699,7 +9999,7 @@ StringTypeCondition.prototype.validate = function (value, path) {
         return value;
     }
     
-    if (this.coerce) {
+    if (this._coerce) {
         return value + '';
     }
 
@@ -9708,7 +10008,7 @@ StringTypeCondition.prototype.validate = function (value, path) {
 
 module.exports = StringTypeCondition;
 
-},{"../../messages":43,"../Condition":9,"util":4}],33:[function(require,module,exports){
+},{"../../messages":44,"../Condition":9,"util":4}],33:[function(require,module,exports){
 var util = require('util');
 
 var validator = require('validator');
@@ -9745,7 +10045,7 @@ CreditcardCondition.prototype.validate = function (value, path) {
 
 module.exports = CreditcardCondition;
 
-},{"../../exception/IllegalParameterException":41,"../../messages":43,"../Condition":9,"util":4,"validator":8}],34:[function(require,module,exports){
+},{"../../exception/IllegalParameterException":42,"../../messages":44,"../Condition":9,"util":4,"validator":8}],34:[function(require,module,exports){
 var util = require('util');
 
 var validator = require('validator');
@@ -9782,7 +10082,7 @@ EmailCondition.prototype.validate = function (value, path) {
 
 module.exports = EmailCondition;
 
-},{"../../exception/IllegalParameterException":41,"../../messages":43,"../Condition":9,"util":4,"validator":8}],35:[function(require,module,exports){
+},{"../../exception/IllegalParameterException":42,"../../messages":44,"../Condition":9,"util":4,"validator":8}],35:[function(require,module,exports){
 var util = require('util');
 
 var validator = require('validator');
@@ -9826,7 +10126,7 @@ FqdnCondition.prototype.validate = function (value, path) {
 
 module.exports = FqdnCondition;
 
-},{"../../exception/IllegalParameterException":41,"../../messages":43,"../Condition":9,"util":4,"validator":8}],36:[function(require,module,exports){
+},{"../../exception/IllegalParameterException":42,"../../messages":44,"../Condition":9,"util":4,"validator":8}],36:[function(require,module,exports){
 var util = require('util');
 
 var validator = require('validator');
@@ -9870,7 +10170,7 @@ IpCondition.prototype.validate = function (value, path) {
 
 module.exports = IpCondition;
 
-},{"../../exception/IllegalParameterException":41,"../../messages":43,"../Condition":9,"util":4,"validator":8}],37:[function(require,module,exports){
+},{"../../exception/IllegalParameterException":42,"../../messages":44,"../Condition":9,"util":4,"validator":8}],37:[function(require,module,exports){
 var util = require('util');
 
 var validator = require('validator');
@@ -9914,7 +10214,7 @@ IsbnCondition.prototype.validate = function (value, path) {
 
 module.exports = IsbnCondition;
 
-},{"../../exception/IllegalParameterException":41,"../../messages":43,"../Condition":9,"util":4,"validator":8}],38:[function(require,module,exports){
+},{"../../exception/IllegalParameterException":42,"../../messages":44,"../Condition":9,"util":4,"validator":8}],38:[function(require,module,exports){
 var util = require('util');
 
 var validator = require('validator');
@@ -9958,7 +10258,7 @@ UrlCondition.prototype.validate = function (value, path) {
 
 module.exports = UrlCondition;
 
-},{"../../exception/IllegalParameterException":41,"../../messages":43,"../Condition":9,"util":4,"validator":8}],39:[function(require,module,exports){
+},{"../../exception/IllegalParameterException":42,"../../messages":44,"../Condition":9,"util":4,"validator":8}],39:[function(require,module,exports){
 var util = require('util');
 
 var validator = require('validator');
@@ -10002,7 +10302,25 @@ UuidCondition.prototype.validate = function (value, path) {
 
 module.exports = UuidCondition;
 
-},{"../../exception/IllegalParameterException":41,"../../messages":43,"../Condition":9,"util":4,"validator":8}],40:[function(require,module,exports){
+},{"../../exception/IllegalParameterException":42,"../../messages":44,"../Condition":9,"util":4,"validator":8}],40:[function(require,module,exports){
+var util = require('util');
+
+/**
+ * @class lewd.exception.ConditionLockedException
+ * @extends Error
+ */
+function ConditionLockedException() {
+    Error.call(this);
+
+    this.name = 'ConditionLockedException';
+    this.message = 'The condition is locked.';
+}
+
+util.inherits(ConditionLockedException, Error);
+
+module.exports = ConditionLockedException;
+
+},{"util":4}],41:[function(require,module,exports){
 var util = require('util');
 
 var _ = require('lodash'),
@@ -10012,7 +10330,7 @@ var _ = require('lodash'),
  * @class lewd.exception.ConditionViolationException
  * @extends Error
  * @param {*} value 
- * @param {Array.<string>} path 
+ * @param {Array.<(string|number)>} path 
  * @param {string} template 
  * @param {Object=} data
  */
@@ -10047,9 +10365,16 @@ ConditionViolationException.prototype._getTemplateVariables = function () {
     });
 };
 
+/**
+ * @inheritdoc
+ */
+ConditionViolationException.prototype.toString = function () {
+    return util.format('Condition violation at "%s": %s', this.pathStr, this.message);
+};
+
 module.exports = ConditionViolationException;
 
-},{"../utils":44,"json-pointer":5,"lodash":7,"util":4}],41:[function(require,module,exports){
+},{"../utils":45,"json-pointer":5,"lodash":7,"util":4}],42:[function(require,module,exports){
 var util = require('util');
 
 /**
@@ -10068,12 +10393,12 @@ util.inherits(IllegalParameterException, Error);
 
 module.exports = IllegalParameterException;
 
-},{"util":4}],42:[function(require,module,exports){
+},{"util":4}],43:[function(require,module,exports){
 /**
  * lewd - an intuitive and easy to use data validation library
  *
  * @class lewd
- * @version 0.7.0
+ * @version 0.8.1
  * @author Raphael Pigulla <pigulla@four66.com>
  * @license BSD-2-Clause
  */
@@ -10082,7 +10407,8 @@ var _ = require('lodash');
 
 var util = require('util');
 
-var ConditionViolationException = require('./exception/ConditionViolationException'),
+var ConsumerWrapper = require('./condition/ConsumerWrapper'),
+    ConditionViolationException = require('./exception/ConditionViolationException'),
     IllegalParameterException = require('./exception/IllegalParameterException'),
     utils = require('./utils'),
     errorMessages = require('./messages'),
@@ -10148,7 +10474,7 @@ var lewd = function () {
  * @readonly
  * @type {string}
  */
-lewd.version = '0.7.1';
+lewd.version = '0.8.1';
 
 /**
  * Wraps an arbitrary value in its appropriate condition wrapper (or returns the argument if it is already wrapped).
@@ -10165,7 +10491,7 @@ lewd._wrap = function (spec) {
         lewd.creditcard
     ];
     
-    /*jshint maxcomplexity:false */
+    /* jshint maxcomplexity:false */
     if (spec === Array) {
         return (new conditions.ArrayType()).consumer();
     } else if (spec === Boolean) {
@@ -10193,7 +10519,7 @@ lewd._wrap = function (spec) {
     } else if (shorthands.indexOf(spec) !== -1) {
         return spec();
     } else if (typeof spec === 'function') {
-        return utils.isConsumerWrapper(spec) ? spec : lewd.custom(spec);
+        return ConsumerWrapper.isWrapper(spec) ? spec : lewd.custom(spec);
     } else {
         throw new IllegalParameterException('Invalid specification');
     }
@@ -10245,7 +10571,7 @@ lewd.expose = function (prefix) {
 lewd.custom = function (fn) {
     utils.assertParameterCount(arguments, 1);
     
-    if (utils.isConsumerWrapper(fn)) {
+    if (ConsumerWrapper.isWrapper(fn)) {
         return fn;
     } else if (fn instanceof Condition) {
         return fn.consumer();
@@ -10569,7 +10895,7 @@ lewd.Condition = Condition;
 
 module.exports = lewd;
 
-},{"./condition/Condition":9,"./condition/Custom":11,"./condition/composite/Integer":13,"./condition/composite/IsoDateTime":14,"./condition/content/Len":15,"./condition/content/Literal":16,"./condition/content/Range":17,"./condition/content/Regex":18,"./condition/logic/All":19,"./condition/logic/Any":20,"./condition/logic/None":21,"./condition/logic/Not":22,"./condition/logic/Some":23,"./condition/structure/Array":24,"./condition/structure/Object":25,"./condition/structure/Unique":26,"./condition/type/Array":27,"./condition/type/Boolean":28,"./condition/type/Null":29,"./condition/type/Number":30,"./condition/type/Object":31,"./condition/type/String":32,"./condition/validator/Creditcard":33,"./condition/validator/Email":34,"./condition/validator/Fqdn":35,"./condition/validator/Ip":36,"./condition/validator/Isbn":37,"./condition/validator/Url":38,"./condition/validator/Uuid":39,"./exception/ConditionViolationException":40,"./exception/IllegalParameterException":41,"./messages":43,"./utils":44,"lodash":7,"util":4}],43:[function(require,module,exports){
+},{"./condition/Condition":9,"./condition/ConsumerWrapper":10,"./condition/Custom":11,"./condition/composite/Integer":13,"./condition/composite/IsoDateTime":14,"./condition/content/Len":15,"./condition/content/Literal":16,"./condition/content/Range":17,"./condition/content/Regex":18,"./condition/logic/All":19,"./condition/logic/Any":20,"./condition/logic/None":21,"./condition/logic/Not":22,"./condition/logic/Some":23,"./condition/structure/Array":24,"./condition/structure/Object":25,"./condition/structure/Unique":26,"./condition/type/Array":27,"./condition/type/Boolean":28,"./condition/type/Null":29,"./condition/type/Number":30,"./condition/type/Object":31,"./condition/type/String":32,"./condition/validator/Creditcard":33,"./condition/validator/Email":34,"./condition/validator/Fqdn":35,"./condition/validator/Ip":36,"./condition/validator/Isbn":37,"./condition/validator/Url":38,"./condition/validator/Uuid":39,"./exception/ConditionViolationException":41,"./exception/IllegalParameterException":42,"./messages":44,"./utils":45,"lodash":7,"util":4}],44:[function(require,module,exports){
 module.exports = {
     'Array': 'must be an array',
     'Custom': 'custom condition failed',
@@ -10633,7 +10959,7 @@ module.exports = {
     }
 };
 
-},{}],44:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 var util = require('util');
 
 var _ = require('lodash');
@@ -10642,17 +10968,6 @@ var ConditionViolationException = require('./exception/ConditionViolationExcepti
     IllegalParameterException = require('./exception/IllegalParameterException');
 
 var utils = {
-    /**
-     * Checks if the given value is the consumer wrapper of a condition.
-     *
-     * @param {*} value
-     * @return {boolean}
-     */
-    isConsumerWrapper: function (value) {
-        // A heuristic will have to do here.
-        return typeof value === 'function' && value.hasOwnProperty('isOptional') && value.hasOwnProperty('wrapped');
-    },
-    
     /**
      * Asserts that the given arguments array contains at least `min` and no more than `max` parameters.
      *
@@ -10685,7 +11000,7 @@ var utils = {
      * @return {string}
      */
     smartFormat: function (value) {
-        /*jshint maxcomplexity:false */
+        /* jshint maxcomplexity:false */
         if (value === null) {
             return 'null';
         } else if (value === undefined) {
@@ -10702,9 +11017,9 @@ var utils = {
         } else if (_.isDate(value)) {
             return '<date>' + value.toISOString();
         } else if (value === Infinity) {
-            return 'PositiveInfinity';
+            return 'Infinity';
         } else if (value === -Infinity) {
-            return 'NegativeInfinity';
+            return '-Infinity';
         } else if (typeof value === 'number') {
             return '<number>' + value;
         } else if (_.isRegExp(value)) {
@@ -10718,20 +11033,41 @@ var utils = {
         } else /* istanbul ignore else */ if (typeof value === 'object') {
             return 'object';
         } else {
+            // Could be a host object.
             return '<unknown>' + value;
         }
     },
-    
+
     /**
-     * Checks if the given value is a constructor for a native JSON type (i.e. Number, String, Boolean, Object,
-     * Array or null). 
-     *
+     * Checks if the given value is a "basic object", i.e. an object that is not actually one of JavaScript's built-in
+     * object-like types.
+     * 
+     * This function does not detect "subclasses" of built-in types, e.g. `Object.create(Date)`.
+     * 
      * @param {*} value
      * @return {boolean}
      */
-    isJsonType: function  (value) {
-        return value === Array || value === Number || value === String || value === Boolean || value === Object ||
-            value === null;
+    isBasicObject: function (value) {
+        return (!!value && typeof value === 'object' &&
+            !(Array.isArray(value) || value instanceof RegExp || value instanceof Date));
+    },
+
+    /**
+     * Returns all enumerable keys of the given object.
+     * 
+     * @param {Object} value
+     * @return {Array.<string>}
+     */
+    getEnumerableProperties: function (value) {
+        var keys = [],
+            k;
+        
+        /* jshint forin:false */
+        for (k in value) {
+            keys.push(k);
+        }
+        
+        return keys;
     },
 
     /**
@@ -10749,5 +11085,5 @@ var utils = {
 
 module.exports = utils;
 
-},{"./exception/ConditionViolationException":40,"./exception/IllegalParameterException":41,"lodash":7,"util":4}]},{},[42])(42)
+},{"./exception/ConditionViolationException":41,"./exception/IllegalParameterException":42,"lodash":7,"util":4}]},{},[43])(43)
 });

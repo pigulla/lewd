@@ -1,4 +1,8 @@
-## 0.9.0-dev (2014-??-??)
+## 0.8.1 (2014-10-02)
+
+###### New features:
+
+ - `ignoreExtraFunctions` option to `lewd.object` added
 
 ## 0.8.0 (2014-09-26)
 
