@@ -31,6 +31,7 @@ module.exports = {
         'type': 'must be a string or array'
     },
     'Literal': 'must be equal to ${literalStr}',
+    'MongoId': 'must be a valid MongoDB object id',
     'None': 'must not satisfy any of the given conditions',
     'Not': 'must not satisfy the condition',
     'Object': {

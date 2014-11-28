@@ -35,6 +35,29 @@ buster.testCase('validator conditions', {
             refuteSchemaOptions(lewd.creditcard, [2]);
         }
     },  
+    'mongoId': {
+        'values': function () {
+            refuteValues(lewd.mongoId, [], [null, true, 32, 17.3, [], {}]);
+
+            refuteValues(lewd.mongoId, [], ['507f1f77bcf86cd7994390', '507f1f77bcf86cd79943901z', '']);
+            acceptValues(lewd.mongoId, [], ['507f1f77bcf86cd799439011']);
+        },
+        'error message': {
+            'type': function () {
+                assertViolationWithMessage(function () {
+                    lewd.mongoId()(null);
+                }, _.template(errorMessages.MongoId.type, {}));
+            },
+            'invalid': function () {
+                assertViolationWithMessage(function () {
+                    lewd.mongoId()('not an email');
+                }, _.template(errorMessages.MongoId.invalid, {}));
+            }
+        },
+        'invalid schema options': function () {
+            refuteSchemaOptions(lewd.mongoId, [2]);
+        }
+    },
     'email': {
         'values': function () {
             refuteValues(lewd.email, [], [null, true, 32, 17.3, [], {}]);

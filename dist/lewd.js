@@ -31,6 +31,8 @@ var process = module.exports = {};
 process.nextTick = (function () {
     var canSetImmediate = typeof window !== 'undefined'
     && window.setImmediate;
+    var canMutationObserver = typeof window !== 'undefined'
+    && window.MutationObserver;
     var canPost = typeof window !== 'undefined'
     && window.postMessage && window.addEventListener
     ;
@@ -39,8 +41,29 @@ process.nextTick = (function () {
         return function (f) { return window.setImmediate(f) };
     }
 
+    var queue = [];
+
+    if (canMutationObserver) {
+        var hiddenDiv = document.createElement("div");
+        var observer = new MutationObserver(function () {
+            var queueList = queue.slice();
+            queue.length = 0;
+            queueList.forEach(function (fn) {
+                fn();
+            });
+        });
+
+        observer.observe(hiddenDiv, { attributes: true });
+
+        return function nextTick(fn) {
+            if (!queue.length) {
+                hiddenDiv.setAttribute('yes', 'no');
+            }
+            queue.push(fn);
+        };
+    }
+
     if (canPost) {
-        var queue = [];
         window.addEventListener('message', function (ev) {
             var source = ev.source;
             if ((source === window || source === null) && ev.data === 'process-tick') {
@@ -80,7 +103,7 @@ process.emit = noop;
 
 process.binding = function (name) {
     throw new Error('process.binding is not supported');
-}
+};
 
 // TODO(shtylman)
 process.cwd = function () { return '/' };
@@ -7741,7 +7764,7 @@ module.exports = function forEach (obj, fn, ctx) {
 
     'use strict';
 
-    validator = { version: '3.19.0' };
+    validator = { version: '3.22.1' };
 
     var email = /^((([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+(\.([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+)*)|((\x22)((((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(([\x01-\x08\x0b\x0c\x0e-\x1f\x7f]|\x21|[\x23-\x5b]|[\x5d-\x7e]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(\\([\x01-\x09\x0b\x0c\x0d-\x7f]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))))*(((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(\x22)))@((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))$/i;
 
@@ -7857,37 +7880,79 @@ module.exports = function forEach (obj, fn, ctx) {
       , allow_underscores: false
     };
 
-    validator.isURL = function (str, options) {
-        if (!str || str.length >= 2083) {
+    validator.isURL = function (url, options) {
+        if (!url || url.length >= 2083) {
+            return false;
+        }
+        if (url.indexOf('mailto:') === 0) {
             return false;
         }
         options = merge(options, default_url_options);
-        var ipv4_url_parts = [
-            '(?:[1-9]\\d?|1\\d\\d|2[01]\\d|22[0-3])'
-          , '(?:\\.(?:1?\\d{1,2}|2[0-4]\\d|25[0-5])){2}',
-          , '(?:\\.(?:[0-9]\\d?|1\\d\\d|2[0-4]\\d|25[0-4]))'
-        ];
-        var protocol = '(?:(?:' + options.protocols.join('|') + ')://)' + (options.require_protocol ? '' : '?')
-          , auth = '(?:\\S+(?::\\S*)?@)?'
-          , ipv4 = '(?:' + ipv4_url_parts.join('') + ')'
-          , hostname = '(' + ipv4 + '|' + domain(options) + '|localhost)'
-          , port = '(\\d{1,5})'
-          , host = hostname + '(?::' + port + ')?'
-          , path_query_anchor = '(?:(?:/|\\?|#)[^\\s]*)?';
-        var is_url = new RegExp('^(?!mailto:)' + protocol + auth + host + path_query_anchor + '$', 'i')
-          , match = str.match(is_url);
-        if (!match) {
+        var protocol, user, pass, auth, host, hostname, port,
+            port_str, path, query, hash, split;
+        split = url.split('://');
+        if (split.length > 1) {
+            protocol = split.shift();
+            if (options.protocols.indexOf(protocol) === -1) {
+                return false;
+            }
+        } else if (options.require_protocol) {
             return false;
         }
-        host = match[1];
-        port = match[2];
-        if (port && !(port > 0 && port <= 65535)) {
+        url = split.join('://');
+        split = url.split('#');
+        url = split.shift();
+        hash = split.join('#');
+        if (hash && /\s/.test(hash)) {
             return false;
         }
-        if (options.host_whitelist && options.host_whitelist.indexOf(host) === -1) {
+        split = url.split('?');
+        url = split.shift();
+        query = split.join('?');
+        if (query && /\s/.test(query)) {
             return false;
         }
-        if (options.host_blacklist && options.host_blacklist.indexOf(host) !== -1) {
+        split = url.split('/');
+        url = split.shift();
+        path = split.join('/');
+        if (path && /\s/.test(path)) {
+            return false;
+        }
+        split = url.split('@');
+        if (split.length > 1) {
+            auth = split.shift();
+            if (auth.indexOf(':') >= 0) {
+                auth = auth.split(':');
+                user = auth.shift();
+                if (!/^\S+$/.test(user)) {
+                    return false;
+                }
+                pass = auth.join(':');
+                if (!/^\S*$/.test(user)) {
+                    return false;
+                }
+            }
+        }
+        hostname = split.join('@');
+        split = hostname.split(':');
+        host = split.shift();
+        if (split.length) {
+            port_str = split.join(':');
+            port = parseInt(port_str, 10);
+            if (!/^[0-9]+$/.test(port_str) || port <= 0 || port > 65535) {
+                return false;
+            }
+        }
+        if (!validator.isIP(host) && !validator.isFQDN(host, options) &&
+                host !== 'localhost') {
+            return false;
+        }
+        if (options.host_whitelist &&
+                options.host_whitelist.indexOf(host) === -1) {
+            return false;
+        }
+        if (options.host_blacklist &&
+                options.host_blacklist.indexOf(host) !== -1) {
             return false;
         }
         return true;
@@ -7915,8 +7980,31 @@ module.exports = function forEach (obj, fn, ctx) {
     };
 
     validator.isFQDN = function (str, options) {
-      options = merge(options, default_fqdn_options);
-      return new RegExp('^' + domain(options) + '$', 'i').test(str);
+        options = merge(options, default_fqdn_options);
+        var parts = str.split('.');
+        if (options.require_tld) {
+            var tld = parts.pop();
+            if (!parts.length || !/^[a-z]{2,}$/i.test(tld)) {
+                return false;
+            }
+        }
+        for (var part, i = 0; i < parts.length; i++) {
+            part = parts[i];
+            if (options.allow_underscores) {
+                if (part.indexOf('__') >= 0) {
+                    return false;
+                }
+                part = part.replace(/_/g, '');
+            }
+            if (!/^[a-z\\u00a1-\\uffff0-9-]+$/i.test(part)) {
+                return false;
+            }
+            if (part[0] === '-' || part[part.length - 1] === '-' ||
+                    part.indexOf('---') >= 0) {
+                return false;
+            }
+        }
+        return true;
     };
 
     validator.isAlpha = function (str) {
@@ -8106,6 +8194,10 @@ module.exports = function forEach (obj, fn, ctx) {
         return base64.test(str);
     };
 
+    validator.isMongoId = function (str) {
+        return validator.isHexadecimal(str) && str.length === 24;
+    };
+
     validator.ltrim = function (str, chars) {
         var pattern = chars ? new RegExp('^[' + chars + ']+', 'g') : /^\s+/g;
         return str.replace(pattern, '');
@@ -8142,13 +8234,28 @@ module.exports = function forEach (obj, fn, ctx) {
         return str.replace(new RegExp('[' + chars + ']+', 'g'), '');
     };
 
-    validator.normalizeEmail = function (email) {
-        var parts = email.toLowerCase().split('@', 2);
-        if (parts[1] === 'gmail.com' || parts[1] === 'googlemail.com') {
-            parts[0] = parts[0].replace('.', '').split('+')[0];
-            email = parts.join('@');
+    var default_normalize_email_options = {
+        lowercase: true
+    };
+
+    validator.normalizeEmail = function (email, options) {
+        options = merge(options, default_normalize_email_options);
+        if (!validator.isEmail(email)) {
+            return false;
         }
-        return email;
+        var parts = email.split('@', 2);
+        parts[1] = parts[1].toLowerCase();
+        if (options.lowercase) {
+            parts[0] = parts[0].toLowerCase();
+        }
+        if (parts[1] === 'gmail.com' || parts[1] === 'googlemail.com') {
+            if (!options.lowercase) {
+                parts[0] = parts[0].toLowerCase();
+            }
+            parts[0] = parts[0].replace(/\./g, '').split('+')[0];
+            parts[1] = 'gmail.com';
+        }
+        return parts.join('@');
     };
 
     function merge(obj, defaults) {
@@ -8159,15 +8266,6 @@ module.exports = function forEach (obj, fn, ctx) {
             }
         }
         return obj;
-    }
-
-    function domain(options) {
-      var sep = '-?-?' + (options.allow_underscores ? '_?' : '')
-        , alpha = 'a-z\\u00a1-\\uffff'
-        , alphanum = alpha + '0-9'
-        , subdomain = '(?:(?:[' + alphanum + ']+' + sep + ')*[' + alphanum + ']+)'
-        , tld = '(?:\\.(?:[' + alpha + ']{2,}))' + (options.require_tld ? '' : '?');
-      return '(?:' + subdomain + '(?:\\.' + subdomain + ')*' + tld + ')';
     }
 
     validator.init();
@@ -8468,7 +8566,7 @@ Condition.prototype.consumer = function () {
 
 module.exports = Condition;
 
-},{"../exception/ConditionLockedException":40,"../exception/ConditionViolationException":41,"../exception/IllegalParameterException":42,"./ConsumerWrapper":10,"lodash":7}],10:[function(require,module,exports){
+},{"../exception/ConditionLockedException":41,"../exception/ConditionViolationException":42,"../exception/IllegalParameterException":43,"./ConsumerWrapper":10,"lodash":7}],10:[function(require,module,exports){
 var _ = require('lodash');
 
 var assertParameterCount = require('../utils').assertParameterCount;
@@ -8708,7 +8806,7 @@ module.exports = {
     isWrapper: ConsumerWrapper.isWrapper
 };
 
-},{"../utils":45,"./Condition":9,"lodash":7}],11:[function(require,module,exports){
+},{"../utils":46,"./Condition":9,"lodash":7}],11:[function(require,module,exports){
 var util = require('util');
 
 var Condition = require('./Condition'),
@@ -8769,7 +8867,7 @@ CustomCondition.prototype.validate = function (value, path) {
 
 module.exports = CustomCondition;
 
-},{"../exception/ConditionViolationException":41,"../exception/IllegalParameterException":42,"../messages":44,"./Condition":9,"util":4}],12:[function(require,module,exports){
+},{"../exception/ConditionViolationException":42,"../exception/IllegalParameterException":43,"../messages":45,"./Condition":9,"util":4}],12:[function(require,module,exports){
 var util = require('util');
 
 var Condition = require('./Condition'),
@@ -8827,7 +8925,7 @@ NestedCondition.prototype.find = function (name) {
 
 module.exports = NestedCondition;
 
-},{"../exception/IllegalParameterException":42,"./Condition":9,"util":4}],13:[function(require,module,exports){
+},{"../exception/IllegalParameterException":43,"./Condition":9,"util":4}],13:[function(require,module,exports){
 var util = require('util');
 
 var Condition = require('../Condition'),
@@ -8867,7 +8965,7 @@ IntegerCondition.prototype.validate = function (value, path) {
 
 module.exports = IntegerCondition;
 
-},{"../../messages":44,"../Condition":9,"util":4}],14:[function(require,module,exports){
+},{"../../messages":45,"../Condition":9,"util":4}],14:[function(require,module,exports){
 var util = require('util');
 
 var Condition = require('../Condition'),
@@ -8915,7 +9013,7 @@ IsoDateTimeCondition.prototype.validate = function (value, path) {
 
 module.exports = IsoDateTimeCondition;
 
-},{"../../exception/ConditionViolationException":41,"../../lewd":43,"../../messages":44,"../Condition":9,"util":4}],15:[function(require,module,exports){
+},{"../../exception/ConditionViolationException":42,"../../lewd":44,"../../messages":45,"../Condition":9,"util":4}],15:[function(require,module,exports){
 var util = require('util');
 
 var _ = require('lodash');
@@ -8995,7 +9093,7 @@ LenCondition.prototype.validate = function (value, path) {
 
 module.exports = LenCondition;
 
-},{"../../exception/IllegalParameterException":42,"../../messages":44,"../Condition":9,"lodash":7,"util":4}],16:[function(require,module,exports){
+},{"../../exception/IllegalParameterException":43,"../../messages":45,"../Condition":9,"lodash":7,"util":4}],16:[function(require,module,exports){
 var util = require('util');
 
 var Condition = require('../Condition'),
@@ -9045,7 +9143,7 @@ LiteralCondition.prototype.validate = function (value, path) {
 
 module.exports = LiteralCondition;
 
-},{"../../exception/IllegalParameterException":42,"../../messages":44,"../../utils":45,"../Condition":9,"util":4}],17:[function(require,module,exports){
+},{"../../exception/IllegalParameterException":43,"../../messages":45,"../../utils":46,"../Condition":9,"util":4}],17:[function(require,module,exports){
 var util = require('util');
 
 var _ = require('lodash');
@@ -9121,7 +9219,7 @@ RangeCondition.prototype.validate = function (value, path) {
 
 module.exports = RangeCondition;
 
-},{"../../exception/IllegalParameterException":42,"../../messages":44,"../Condition":9,"lodash":7,"util":4}],18:[function(require,module,exports){
+},{"../../exception/IllegalParameterException":43,"../../messages":45,"../Condition":9,"lodash":7,"util":4}],18:[function(require,module,exports){
 var util = require('util');
 
 var Condition = require('../Condition'),
@@ -9158,7 +9256,7 @@ RegexCondition.prototype.validate = function (value, path) {
 
 module.exports = RegexCondition;
 
-},{"../../exception/IllegalParameterException":42,"../../messages":44,"../Condition":9,"util":4}],19:[function(require,module,exports){
+},{"../../exception/IllegalParameterException":43,"../../messages":45,"../Condition":9,"util":4}],19:[function(require,module,exports){
 var util = require('util');
 
 var NestedCondition = require('../NestedCondition'),
@@ -9203,7 +9301,7 @@ AllCondition.prototype.validate = function (value, path) {
 
 module.exports = AllCondition;
 
-},{"../../exception/ConditionViolationException":41,"../NestedCondition":12,"util":4}],20:[function(require,module,exports){
+},{"../../exception/ConditionViolationException":42,"../NestedCondition":12,"util":4}],20:[function(require,module,exports){
 var util = require('util');
 
 var Condition = require('../Condition'),
@@ -9229,7 +9327,7 @@ AnyCondition.prototype.validate = function (value, path) {
 
 module.exports = AnyCondition;
 
-},{"../../messages":44,"../Condition":9,"util":4}],21:[function(require,module,exports){
+},{"../../messages":45,"../Condition":9,"util":4}],21:[function(require,module,exports){
 var util = require('util');
 
 var NestedCondition = require('../NestedCondition'),
@@ -9276,7 +9374,7 @@ NoneCondition.prototype.validate = function (value, path) {
 
 module.exports = NoneCondition;
 
-},{"../../exception/ConditionViolationException":41,"../../messages":44,"../NestedCondition":12,"util":4}],22:[function(require,module,exports){
+},{"../../exception/ConditionViolationException":42,"../../messages":45,"../NestedCondition":12,"util":4}],22:[function(require,module,exports){
 var util = require('util');
 
 var NestedCondition = require('../NestedCondition'),
@@ -9314,7 +9412,7 @@ NotCondition.prototype.validate = function (value, path) {
 
 module.exports = NotCondition;
 
-},{"../../exception/ConditionViolationException":41,"../../messages":44,"../NestedCondition":12,"util":4}],23:[function(require,module,exports){
+},{"../../exception/ConditionViolationException":42,"../../messages":45,"../NestedCondition":12,"util":4}],23:[function(require,module,exports){
 var util = require('util');
 
 var NestedCondition = require('../NestedCondition'),
@@ -9363,7 +9461,7 @@ SomeCondition.prototype.validate = function (value, path) {
 
 module.exports = SomeCondition;
 
-},{"../../exception/ConditionViolationException":41,"../../messages":44,"../NestedCondition":12,"util":4}],24:[function(require,module,exports){
+},{"../../exception/ConditionViolationException":42,"../../messages":45,"../NestedCondition":12,"util":4}],24:[function(require,module,exports){
 var util = require('util');
 
 var NestedCondition = require('../NestedCondition'),
@@ -9423,7 +9521,7 @@ ArrayCondition.prototype.validate = function (value, path) {
 
 module.exports = ArrayCondition;
 
-},{"../../exception/ConditionViolationException":41,"../../exception/IllegalParameterException":42,"../../lewd":43,"../../messages":44,"../NestedCondition":12,"util":4}],25:[function(require,module,exports){
+},{"../../exception/ConditionViolationException":42,"../../exception/IllegalParameterException":43,"../../lewd":44,"../../messages":45,"../NestedCondition":12,"util":4}],25:[function(require,module,exports){
 var util = require('util');
 
 var _ = require('lodash');
@@ -9733,7 +9831,7 @@ ObjectCondition.prototype.find = function (name) {
 
 module.exports = ObjectCondition;
 
-},{"../../exception/ConditionViolationException":41,"../../exception/IllegalParameterException":42,"../../lewd":43,"../../messages":44,"../../utils":45,"../Condition":9,"lodash":7,"util":4}],26:[function(require,module,exports){
+},{"../../exception/ConditionViolationException":42,"../../exception/IllegalParameterException":43,"../../lewd":44,"../../messages":45,"../../utils":46,"../Condition":9,"lodash":7,"util":4}],26:[function(require,module,exports){
 var util = require('util');
 
 var Condition = require('../Condition'),
@@ -9811,7 +9909,7 @@ UniqueCondition.prototype.validate = function (value, path) {
 
 module.exports = UniqueCondition;
 
-},{"../../exception/ConditionViolationException":41,"../../exception/IllegalParameterException":42,"../../messages":44,"../../utils":45,"../Condition":9,"util":4}],27:[function(require,module,exports){
+},{"../../exception/ConditionViolationException":42,"../../exception/IllegalParameterException":43,"../../messages":45,"../../utils":46,"../Condition":9,"util":4}],27:[function(require,module,exports){
 var util = require('util');
 
 var Condition = require('../Condition'),
@@ -9841,7 +9939,7 @@ ArrayTypeCondition.prototype.validate = function (value, path) {
 
 module.exports = ArrayTypeCondition;
 
-},{"../../messages":44,"../Condition":9,"util":4}],28:[function(require,module,exports){
+},{"../../messages":45,"../Condition":9,"util":4}],28:[function(require,module,exports){
 var util = require('util');
 
 var Condition = require('../Condition'),
@@ -9877,7 +9975,7 @@ BooleanTypeCondition.prototype.validate = function (value, path) {
 
 module.exports = BooleanTypeCondition;
 
-},{"../../messages":44,"../Condition":9,"util":4}],29:[function(require,module,exports){
+},{"../../messages":45,"../Condition":9,"util":4}],29:[function(require,module,exports){
 var util = require('util');
 
 var Condition = require('../Condition'),
@@ -9907,7 +10005,7 @@ NullTypeCondition.prototype.validate = function (value, path) {
 
 module.exports = NullTypeCondition;
 
-},{"../../messages":44,"../Condition":9,"util":4}],30:[function(require,module,exports){
+},{"../../messages":45,"../Condition":9,"util":4}],30:[function(require,module,exports){
 var util = require('util');
 
 var Condition = require('../Condition'),
@@ -9939,7 +10037,7 @@ NumberTypeCondition.prototype.validate = function (value, path) {
 
 module.exports = NumberTypeCondition;
 
-},{"../../messages":44,"../Condition":9,"util":4}],31:[function(require,module,exports){
+},{"../../messages":45,"../Condition":9,"util":4}],31:[function(require,module,exports){
 var util = require('util');
 
 var _ = require('lodash');
@@ -9972,7 +10070,7 @@ ObjectTypeCondition.prototype.validate = function (value, path) {
 
 module.exports = ObjectTypeCondition;
 
-},{"../../messages":44,"../../utils":45,"../Condition":9,"lodash":7,"util":4}],32:[function(require,module,exports){
+},{"../../messages":45,"../../utils":46,"../Condition":9,"lodash":7,"util":4}],32:[function(require,module,exports){
 var util = require('util');
 
 var Condition = require('../Condition'),
@@ -10008,7 +10106,7 @@ StringTypeCondition.prototype.validate = function (value, path) {
 
 module.exports = StringTypeCondition;
 
-},{"../../messages":44,"../Condition":9,"util":4}],33:[function(require,module,exports){
+},{"../../messages":45,"../Condition":9,"util":4}],33:[function(require,module,exports){
 var util = require('util');
 
 var validator = require('validator');
@@ -10045,7 +10143,7 @@ CreditcardCondition.prototype.validate = function (value, path) {
 
 module.exports = CreditcardCondition;
 
-},{"../../exception/IllegalParameterException":42,"../../messages":44,"../Condition":9,"util":4,"validator":8}],34:[function(require,module,exports){
+},{"../../exception/IllegalParameterException":43,"../../messages":45,"../Condition":9,"util":4,"validator":8}],34:[function(require,module,exports){
 var util = require('util');
 
 var validator = require('validator');
@@ -10082,7 +10180,7 @@ EmailCondition.prototype.validate = function (value, path) {
 
 module.exports = EmailCondition;
 
-},{"../../exception/IllegalParameterException":42,"../../messages":44,"../Condition":9,"util":4,"validator":8}],35:[function(require,module,exports){
+},{"../../exception/IllegalParameterException":43,"../../messages":45,"../Condition":9,"util":4,"validator":8}],35:[function(require,module,exports){
 var util = require('util');
 
 var validator = require('validator');
@@ -10126,7 +10224,7 @@ FqdnCondition.prototype.validate = function (value, path) {
 
 module.exports = FqdnCondition;
 
-},{"../../exception/IllegalParameterException":42,"../../messages":44,"../Condition":9,"util":4,"validator":8}],36:[function(require,module,exports){
+},{"../../exception/IllegalParameterException":43,"../../messages":45,"../Condition":9,"util":4,"validator":8}],36:[function(require,module,exports){
 var util = require('util');
 
 var validator = require('validator');
@@ -10170,7 +10268,7 @@ IpCondition.prototype.validate = function (value, path) {
 
 module.exports = IpCondition;
 
-},{"../../exception/IllegalParameterException":42,"../../messages":44,"../Condition":9,"util":4,"validator":8}],37:[function(require,module,exports){
+},{"../../exception/IllegalParameterException":43,"../../messages":45,"../Condition":9,"util":4,"validator":8}],37:[function(require,module,exports){
 var util = require('util');
 
 var validator = require('validator');
@@ -10214,7 +10312,44 @@ IsbnCondition.prototype.validate = function (value, path) {
 
 module.exports = IsbnCondition;
 
-},{"../../exception/IllegalParameterException":42,"../../messages":44,"../Condition":9,"util":4,"validator":8}],38:[function(require,module,exports){
+},{"../../exception/IllegalParameterException":43,"../../messages":45,"../Condition":9,"util":4,"validator":8}],38:[function(require,module,exports){
+var util = require('util');
+
+var validator = require('validator');
+
+var Condition = require('../Condition'),
+    IllegalParameterException = require('../../exception/IllegalParameterException'),
+    errorMessages = require('../../messages').MongoId;
+
+/**
+ * @class lewd.condition.validator.MongoId
+ * @extends {lewd.condition.Condition}
+ * @constructor
+ */
+function MongoIdCondition() {
+    Condition.call(this, 'MongoId');
+}
+
+util.inherits(MongoIdCondition, Condition);
+
+/**
+ * @inheritdoc
+ */
+MongoIdCondition.prototype.validate = function (value, path) {
+    if (typeof value !== 'string') {
+        this.reject(value, path, errorMessages.type);
+    }
+
+    if (!validator.isMongoId(value)) {
+        this.reject(value, path, errorMessages.invalid);
+    }
+
+    return value;
+};
+
+module.exports = MongoIdCondition;
+
+},{"../../exception/IllegalParameterException":43,"../../messages":45,"../Condition":9,"util":4,"validator":8}],39:[function(require,module,exports){
 var util = require('util');
 
 var validator = require('validator');
@@ -10258,7 +10393,7 @@ UrlCondition.prototype.validate = function (value, path) {
 
 module.exports = UrlCondition;
 
-},{"../../exception/IllegalParameterException":42,"../../messages":44,"../Condition":9,"util":4,"validator":8}],39:[function(require,module,exports){
+},{"../../exception/IllegalParameterException":43,"../../messages":45,"../Condition":9,"util":4,"validator":8}],40:[function(require,module,exports){
 var util = require('util');
 
 var validator = require('validator');
@@ -10302,7 +10437,7 @@ UuidCondition.prototype.validate = function (value, path) {
 
 module.exports = UuidCondition;
 
-},{"../../exception/IllegalParameterException":42,"../../messages":44,"../Condition":9,"util":4,"validator":8}],40:[function(require,module,exports){
+},{"../../exception/IllegalParameterException":43,"../../messages":45,"../Condition":9,"util":4,"validator":8}],41:[function(require,module,exports){
 var util = require('util');
 
 /**
@@ -10320,7 +10455,7 @@ util.inherits(ConditionLockedException, Error);
 
 module.exports = ConditionLockedException;
 
-},{"util":4}],41:[function(require,module,exports){
+},{"util":4}],42:[function(require,module,exports){
 var util = require('util');
 
 var _ = require('lodash'),
@@ -10374,7 +10509,7 @@ ConditionViolationException.prototype.toString = function () {
 
 module.exports = ConditionViolationException;
 
-},{"../utils":45,"json-pointer":5,"lodash":7,"util":4}],42:[function(require,module,exports){
+},{"../utils":46,"json-pointer":5,"lodash":7,"util":4}],43:[function(require,module,exports){
 var util = require('util');
 
 /**
@@ -10393,12 +10528,12 @@ util.inherits(IllegalParameterException, Error);
 
 module.exports = IllegalParameterException;
 
-},{"util":4}],43:[function(require,module,exports){
+},{"util":4}],44:[function(require,module,exports){
 /**
  * lewd - an intuitive and easy to use data validation library
  *
  * @class lewd
- * @version 0.8.1
+ * @version 0.8.2
  * @author Raphael Pigulla <pigulla@four66.com>
  * @license BSD-2-Clause
  */
@@ -10424,6 +10559,7 @@ var ConsumerWrapper = require('./condition/ConsumerWrapper'),
         Fqdn: require('./condition/validator/Fqdn'),
         Ip: require('./condition/validator/Ip'),
         Isbn: require('./condition/validator/Isbn'),
+        MongoId: require('./condition/validator/MongoId'),
         Url: require('./condition/validator/Url'),
         Uuid: require('./condition/validator/Uuid'),
 
@@ -10488,7 +10624,7 @@ lewd._wrap = function (spec) {
     var shorthands = [
         lewd.Array, lewd.Boolean, lewd.null, lewd.Number, lewd.Object, lewd.String, lewd.undefined,
         lewd.unique, lewd.isoDateTime, lewd.integer, lewd.ip, lewd.email, lewd.uuid, lewd.url, lewd.fqdn, lewd.isbn,
-        lewd.creditcard
+        lewd.creditcard, lewd.mongoId
     ];
     
     /* jshint maxcomplexity:false */
@@ -10536,7 +10672,7 @@ lewd._wrap = function (spec) {
 lewd.expose = function (prefix) {
     var p = prefix || '',
         exposedFunctions = [
-            'creditcard', 'email', 'ip', 'isbn', 'url', 'fqdn', 'uuid',
+            'creditcard', 'email', 'ip', 'isbn', 'mongoId', 'url', 'fqdn', 'uuid',
             'optional', 'required', 'forbidden',
             'integer', 'isoDateTime',
             'array', 'len', 'literal', 'object', 'range', 'regex',
@@ -10655,6 +10791,15 @@ lewd.isoDateTime = function () {
 lewd.creditcard = function () {
     utils.assertParameterCount(arguments, 0);
     return (new conditions.Creditcard()).consumer();
+};
+
+/**
+ * @since 0.8.2
+ * @return {lewd.condition.ConsumerWrapper}
+ */
+lewd.mongoId = function () {
+    utils.assertParameterCount(arguments, 0);
+    return (new conditions.MongoId()).consumer();
 };
 
 /**
@@ -10895,7 +11040,7 @@ lewd.Condition = Condition;
 
 module.exports = lewd;
 
-},{"./condition/Condition":9,"./condition/ConsumerWrapper":10,"./condition/Custom":11,"./condition/composite/Integer":13,"./condition/composite/IsoDateTime":14,"./condition/content/Len":15,"./condition/content/Literal":16,"./condition/content/Range":17,"./condition/content/Regex":18,"./condition/logic/All":19,"./condition/logic/Any":20,"./condition/logic/None":21,"./condition/logic/Not":22,"./condition/logic/Some":23,"./condition/structure/Array":24,"./condition/structure/Object":25,"./condition/structure/Unique":26,"./condition/type/Array":27,"./condition/type/Boolean":28,"./condition/type/Null":29,"./condition/type/Number":30,"./condition/type/Object":31,"./condition/type/String":32,"./condition/validator/Creditcard":33,"./condition/validator/Email":34,"./condition/validator/Fqdn":35,"./condition/validator/Ip":36,"./condition/validator/Isbn":37,"./condition/validator/Url":38,"./condition/validator/Uuid":39,"./exception/ConditionViolationException":41,"./exception/IllegalParameterException":42,"./messages":44,"./utils":45,"lodash":7,"util":4}],44:[function(require,module,exports){
+},{"./condition/Condition":9,"./condition/ConsumerWrapper":10,"./condition/Custom":11,"./condition/composite/Integer":13,"./condition/composite/IsoDateTime":14,"./condition/content/Len":15,"./condition/content/Literal":16,"./condition/content/Range":17,"./condition/content/Regex":18,"./condition/logic/All":19,"./condition/logic/Any":20,"./condition/logic/None":21,"./condition/logic/Not":22,"./condition/logic/Some":23,"./condition/structure/Array":24,"./condition/structure/Object":25,"./condition/structure/Unique":26,"./condition/type/Array":27,"./condition/type/Boolean":28,"./condition/type/Null":29,"./condition/type/Number":30,"./condition/type/Object":31,"./condition/type/String":32,"./condition/validator/Creditcard":33,"./condition/validator/Email":34,"./condition/validator/Fqdn":35,"./condition/validator/Ip":36,"./condition/validator/Isbn":37,"./condition/validator/MongoId":38,"./condition/validator/Url":39,"./condition/validator/Uuid":40,"./exception/ConditionViolationException":42,"./exception/IllegalParameterException":43,"./messages":45,"./utils":46,"lodash":7,"util":4}],45:[function(require,module,exports){
 module.exports = {
     'Array': 'must be an array',
     'Custom': 'custom condition failed',
@@ -10929,6 +11074,7 @@ module.exports = {
         'type': 'must be a string or array'
     },
     'Literal': 'must be equal to ${literalStr}',
+    'MongoId': 'must be a valid MongoDB object id',
     'None': 'must not satisfy any of the given conditions',
     'Not': 'must not satisfy the condition',
     'Object': {
@@ -10959,7 +11105,7 @@ module.exports = {
     }
 };
 
-},{}],45:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 var util = require('util');
 
 var _ = require('lodash');
@@ -11085,5 +11231,5 @@ var utils = {
 
 module.exports = utils;
 
-},{"./exception/ConditionViolationException":41,"./exception/IllegalParameterException":42,"lodash":7,"util":4}]},{},[43])(43)
+},{"./exception/ConditionViolationException":42,"./exception/IllegalParameterException":43,"lodash":7,"util":4}]},{},[44])(44)
 });

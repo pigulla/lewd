@@ -1,3 +1,9 @@
+## 0.8.2 (2014-11-28)
+
+###### New features:
+
+ - Added condition wrapper for validator.js' `isMongoId`
+
 ## 0.8.1 (2014-10-02)
 
 ###### New features:

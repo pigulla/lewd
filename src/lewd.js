@@ -2,7 +2,7 @@
  * lewd - an intuitive and easy to use data validation library
  *
  * @class lewd
- * @version 0.8.1
+ * @version 0.8.2
  * @author Raphael Pigulla <pigulla@four66.com>
  * @license BSD-2-Clause
  */
@@ -28,6 +28,7 @@ var ConsumerWrapper = require('./condition/ConsumerWrapper'),
         Fqdn: require('./condition/validator/Fqdn'),
         Ip: require('./condition/validator/Ip'),
         Isbn: require('./condition/validator/Isbn'),
+        MongoId: require('./condition/validator/MongoId'),
         Url: require('./condition/validator/Url'),
         Uuid: require('./condition/validator/Uuid'),
 
@@ -92,7 +93,7 @@ lewd._wrap = function (spec) {
     var shorthands = [
         lewd.Array, lewd.Boolean, lewd.null, lewd.Number, lewd.Object, lewd.String, lewd.undefined,
         lewd.unique, lewd.isoDateTime, lewd.integer, lewd.ip, lewd.email, lewd.uuid, lewd.url, lewd.fqdn, lewd.isbn,
-        lewd.creditcard
+        lewd.creditcard, lewd.mongoId
     ];
     
     /* jshint maxcomplexity:false */
@@ -140,7 +141,7 @@ lewd._wrap = function (spec) {
 lewd.expose = function (prefix) {
     var p = prefix || '',
         exposedFunctions = [
-            'creditcard', 'email', 'ip', 'isbn', 'url', 'fqdn', 'uuid',
+            'creditcard', 'email', 'ip', 'isbn', 'mongoId', 'url', 'fqdn', 'uuid',
             'optional', 'required', 'forbidden',
             'integer', 'isoDateTime',
             'array', 'len', 'literal', 'object', 'range', 'regex',
@@ -259,6 +260,15 @@ lewd.isoDateTime = function () {
 lewd.creditcard = function () {
     utils.assertParameterCount(arguments, 0);
     return (new conditions.Creditcard()).consumer();
+};
+
+/**
+ * @since 0.8.2
+ * @return {lewd.condition.ConsumerWrapper}
+ */
+lewd.mongoId = function () {
+    utils.assertParameterCount(arguments, 0);
+    return (new conditions.MongoId()).consumer();
 };
 
 /**
