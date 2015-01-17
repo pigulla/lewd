@@ -87,5 +87,9 @@
     },
     "disallowSpacesInFunctionDeclaration": {
         "beforeOpeningRoundBrace": true
-    }    
+    },
+    "excludeFiles": [
+        "node_modules/**",
+        "dist/**"
+    ]
 }

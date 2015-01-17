@@ -27,69 +27,39 @@ if (typeof Object.create === 'function') {
 // shim for using process in browser
 
 var process = module.exports = {};
+var queue = [];
+var draining = false;
 
-process.nextTick = (function () {
-    var canSetImmediate = typeof window !== 'undefined'
-    && window.setImmediate;
-    var canMutationObserver = typeof window !== 'undefined'
-    && window.MutationObserver;
-    var canPost = typeof window !== 'undefined'
-    && window.postMessage && window.addEventListener
-    ;
-
-    if (canSetImmediate) {
-        return function (f) { return window.setImmediate(f) };
+function drainQueue() {
+    if (draining) {
+        return;
     }
-
-    var queue = [];
-
-    if (canMutationObserver) {
-        var hiddenDiv = document.createElement("div");
-        var observer = new MutationObserver(function () {
-            var queueList = queue.slice();
-            queue.length = 0;
-            queueList.forEach(function (fn) {
-                fn();
-            });
-        });
-
-        observer.observe(hiddenDiv, { attributes: true });
-
-        return function nextTick(fn) {
-            if (!queue.length) {
-                hiddenDiv.setAttribute('yes', 'no');
-            }
-            queue.push(fn);
-        };
+    draining = true;
+    var currentQueue;
+    var len = queue.length;
+    while(len) {
+        currentQueue = queue;
+        queue = [];
+        var i = -1;
+        while (++i < len) {
+            currentQueue[i]();
+        }
+        len = queue.length;
     }
-
-    if (canPost) {
-        window.addEventListener('message', function (ev) {
-            var source = ev.source;
-            if ((source === window || source === null) && ev.data === 'process-tick') {
-                ev.stopPropagation();
-                if (queue.length > 0) {
-                    var fn = queue.shift();
-                    fn();
-                }
-            }
-        }, true);
-
-        return function nextTick(fn) {
-            queue.push(fn);
-            window.postMessage('process-tick', '*');
-        };
+    draining = false;
+}
+process.nextTick = function (fun) {
+    queue.push(fun);
+    if (!draining) {
+        setTimeout(drainQueue, 0);
     }
-
-    return function nextTick(fn) {
-        setTimeout(fn, 0);
-    };
-})();
+};
 
 process.title = 'browser';
 process.browser = true;
 process.env = {};
 process.argv = [];
+process.version = ''; // empty string to avoid regexp issues
 
 function noop() {}
 
@@ -110,6 +80,7 @@ process.cwd = function () { return '/' };
 process.chdir = function (dir) {
     throw new Error('process.chdir is not supported');
 };
+process.umask = function() { return 0; };
 
 },{}],3:[function(require,module,exports){
 module.exports = function isBuffer(arg) {
@@ -7764,7 +7735,7 @@ module.exports = function forEach (obj, fn, ctx) {
 
     'use strict';
 
-    validator = { version: '3.22.1' };
+    validator = { version: '3.27.0' };
 
     var email = /^((([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+(\.([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+)*)|((\x22)((((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(([\x01-\x08\x0b\x0c\x0e-\x1f\x7f]|\x21|[\x23-\x5b]|[\x5d-\x7e]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(\\([\x01-\x09\x0b\x0c\x0d-\x7f]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))))*(((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(\x22)))@((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))$/i;
 
@@ -7799,6 +7770,12 @@ module.exports = function forEach (obj, fn, ctx) {
     var surrogatePair = /[\uD800-\uDBFF][\uDC00-\uDFFF]/;
 
     var base64 = /^(?:[A-Za-z0-9+\/]{4})*(?:[A-Za-z0-9+\/]{2}==|[A-Za-z0-9+\/]{3}=|[A-Za-z0-9+\/]{4})$/;
+
+    var phones = {
+      'zh-CN': /^(\+?0?86\-?)?1[345789][0-9]{9}$/,
+      'en-ZA': /^(\+?27|0)(\d{9})$/,
+      'en-AU': /^(\+?61|0)4(\d{8})/
+    };
 
     validator.extend = function (name, fn) {
         validator[name] = function () {
@@ -7878,6 +7855,7 @@ module.exports = function forEach (obj, fn, ctx) {
       , require_tld: true
       , require_protocol: false
       , allow_underscores: false
+      , allow_trailing_dot: false
     };
 
     validator.isURL = function (url, options) {
@@ -7977,10 +7955,16 @@ module.exports = function forEach (obj, fn, ctx) {
     var default_fqdn_options = {
         require_tld: true
       , allow_underscores: false
+      , allow_trailing_dot: false
     };
 
     validator.isFQDN = function (str, options) {
         options = merge(options, default_fqdn_options);
+
+        /* Remove the optional trailing dot before checking validity */
+        if (options.allow_trailing_dot && str[str.length - 1] === '.') {
+            str = str.substring(0, str.length - 1);
+        }
         var parts = str.split('.');
         if (options.require_tld) {
             var tld = parts.pop();
@@ -7996,7 +7980,7 @@ module.exports = function forEach (obj, fn, ctx) {
                 }
                 part = part.replace(/_/g, '');
             }
-            if (!/^[a-z\\u00a1-\\uffff0-9-]+$/i.test(part)) {
+            if (!/^[a-z\u00a1-\uffff0-9-]+$/i.test(part)) {
                 return false;
             }
             if (part[0] === '-' || part[part.length - 1] === '-' ||
@@ -8083,17 +8067,19 @@ module.exports = function forEach (obj, fn, ctx) {
     };
 
     validator.isIn = function (str, options) {
-        if (!options || typeof options.indexOf !== 'function') {
-            return false;
-        }
+        var i;
         if (Object.prototype.toString.call(options) === '[object Array]') {
             var array = [];
-            for (var i = 0, len = options.length; i < len; i++) {
+            for (i in options) {
                 array[i] = validator.toString(options[i]);
             }
-            options = array;
+            return array.indexOf(str) >= 0;
+        } else if (typeof options === 'object') {
+            return options.hasOwnProperty(str);
+        } else if (options && typeof options.indexOf === 'function') {
+            return options.indexOf(str) >= 0;
         }
-        return options.indexOf(str) >= 0;
+        return false;
     };
 
     validator.isCreditCard = function (str) {
@@ -8153,6 +8139,13 @@ module.exports = function forEach (obj, fn, ctx) {
             if (sanitized.charAt(12) - ((10 - (checksum % 10)) % 10) === 0) {
                 return !!sanitized;
             }
+        }
+        return false;
+    };
+
+    validator.isMobilePhone = function(str, locale) {
+        if (locale in phones) {
+            return phones[locale].test(str);
         }
         return false;
     };
@@ -8218,7 +8211,8 @@ module.exports = function forEach (obj, fn, ctx) {
             .replace(/"/g, '&quot;')
             .replace(/'/g, '&#x27;')
             .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;'));
+            .replace(/>/g, '&gt;')
+            .replace(/\//g, '&#x2F;'));
     };
 
     validator.stripLow = function (str, keep_new_lines) {
@@ -10533,7 +10527,7 @@ module.exports = IllegalParameterException;
  * lewd - an intuitive and easy to use data validation library
  *
  * @class lewd
- * @version 0.8.2
+ * @version 0.8.3
  * @author Raphael Pigulla <pigulla@four66.com>
  * @license BSD-2-Clause
  */

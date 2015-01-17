@@ -1,3 +1,9 @@
+## 0.8.2 (2015-01-17)
+
+ - update dependencies and year
+
+###### New features:
+
 ## 0.8.2 (2014-11-28)
 
 ###### New features:

@@ -2,7 +2,7 @@
  * lewd - an intuitive and easy to use data validation library
  *
  * @class lewd
- * @version 0.8.2
+ * @version 0.8.3
  * @author Raphael Pigulla <pigulla@four66.com>
  * @license BSD-2-Clause
  */
