@@ -2,7 +2,7 @@
 
 ###### New features:
 
- - Added `lewd.any`. 
+ - Added `lewd.any` (fixes #7).
  - Added condition wrapper for validator.js' `isISIN`.
 
 ###### Improvements:

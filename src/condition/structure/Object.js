@@ -44,6 +44,10 @@ function validateOptions(options, allowExtraDefault) {
         throw new IllegalParameterException('option "removeExtra" must be a boolean');
     }
 
+    if (typeof opts.ignoreExtraFunctions !== 'boolean') {
+        throw new IllegalParameterException('option "removeExtra" must be a boolean');
+    }
+
     var unknownOptions = _.difference(Object.keys(options), Object.keys(defaults));
 
     if (unknownOptions.length > 0) {

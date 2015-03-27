@@ -642,6 +642,7 @@ buster.testCase('"object" condition', {
     'invalid schema options': function () {
         refuteSchemaOptions(condition, [{}, { allowExtra: 42 }]);
         refuteSchemaOptions(condition, [{}, { removeExtra: 42 }]);
+        refuteSchemaOptions(condition, [{}, { ignoreExtraFunctions: null }]);
         refuteSchemaOptions(condition, [{}, { unknownKey: ['w00t'] }]);
         refuteSchemaOptions(condition, [{}, { optional: 'w00t' }]);
         refuteSchemaOptions(condition, [{}, { byDefault: 'whatever' }]);
