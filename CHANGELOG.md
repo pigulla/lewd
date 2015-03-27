@@ -7,6 +7,7 @@
 
 ###### Improvements:
  - Added `lewd.ignore` as an alias to `lewd.undefined`.
+ - Better error message for top-level validation failures (fixes #5). 
 
 ###### Misc:
 

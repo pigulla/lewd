@@ -19,6 +19,14 @@ buster.testCase('paths in exceptions', {
             assertViolationAt(function () {
                 lewd.String()(42);
             }, []);
+        },
+        'error message': function () {
+            try {
+                lewd.String()(42);
+                assert(false, 'Condition should have failed');
+            } catch (e) {
+                assert.match(e.toString(), 'violation at input value');
+            }
         }
     },
     'object': {
