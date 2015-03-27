@@ -1,6 +1,17 @@
-## 0.8.2 (2015-01-17)
+## 0.9.0 (2015-03-27)
 
- - update dependencies and year
+###### New features:
+
+ - Added condition wrapper for validator.js' `isISIN`.
+
+###### Misc:
+
+ - Updated dependencies.
+ - Replace JSHint with ESLint.
+ 
+## 0.8.3 (2015-01-17)
+
+ - Updated dependencies and year.
 
 ###### New features:
 
@@ -8,13 +19,13 @@
 
 ###### New features:
 
- - Added condition wrapper for validator.js' `isMongoId`
+ - Added condition wrapper for validator.js' `isMongoId`.
 
 ## 0.8.1 (2014-10-02)
 
 ###### New features:
 
- - `ignoreExtraFunctions` option to `lewd.object` added
+ - `ignoreExtraFunctions` option to `lewd.object` added.
 
 ## 0.8.0 (2014-09-26)
 

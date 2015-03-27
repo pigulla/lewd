@@ -1,3 +1,5 @@
+'use strict';
+
 var _ = require('lodash'),
     buster = require('buster');
 
@@ -27,18 +29,20 @@ buster.testCase('"all" condition', {
     },
     'multiple conditions': function () {
         var args = [String, lewd.regex(/^\d+/), lewd.regex(/\d+$/)];
-        
+
         refuteValues(condition, args, [0, 42, null, [], {}, ['hey'], false, 'w00t', '0815!']);
         acceptValues(condition, args, ['1', '0815', '12polizei34']);
     },
     'passes exceptions through': function () {
         assertExceptionWithName(function () {
-            condition(function () { x(); }).because('oh noes')('x');  // jshint ignore:line                
+            /* eslint-disable block-scoped-var, no-undef */
+            condition(function () { x(); }).because('oh noes')('x');
+            /* eslint-enable block-scoped-var, no-undef */
         }, 'ReferenceError');
     },
     'error message': function () {
         assertViolationWithMessage(function () {
             condition(String, Number)('foo');
-        }, _.template(errorMessages.Type, { type: 'number' }));
+        }, _.template(errorMessages.Type)({ type: 'number' }));
     }
 });

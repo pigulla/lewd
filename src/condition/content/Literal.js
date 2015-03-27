@@ -1,3 +1,5 @@
+'use strict';
+
 var util = require('util');
 
 var Condition = require('../Condition'),
@@ -17,19 +19,19 @@ function LiteralCondition(literal) {
     if (!utils.isLiteral(literal)) {
         throw new IllegalParameterException('Value must be a literal');
     }
-    
+
     this._literal = literal;
 }
 
 util.inherits(LiteralCondition, Condition);
 
-/* jshint -W030 */
+/* eslint-disable no-unused-expressions */
 /**
  * @private
  * @type {(String|Number|Boolean|null))}
  */
 LiteralCondition.prototype._literal;
-/* jshint +W030 */
+/* eslint-enable no-unused-expressions */
 
 /**
  * @inheritdoc

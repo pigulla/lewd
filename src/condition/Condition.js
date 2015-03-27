@@ -1,3 +1,5 @@
+'use strict';
+
 var _ = require('lodash');
 
 var ConditionLockedException = require('../exception/ConditionLockedException'),
@@ -6,7 +8,7 @@ var ConditionLockedException = require('../exception/ConditionLockedException'),
 
 /**
  * @abstract
- * @class lewd.condition.Condition 
+ * @class lewd.condition.Condition
  * @constructor
  * @param {string} type
  */
@@ -23,7 +25,7 @@ function Condition(type) {
 
 /**
  * Constants used by `setPropertyState`.
- * 
+ *
  * @type {Object.<string, string>}
  */
 Condition.PROPERTY_STATE = {
@@ -33,10 +35,10 @@ Condition.PROPERTY_STATE = {
     OPTIONAL: 'optional'
 };
 
-/* jshint -W030 */
+/* eslint-disable no-unused-expressions */
 /**
  * Internal flag to indicate whether coercion is enabled.
- * 
+ *
  * @protected
  * @type {boolean}
  */
@@ -76,7 +78,7 @@ Condition.prototype._name;
 
 /**
  * The required/optional state for object properties.
- * 
+ *
  * @private
  * @type {string}
  */
@@ -98,11 +100,11 @@ Condition.prototype._type;
  * @type {?lewd.condition.ConsumerWrapper}
  */
 Condition.prototype._wrapper;
-/* jshint +W030 */
+/* eslint-enable no-unused-expressions */
 
 /**
  * Asserts that the condition has not been locked.
- * 
+ *
  * @private
  * @throws {lewd.exception.ConditionLockedException}
  */
@@ -114,7 +116,7 @@ Condition.prototype._assertNotLocked = function () {
 
 /**
  * Returns this condition's internal type.
- * 
+ *
  * @return {string}
  */
 Condition.prototype.getType = function () {
@@ -123,7 +125,7 @@ Condition.prototype.getType = function () {
 
 /**
  * The actual validation function. Must return the input value (or its coerced version).
- * 
+ *
  * @abstract
  * @param {*} value
  * @param {Array.<(string|number)>} path
@@ -137,7 +139,7 @@ Condition.prototype.validate = function (value, path) {
 /**
  * Wrapper function for rejecting a value by throwing the appropriate exception.
  * Takes care of overriding the passed message with the custom message if needed.
- * 
+ *
  * @param {*} value
  * @param {Array.<(string|number)>} path
  * @param {string} messageTemplate
@@ -147,18 +149,18 @@ Condition.prototype.validate = function (value, path) {
 Condition.prototype.reject = function (value, path, messageTemplate, templateData) {
     var data = templateData || {},
         error = this._customError ? this._customError : messageTemplate;
-    
+
     if (this._customError) {
         data.originalMessage = messageTemplate;
     }
-    
+
     throw new ConditionViolationException(value, path, error, data);
 };
 
 /**
  * Get a condition by its user-assigned name. Returns an array containing this instance if the name matches and an empty
  * array otherwise.
- *  
+ *
  * @param {string} name
  * @return {Array.<lewd.condition.ConsumerWrapper>}
  */
@@ -168,7 +170,7 @@ Condition.prototype.find = function (name) {
 
 /**
  * Locks the condition to prevent it or its nested conditions from being modified (e.g., changing the default value).
- *  
+ *
  * @return {lewd.condition.Condition}
  */
 Condition.prototype.lock = function () {
@@ -178,7 +180,7 @@ Condition.prototype.lock = function () {
 
 /**
  * Set a custom error message.
- * 
+ *
  * @param {?string} messageTemplate
  * @return {lewd.condition.Condition}
  * @throws {lewd.exception.ConditionLockedException}
@@ -191,7 +193,7 @@ Condition.prototype.setCustomMessage = function (messageTemplate) {
 
 /**
  * Sets the conditions user-defined name.
- * 
+ *
  * @param {string} name
  * @return {lewd.condition.Condition}
  * @throws {lewd.exception.ConditionLockedException}
@@ -204,7 +206,7 @@ Condition.prototype.setName = function (name) {
 
 /**
  * Check whether coercion is enabled.
- * 
+ *
  * @return {boolean}
  */
 Condition.prototype.isCoercionEnabled = function () {
@@ -213,7 +215,7 @@ Condition.prototype.isCoercionEnabled = function () {
 
 /**
  * Enable or disable coercion.
- * 
+ *
  * @param {boolean} enabled
  * @return {lewd.condition.Condition}
  * @throws {lewd.exception.ConditionLockedException}
@@ -224,14 +226,14 @@ Condition.prototype.setCoercionEnabled = function (enabled) {
     if (!this.supportsCoercion) {
         throw new IllegalParameterException('Condition does not support coercion');
     }
-    
+
     this._coerce = !!enabled;
     return this;
 };
 
 /**
  * Gets the property state.
- * 
+ *
  * @return {string}
  */
 Condition.prototype.getPropertyState = function () {
@@ -241,7 +243,7 @@ Condition.prototype.getPropertyState = function () {
 /**
  * Sets the property state, i.e. whether the value associated with this condition is required or optional (or neither)
  * when used as an object property (ignored if it is not).
- * 
+ *
  * @param {string} state
  * @return {lewd.condition.Condition}
  * @throws {lewd.exception.ConditionLockedException}
@@ -254,7 +256,7 @@ Condition.prototype.setPropertyState = function (state) {
 
 /**
  * Gets the default value when used as an object property.
- * 
+ *
  * @return {*}
  */
 Condition.prototype.getDefaultValue = function () {
@@ -263,7 +265,7 @@ Condition.prototype.getDefaultValue = function () {
 
 /**
  * Sets the default value when used as an object property (ignored if it is not).
- * 
+ *
  * @param {*} value
  * @return {lewd.condition.Condition}
  * @throws {lewd.exception.ConditionLockedException}
@@ -276,14 +278,14 @@ Condition.prototype.setDefaultValue = function (value) {
 
 /**
  * Returns a "consumer" object of this condition that hides away the internals and provides convenience methods.
- * 
+ *
  * @return {lewd.condition.ConsumerWrapper}
  */
 Condition.prototype.consumer = function () {
     if (!this._wrapper) {
         this._wrapper = require('./ConsumerWrapper').wrap(this);
     }
-    
+
     return this._wrapper;
 };
 

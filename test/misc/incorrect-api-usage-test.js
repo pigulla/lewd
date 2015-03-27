@@ -1,11 +1,12 @@
+'use strict';
+
 var buster = require('buster');
 
 var lewd = require('../../src/lewd');
 
 var assert = buster.referee.assert;
 
-/*jshint nonew:false */
-
+/* eslint-disable no-new */
 buster.testCase('incorrect api usage', {
     'wrong parameter count for lewd': function () {
         assert.exception(function () {
@@ -21,7 +22,7 @@ buster.testCase('incorrect api usage', {
         assert.exception(function () {
             lewd.custom();
         }, 'IllegalParameterException');
-        
+
         assert.exception(function () {
             lewd.Boolean(true);
         }, 'IllegalParameterException');

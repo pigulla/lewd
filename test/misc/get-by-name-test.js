@@ -1,3 +1,5 @@
+'use strict';
+
 var buster = require('buster');
 
 var lewd = require('../../src/lewd'),
@@ -9,7 +11,7 @@ buster.testCase('get by name', {
     'top level': function () {
         var c = lewd.Boolean().as('a'),
             result = c.find('a');
-        
+
         assert.same(c.get('a'), c);
         assert.equals(result.length, 1);
         assert.same(result[0], c);
@@ -23,33 +25,33 @@ buster.testCase('get by name', {
                 c2 = lewd.integer().as('c2'),
                 c3 = lewd.all(c1, c2).as('c3'),
                 result;
-            
+
             result = c3.find('c3');
             assert.equals(result.length, 1);
             assert.same(result[0], c3);
-            
+
             result = c3.find('c1');
             assert.equals(result.length, 1);
             assert.same(result[0], c1);
-            
+
             result = c3.find('c2');
             assert.equals(result.length, 1);
             assert.same(result[0], c2);
-        },       
+        },
         'none': function () {
             var c1 = lewd.literal('foo').as('c1'),
                 c2 = lewd.integer().as('c2'),
                 c3 = lewd.none(c1, c2).as('c3'),
                 result;
-            
+
             result = c3.find('c3');
             assert.equals(result.length, 1);
             assert.same(result[0], c3);
-            
+
             result = c3.find('c1');
             assert.equals(result.length, 1);
             assert.same(result[0], c1);
-            
+
             result = c3.find('c2');
             assert.equals(result.length, 1);
             assert.same(result[0], c2);
@@ -59,15 +61,15 @@ buster.testCase('get by name', {
                 c2 = lewd.integer().as('c2'),
                 c3 = lewd.some(c1, c2).as('c3'),
                 result;
-            
+
             result = c3.find('c3');
             assert.equals(result.length, 1);
             assert.same(result[0], c3);
-            
+
             result = c3.find('c1');
             assert.equals(result.length, 1);
             assert.same(result[0], c1);
-            
+
             result = c3.find('c2');
             assert.equals(result.length, 1);
             assert.same(result[0], c2);
@@ -98,7 +100,7 @@ buster.testCase('get by name', {
                 c4 = lewd.String().as('A'),
                 c5 = lewd.all(c3, c4).as('D'),
                 result;
-            
+
             result = c5.find('A');
             assert.equals(result.length, 2);
             assert.contains(result, c1);
@@ -109,7 +111,7 @@ buster.testCase('get by name', {
                 c2 = lewd.not(lewd.integer()).as('N'),
                 c3 = lewd.all(c1, c2).as('D'),
                 result;
-            
+
             result = c3.find('N');
             assert.equals(result.length, 2);
             assert.contains(result, c1);
@@ -127,11 +129,11 @@ buster.testCase('get by name', {
                     b: c4
                 }),
                 result;
-            
+
             result = c5.find('c1');
             assert.equals(result.length, 1);
             assert.same(result[0], c1);
-            
+
             result = c5.find('c3');
             assert.equals(result.length, 1);
             assert.same(result[0], c3);
@@ -172,7 +174,6 @@ buster.testCase('get by name', {
             result = c4.find('c2');
             assert.equals(result.length, 1);
             assert.same(result[0], c2);
-            
         }
     },
     'inside arrays': function () {

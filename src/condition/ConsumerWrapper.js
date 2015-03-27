@@ -1,3 +1,5 @@
+'use strict';
+
 var _ = require('lodash');
 
 var assertParameterCount = require('../utils').assertParameterCount;
@@ -8,10 +10,10 @@ var MARKER_PROPERTY = '__lewd__invokable__';
 
 /*
  * Implementation details:
- * 
+ *
  * The idea behind the construct below is to make a condition immediately callable while at the same time minimizing
  * the API surface exposed to the consumer (i.e., the user).
- * 
+ *
  * If we were to use a construct like "wrapper = new ConsumerWrapper(condition)" the user couldn't do "wrapper(42)".
  * This is why the "wrapInvokable" function creates a closure and has to proxy the methods provided by the
  * ConsumerWrapper class.
@@ -27,20 +29,22 @@ function ConsumerWrapper(condition, invokable) {
     this.condition = condition;
     this.invokable = invokable;
 }
- 
+
+/* eslint-disable no-unused-expressions */
 /**
  * The condition being wrapped.
- * 
+ *
  * @type {lewd.condition.Condition}
  */
-ConsumerWrapper.prototype.condition; // jshint ignore:line
+ConsumerWrapper.prototype.condition;
 
 /**
  * The invokable function created by wrapInvokable which most methods will need to return to allow for proper chaining.
- * 
+ *
  * @type {function}
  */
-ConsumerWrapper.prototype.invokable; // jshint ignore:line
+ConsumerWrapper.prototype.invokable;
+/* eslint-enable no-unused-expressions */
 
 /**
  * @since 0.8.0

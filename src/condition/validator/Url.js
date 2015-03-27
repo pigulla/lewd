@@ -1,3 +1,5 @@
+'use strict';
+
 var util = require('util');
 
 var validator = require('validator');
@@ -16,7 +18,7 @@ function UrlCondition(options) {
     if (options && typeof options !== 'object') {
         throw new IllegalParameterException('Parameter must be an object');
     }
-    
+
     this.options = options || {};
 
     Condition.call(this, 'Url');

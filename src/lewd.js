@@ -1,12 +1,14 @@
+'use strict';
+
 /**
  * lewd - an intuitive and easy to use data validation library
  *
  * @class lewd
- * @version 0.8.3
+ * @version 0.9.0
  * @author Raphael Pigulla <pigulla@four66.com>
  * @license BSD-2-Clause
  */
-    
+
 var _ = require('lodash');
 
 var util = require('util');
@@ -16,10 +18,11 @@ var ConsumerWrapper = require('./condition/ConsumerWrapper'),
     IllegalParameterException = require('./exception/IllegalParameterException'),
     utils = require('./utils'),
     errorMessages = require('./messages'),
-    Condition = require('./condition/Condition'),
-    conditions = {
+    Condition = require('./condition/Condition');
+
+var conditions = {
         Custom: require('./condition/Custom'),
-        
+
         Integer: require('./condition/composite/Integer'),
         IsoDateTime: require('./condition/composite/IsoDateTime'),
 
@@ -28,6 +31,7 @@ var ConsumerWrapper = require('./condition/ConsumerWrapper'),
         Fqdn: require('./condition/validator/Fqdn'),
         Ip: require('./condition/validator/Ip'),
         Isbn: require('./condition/validator/Isbn'),
+        Isin: require('./condition/validator/Isin'),
         MongoId: require('./condition/validator/MongoId'),
         Url: require('./condition/validator/Url'),
         Uuid: require('./condition/validator/Uuid'),
@@ -75,11 +79,11 @@ var lewd = function () {
 /**
  * The version string.
  *
- * @since 0.6.0 
+ * @since 0.6.0
  * @readonly
  * @type {string}
  */
-lewd.version = '0.8.1';
+lewd.version = '0.9.0';
 
 /**
  * Wraps an arbitrary value in its appropriate condition wrapper (or returns the argument if it is already wrapped).
@@ -93,9 +97,10 @@ lewd._wrap = function (spec) {
     var shorthands = [
         lewd.Array, lewd.Boolean, lewd.null, lewd.Number, lewd.Object, lewd.String, lewd.undefined,
         lewd.unique, lewd.isoDateTime, lewd.integer, lewd.ip, lewd.email, lewd.uuid, lewd.url, lewd.fqdn, lewd.isbn,
+        lewd.isin,
         lewd.creditcard, lewd.mongoId
     ];
-    
+
     /* jshint maxcomplexity:false */
     if (spec === Array) {
         return (new conditions.ArrayType()).consumer();
@@ -133,7 +138,7 @@ lewd._wrap = function (spec) {
 /* istanbul ignore next */
 /**
  * Exposes the condition functions into the global namespace. Throws an error if a collision occurs.
- * 
+ *
  * @experimental 0.1.0
  * @param {string=} prefix
  * @throws Error
@@ -141,14 +146,14 @@ lewd._wrap = function (spec) {
 lewd.expose = function (prefix) {
     var p = prefix || '',
         exposedFunctions = [
-            'creditcard', 'email', 'ip', 'isbn', 'mongoId', 'url', 'fqdn', 'uuid',
+            'creditcard', 'email', 'ip', 'isbn', 'isin', 'mongoId', 'url', 'fqdn', 'uuid',
             'optional', 'required', 'forbidden',
             'integer', 'isoDateTime',
             'array', 'len', 'literal', 'object', 'range', 'regex',
             'all', 'any', 'none', 'not', 'some'
         ],
         additionalFunctions = ['Array', 'Boolean', 'null', 'Number', 'Object', 'String', 'undefined'];
-    
+
     var expose = function (name) {
         var exposedName = p + name;
 
@@ -160,7 +165,7 @@ lewd.expose = function (prefix) {
         }
         this[exposedName] = lewd[name];
     }.bind(this);
-    
+
     exposedFunctions.forEach(expose);
 
     if (p.length > 0) {
@@ -175,7 +180,7 @@ lewd.expose = function (prefix) {
  */
 lewd.custom = function (fn) {
     utils.assertParameterCount(arguments, 1);
-    
+
     if (ConsumerWrapper.isWrapper(fn)) {
         return fn;
     } else if (fn instanceof Condition) {
@@ -189,7 +194,7 @@ lewd.custom = function (fn) {
 
 /**
  * Marks an object property as optional.
- * 
+ *
  * @since 0.3.0
  * @param {*} condition
  * @return {lewd.condition.ConsumerWrapper}
@@ -201,7 +206,7 @@ lewd.coerce = function (condition) {
 
 /**
  * Marks an object property as optional.
- * 
+ *
  * @since 0.2.0
  * @param {*} condition
  * @return {lewd.condition.ConsumerWrapper}
@@ -213,7 +218,7 @@ lewd.optional = function (condition) {
 
 /**
  * Marks an object property as forbidden.
- * 
+ *
  * @since 0.5.0
  * @param {*} condition
  * @return {lewd.condition.ConsumerWrapper}
@@ -225,7 +230,7 @@ lewd.forbidden = function (condition) {
 
 /**
  * Marks an object property as required.
- * 
+ *
  * @since 0.2.0
  * @param {*} condition
  * @return {lewd.condition.ConsumerWrapper}
@@ -298,6 +303,15 @@ lewd.ip = function (version) {
 lewd.isbn = function (version) {
     utils.assertParameterCount(arguments, 0, 1);
     return (new conditions.Isbn(version)).consumer();
+};
+
+/**
+ * @since 0.9.0
+ * @return {lewd.condition.ConsumerWrapper}
+ */
+lewd.isin = function () {
+    utils.assertParameterCount(arguments, 0, 0);
+    return (new conditions.Isin()).consumer();
 };
 
 /**

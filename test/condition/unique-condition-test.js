@@ -1,3 +1,5 @@
+'use strict';
+
 var _ = require('lodash'),
     buster = require('buster');
 
@@ -38,12 +40,12 @@ buster.testCase('"unique" condition', {
         'type': function () {
             assertViolationWithMessage(function () {
                 condition()(null);
-            }, _.template(errorMessages.Unique.type, {}));
+            }, _.template(errorMessages.Unique.type)({}));
         },
         'duplicateFound': function () {
             assertViolationWithMessage(function () {
                 condition()([1, 2, 1]);
-            }, _.template(errorMessages.Unique.duplicateFound, { duplicate: 1, duplicateStr: utils.smartFormat(1) }));
+            }, _.template(errorMessages.Unique.duplicateFound)({ duplicate: 1, duplicateStr: utils.smartFormat(1) }));
         }
     }
 });

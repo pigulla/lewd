@@ -1,3 +1,5 @@
+'use strict';
+
 var buster = require('buster');
 
 var lewd = require('../../src/lewd'),
@@ -17,7 +19,7 @@ buster.testCase('lock', {
             a: lewd(Number).as('a').lock(),
             b: lewd(Number).as('b')
         });
-        
+
         assert.exception(function () {
             o.get('a').required();
         }, 'ConditionLockedException');

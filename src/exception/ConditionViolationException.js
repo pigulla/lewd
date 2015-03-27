@@ -1,3 +1,5 @@
+'use strict';
+
 var util = require('util');
 
 var _ = require('lodash'),
@@ -6,31 +8,31 @@ var _ = require('lodash'),
 /**
  * @class lewd.exception.ConditionViolationException
  * @extends Error
- * @param {*} value 
- * @param {Array.<(string|number)>} path 
- * @param {string} template 
+ * @param {*} value
+ * @param {Array.<(string|number)>} path
+ * @param {string} template
  * @param {Object=} data
  */
 function ConditionViolationException(value, path, template, data) {
     var smartFormat = require('../utils').smartFormat;
 
     Error.call(this);
-    
+
     this.name = 'ConditionViolationException';
     this.path = path;
     this.pathStr = pointer.compile(path);
     this.data = data || {};
     this.value = value;
     this.valueStr = smartFormat(this.value);
-    
-    this.message = _.template(template, this._getTemplateVariables());
+
+    this.message = _.template(template)(this._getTemplateVariables());
 }
 
 util.inherits(ConditionViolationException, Error);
 
 /**
  * Returns the template variables hash for constructing the actual error message.
- * 
+ *
  * @return {Object.<string, *>}
  */
 ConditionViolationException.prototype._getTemplateVariables = function () {

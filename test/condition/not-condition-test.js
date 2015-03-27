@@ -1,3 +1,5 @@
+'use strict';
+
 var _ = require('lodash'),
     buster = require('buster');
 
@@ -28,12 +30,14 @@ buster.testCase('"not" condition', {
     },
     'passes exceptions through': function () {
         assertExceptionWithName(function () {
-            condition(function () { x(); })(null);  // jshint ignore:line                
+            /* eslint-disable block-scoped-var, no-undef */
+            condition(function () { x(); })(null);
+            /* eslint-enable block-scoped-var, no-undef */
         }, 'ReferenceError');
     },
     'error message': function () {
         assertViolationWithMessage(function () {
             condition(Number)(42);
-        }, _.template(errorMessages.Not, {}));
+        }, _.template(errorMessages.Not)({}));
     }
 });

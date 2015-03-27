@@ -1,3 +1,5 @@
+'use strict';
+
 var buster = require('buster');
 
 var lewd = require('../../src/lewd'),
@@ -80,7 +82,7 @@ buster.testCase('internals', {
     'Exception': {
         'ConditionViolationException': function () {
             var exception = new lewd.ConditionViolationException(42, ['foo', 'bar'], '');
-            
+
             assert.match(
                 exception.toString(),
                 'Condition violation at "/foo/bar":'
@@ -130,7 +132,7 @@ buster.testCase('internals', {
             'functions': function () {
                 var fn = function fn() {},
                     anonymous = function () {};
-                
+
                 assert.equals(utils.smartFormat(fn), '<function>fn');
                 assert.equals(utils.smartFormat(anonymous), '<function>anonymous');
             }

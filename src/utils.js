@@ -1,3 +1,5 @@
+'use strict';
+
 var util = require('util');
 
 var _ = require('lodash');
@@ -16,13 +18,14 @@ var utils = {
      */
     assertParameterCount: function (args, min, max) {
         max = arguments.length === 2 ? min : max;
-    
+
         if (args.length > max) {
             throw new IllegalParameterException(util.format(
                 'Function expected at most %d parameters but was called with %d',
                 max, args.length
             ));
         }
+
         if (args.length < min) {
             throw new IllegalParameterException(util.format(
                 'Function expected no more than %d parameters but was called with %d',
@@ -30,15 +33,14 @@ var utils = {
             ));
         }
     },
-    
+
     /**
      * Formats a value in a human readable way.
-     * 
+     *
      * @param {*} value
      * @return {string}
      */
     smartFormat: function (value) {
-        /* jshint maxcomplexity:false */
         if (value === null) {
             return 'null';
         } else if (value === undefined) {
@@ -79,9 +81,9 @@ var utils = {
     /**
      * Checks if the given value is a "basic object", i.e. an object that is not actually one of JavaScript's built-in
      * object-like types.
-     * 
+     *
      * This function does not detect "subclasses" of built-in types, e.g. `Object.create(Date)`.
-     * 
+     *
      * @param {*} value
      * @return {boolean}
      */
@@ -92,19 +94,20 @@ var utils = {
 
     /**
      * Returns all enumerable keys of the given object.
-     * 
+     *
      * @param {Object} value
      * @return {Array.<string>}
      */
     getEnumerableProperties: function (value) {
         var keys = [],
             k;
-        
-        /* jshint forin:false */
+
+        /* eslint-disable guard-for-in */
         for (k in value) {
             keys.push(k);
         }
-        
+        /* eslint-enable guard-for-in */
+
         return keys;
     },
 

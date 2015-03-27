@@ -1,3 +1,5 @@
+'use strict';
+
 var util = require('util');
 
 var Condition = require('../Condition'),
@@ -23,7 +25,7 @@ StringTypeCondition.prototype.validate = function (value, path) {
     if (typeof value === 'string') {
         return value;
     }
-    
+
     if (this._coerce) {
         return value + '';
     }

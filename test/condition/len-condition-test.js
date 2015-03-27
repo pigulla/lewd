@@ -1,3 +1,5 @@
+'use strict';
+
 var _ = require('lodash'),
     buster = require('buster');
 
@@ -52,31 +54,31 @@ buster.testCase('"len" condition', {
         'type': function () {
             assertViolationWithMessage(function () {
                 condition({ max: 3 })(42);
-            }, _.template(errorMessages.Len.type, {}));
+            }, _.template(errorMessages.Len.type)({}));
         },
         'minimumExclusive': function () {
             var opts = { min: 5, minInclusive: false };
             assertViolationWithMessage(function () {
                 condition(opts)('1234');
-            }, _.template(errorMessages.Len.min, opts));
+            }, _.template(errorMessages.Len.min)(opts));
         },
         'maximumExclusive': function () {
             var opts = { max: 3, maxInclusive: false };
             assertViolationWithMessage(function () {
                 condition(opts)('1234');
-            }, _.template(errorMessages.Len.max, opts));
+            }, _.template(errorMessages.Len.max)(opts));
         },
         'minimumInclusive': function () {
             var opts = { min: 5, minInclusive: true };
             assertViolationWithMessage(function () {
                 condition(opts)('1234');
-            }, _.template(errorMessages.Len.minInclusive, opts));
+            }, _.template(errorMessages.Len.minInclusive)(opts));
         },
         'maximumInclusive': function () {
             var opts = { max: 3, maxInclusive: true };
             assertViolationWithMessage(function () {
                 condition(opts)('1234');
-            }, _.template(errorMessages.Len.maxInclusive, opts));
+            }, _.template(errorMessages.Len.maxInclusive)(opts));
         }
     },
     'invalid schema options': function () {

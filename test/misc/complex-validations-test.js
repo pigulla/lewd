@@ -1,3 +1,5 @@
+'use strict';
+
 var _ = require('lodash'),
     buster = require('buster');
 
@@ -16,7 +18,7 @@ var condition = lewd.object;
 
 buster.testCase('complex validations', {
     'book': function () {
-        var condition = lewd.object({
+        var cond = lewd.object({
             title: lewd.all(String, lewd.len({ min: 1, max: 10 })),
             author: lewd.optional({ firstName: String, lastName: String }),
             chapters: lewd.all([{
@@ -26,9 +28,9 @@ buster.testCase('complex validations', {
                 pages: lewd.all(lewd.integer, lewd.range({ min: 1 }))
             }], lewd.len({ min: 3 }).because('a book needs at least three chapters (where: ${path})'))
         });
-        
+
         refute.exception(function () {
-            var result = condition({
+            var result = cond({
                 title: 'My Book',
                 chapters: [
                     { name: 'Chapter 1', pages: 4 },
@@ -36,21 +38,21 @@ buster.testCase('complex validations', {
                     { name: 'Chapter 3', pages: 11 }
                 ]
             });
-            
+
             assert.same(result.chapters[0].inProgress, false);
             assert.same(result.chapters[1].inProgress, true);
             assert.same(result.chapters[2].inProgress, false);
         });
 
         assertViolationAt(function () {
-            condition({
+            cond({
                 title: 'My Book With A Way Too Long Title',
                 chapters: []
             });
         }, ['title']);
-        
+
         assertViolationAt(function () {
-            condition({
+            cond({
                 title: 'My Book',
                 publisher: 'AwesomeBooks, Inc.',
                 chapters: []
@@ -58,14 +60,14 @@ buster.testCase('complex validations', {
         }, []);
 
         assertViolationAt(function () {
-            condition({
+            cond({
                 title: 'My Book',
                 chapters: []
             });
         }, ['chapters']);
 
         assertViolationAt(function () {
-            condition({
+            cond({
                 title: 'My Book',
                 chapters: [
                     { name: 'Chapter 1', pages: 4 },
@@ -76,7 +78,7 @@ buster.testCase('complex validations', {
         }, ['chapters', 1]);
 
         assertViolationAt(function () {
-            condition({
+            cond({
                 title: 'My Book',
                 chapters: [
                     { name: 'Chapter 1', pages: 4 },
@@ -85,9 +87,9 @@ buster.testCase('complex validations', {
                 ]
             });
         }, ['chapters', 2, 'pages']);
-        
+
         assertViolationAt(function () {
-            condition({
+            cond({
                 title: 'My Book',
                 chapters: [
                     { name: 'Chapter 1', pages: 4, references: [] },
@@ -98,7 +100,7 @@ buster.testCase('complex validations', {
         }, ['chapters', 2, 'references', 2]);
 
         assertViolationWithMessage(function () {
-            condition({
+            cond({
                 title: 'My Book',
                 chapters: [
                     { name: 'Chapter 1', pages: 4 },

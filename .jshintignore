@@ -1,4 +1,0 @@
-node_modules/**/*
-index.js
-test/buster.js
-test/coverage/**/*

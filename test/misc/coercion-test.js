@@ -1,3 +1,5 @@
+'use strict';
+
 var util = require('util');
 
 var _ = require('lodash'),
@@ -9,13 +11,12 @@ var helper = require('./../helper'),
 
 var assert = buster.referee.assert,
     assertExceptionWithName = helper.assertExceptionWithName;
-    
 
 buster.testCase('coercion', {
     'within objects': function () {
         var condition = lewd.object({ a: lewd(Boolean).coerce() }),
             obj = { a: 1 },
-            result = condition(obj); 
+            result = condition(obj);
 
         assert.same(result, obj);
         assert.equals(result, { a: true });
@@ -41,12 +42,12 @@ buster.testCase('coercion', {
                 lewd.integer().coerce()('42x');
             }, 'ConditionViolationException');
         }
-    }, 
+    },
     '"isoDateTime" condition': {
         successful: function () {
             var date = new Date(),
                 value = lewd.isoDateTime().coerce()(date.toISOString());
-            
+
             assert(_.isDate(value), 'Value is a Date object');
             assert.same(value.getTime(), date.getTime());
         },

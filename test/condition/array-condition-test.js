@@ -1,3 +1,5 @@
+'use strict';
+
 var _ = require('lodash'),
     buster = require('buster');
 
@@ -33,31 +35,31 @@ buster.testCase('"array" condition', {
         },
         '[String]': function () {
             var args = [String];
-    
+
             refuteValues(condition, args, [42, {}, [42], [42, '42']]);
             acceptValues(condition, args, [[], ['42', 'hello']]);
         },
         '[Number]': function () {
             var args = [Number];
-    
+
             refuteValues(condition, args, ['42', {}, ['42'], [42, '42']]);
             acceptValues(condition, args, [[], [42, 13]]);
         },
         '[Boolean]': function () {
             var args = [Boolean];
-    
+
             refuteValues(condition, args, [0, null, '42', {}, false, [true, 1]]);
             acceptValues(condition, args, [[], [true], [false, false]]);
         },
         '[Object]': function () {
             var args = [Object];
-    
+
             refuteValues(condition, args, ['42', {}, false, null, 0, [true, 1], [null], [[]], [false]]);
             acceptValues(condition, args, [[], [{}], [{ x: 42 }], [{}, { y: null }]]);
         },
         '[null]': function () {
             var args = [null];
-    
+
             refuteValues(condition, args, ['42', {}, false, [true, 1], ['hey'], [0]]);
             acceptValues(condition, args, [[], [null], [null, null]]);
         }
@@ -82,7 +84,7 @@ buster.testCase('"array" condition', {
             acceptValues(condition, args, [
                 [], [[]], [['42'], [false]], [[], []], [[true, false]], [[42, {}]], [['1xx'], [2, true]]
             ]);
-        },    
+        },
         '[Array]': function () {
             var args = [Array];
 
@@ -102,12 +104,14 @@ buster.testCase('"array" condition', {
     },
     'passes exceptions through': function () {
         assertExceptionWithName(function () {
-            condition(function () { x(); })(['x']);  // jshint ignore:line                
+            /* eslint-disable block-scoped-var, no-undef */
+            condition(function () { x(); })(['x']);
+            /* eslint-enable block-scoped-var, no-undef */
         }, 'ReferenceError');
     },
     'error message': function () {
         assertViolationWithMessage(function () {
             condition()('foo');
-        }, _.template(errorMessages.Array, {}));
+        }, _.template(errorMessages.Array)({}));
     }
 });

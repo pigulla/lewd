@@ -1,3 +1,5 @@
+'use strict';
+
 var util = require('util');
 
 var Condition = require('../Condition'),
@@ -11,7 +13,7 @@ var Condition = require('../Condition'),
  */
 function IsoDateTimeCondition() {
     var lewd = require('../../lewd');
-    
+
     this.condition = lewd.all(
         String,
         /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z$/,
@@ -19,7 +21,7 @@ function IsoDateTimeCondition() {
     );
 
     Condition.call(this, 'IsoDateTime');
-    
+
     this.supportsCoercion = true;
 }
 
@@ -39,7 +41,7 @@ IsoDateTimeCondition.prototype.validate = function (value, path) {
             throw e;
         }
     }
-    
+
     return this._coerce ? new Date(Date.parse(value)) : value;
 };
 

@@ -1,3 +1,5 @@
+'use strict';
+
 var _ = require('lodash'),
     buster = require('buster');
 
@@ -43,6 +45,6 @@ buster.testCase('"isoDateTime" condition', {
     'error message': function () {
         assertViolationWithMessage(function () {
             condition()('foo');
-        }, _.template(errorMessages.IsoDateTime, {}));
+        }, _.template(errorMessages.IsoDateTime)({}));
     }
 });

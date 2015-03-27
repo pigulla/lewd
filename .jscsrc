@@ -88,8 +88,30 @@
     "disallowSpacesInFunctionDeclaration": {
         "beforeOpeningRoundBrace": true
     },
-    "excludeFiles": [
-        "node_modules/**",
-        "dist/**"
-    ]
+    "requireSpaceBeforeKeywords": [
+        "else",
+        "while",
+        "if",
+        "catch"
+    ],
+    "disallowSpaceBeforeKeywords": [],
+    "requireSpaceAfterKeywords": true,
+    "requirePaddingNewlinesBeforeKeywords": [
+        "do",
+        "for",
+        "if",
+        "switch",
+        "try",
+        "while",
+        "with"
+    ],
+    "disallowPaddingNewlinesBeforeKeywords": [
+        "else",
+        "typeof"
+    ],
+    "requireOperatorBeforeLineBreak": [],
+    "disallowOperatorBeforeLineBreak": [
+        "."
+    ],
+    "disallowTrailingWhitespace": true
 }

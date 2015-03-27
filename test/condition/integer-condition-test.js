@@ -1,3 +1,5 @@
+'use strict';
+
 var _ = require('lodash'),
     buster = require('buster');
 
@@ -37,6 +39,6 @@ buster.testCase('"integer" condition', {
     'error message': function () {
         assertViolationWithMessage(function () {
             condition()('foo');
-        }, _.template(errorMessages.Integer, {}));
+        }, _.template(errorMessages.Integer)({}));
     }
 });

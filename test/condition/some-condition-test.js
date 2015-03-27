@@ -1,3 +1,5 @@
+'use strict';
+
 var _ = require('lodash'),
     buster = require('buster');
 
@@ -35,13 +37,13 @@ buster.testCase('"some" condition', {
             var custom = function (value, path) {
                 ''.foo();
             };
-            
+
             condition(lewd(custom))();
         }, 'TypeError');
     },
     'error message': function () {
         assertViolationWithMessage(function () {
             condition(Number, String, Boolean)(null);
-        }, _.template(errorMessages.Some, {}));
+        }, _.template(errorMessages.Some)({}));
     }
 });

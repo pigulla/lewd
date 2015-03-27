@@ -1,3 +1,5 @@
+'use strict';
+
 var util = require('util');
 
 var _ = require('lodash');
@@ -27,12 +29,15 @@ function validateOptions(options) {
     if (typeof opts.min !== 'number') {
         throw new IllegalParameterException('Option "min" must be a number');
     }
+
     if (typeof opts.max !== 'number') {
         throw new IllegalParameterException('Option "max" must be a number');
     }
+
     if (typeof opts.minInclusive !== 'boolean') {
         throw new IllegalParameterException('Option "minInclusive" must be a boolean');
     }
+
     if (typeof opts.maxInclusive !== 'boolean') {
         throw new IllegalParameterException('Option "maxInclusive" must be a boolean');
     }
@@ -47,7 +52,7 @@ function validateOptions(options) {
  */
 function LenCondition(options) {
     Condition.call(this, 'Len');
-    
+
     this.options = validateOptions(options);
 }
 
@@ -67,6 +72,7 @@ LenCondition.prototype.validate = function (value, path) {
         key = 'max' + (this.options.maxInclusive ? 'Inclusive' : '');
         this.reject(value, path, errorMessages[key], this.options);
     }
+
     if (value.length < this.options.min || (value.length === this.options.min && !this.options.minInclusive)) {
         key = 'min' + (this.options.minInclusive ? 'Inclusive' : '');
         this.reject(value, path, errorMessages[key], this.options);

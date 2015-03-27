@@ -1,3 +1,5 @@
+'use strict';
+
 var util = require('util');
 
 var _ = require('lodash'),
@@ -30,9 +32,7 @@ buster.testCase('"object" condition', {
             '', [], { b: 42 }
         ]);
         acceptValues(condition, args, [
-            /*jshint -W010*/
             {}, new Object(), Object.create(null)
-            /*jshint +W010*/
         ]);
     },
     'simple': {
@@ -40,7 +40,7 @@ buster.testCase('"object" condition', {
             var args = [
                 { b: Boolean }
             ];
-    
+
             refuteValues(condition, args, [
                 '', [], {}, { b: 42 }, { b: null }, { b: 0 }, { b: {} }, { y: true },
                 { b: true, x: false }, { b: false, x: {} }
@@ -54,7 +54,7 @@ buster.testCase('"object" condition', {
                 { b: Boolean },
                 { allowExtra: true }
             ];
-    
+
             refuteValues(condition, args, ['', [], {}, { b: 42 }, { b: null }, { b: 0 }, { b: {} }, { y: true }]);
             acceptValues(condition, args, [
                 { b: true }, { b: false },
@@ -66,7 +66,7 @@ buster.testCase('"object" condition', {
             var args = [
                 { n: Number, a: [] }
             ];
-    
+
             refuteValues(condition, args, [
                 '', [], {}, { x: 42 }, { n: null }, { n: 0 }, { n: {} }, { n: true },
                 { n: 42, a: null }, { n: 0, a: {} }, { n: 99, a: 14 }
@@ -81,7 +81,7 @@ buster.testCase('"object" condition', {
                 s: String,
                 b: lewd.optional(Boolean)
             }, { byDefault: 'required' }];
-            
+
             refuteValues(condition, args, [
                 { b: true },
                 { s: '', b: 42 },
@@ -98,7 +98,7 @@ buster.testCase('"object" condition', {
                 s: String,
                 b: lewd.forbidden(Boolean)
             }, { byDefault: 'required' }];
-            
+
             refuteValues(condition, args, [
                 { b: true },
                 { s: '', b: 42 },
@@ -116,7 +116,7 @@ buster.testCase('"object" condition', {
                 s: String,
                 b: lewd.required(Boolean)
             }, { byDefault: 'optional' }];
-            
+
             refuteValues(condition, args, [
                 { s: 'hello' },
                 { s: '', b: 42 },
@@ -136,7 +136,7 @@ buster.testCase('"object" condition', {
                 o: Object,
                 n: Number
             }).allOptional();
-            
+
             refute.exception(function () {
                 cond({ s: 's', o: {} });
                 cond({ s: 's', n: 42 });
@@ -156,14 +156,14 @@ buster.testCase('"object" condition', {
                 s: String,
                 n: lewd(Number).as('n')
             }).allOptional();
-            
+
             cond.get('n').required();
-            
+
             refute.exception(function () {
                 cond({ s: '', n: 42 });
                 cond({ n: 42 });
             });
-            
+
             assertExceptionWithName(function () {
                 cond({ s: '' });
             }, 'ConditionViolationException');
@@ -176,7 +176,7 @@ buster.testCase('"object" condition', {
                 o: lewd(Object).optional(),
                 n: lewd(Number).optional()
             }).allRequired();
-            
+
             refute.exception(function () {
                 cond({ s: 's', o: {}, n: 42 });
             });
@@ -200,14 +200,14 @@ buster.testCase('"object" condition', {
                 o: lewd(Object).optional().as('o'),
                 n: lewd(Number).optional().as('n')
             }).allRequired();
-            
+
             cond.get('o').optional();
-            
+
             refute.exception(function () {
                 cond({ s: '', o: {}, n: 42 });
                 cond({ s: '', n: 42 });
             });
-            
+
             assertExceptionWithName(function () {
                 cond({ o: '', n: 42 });
             }, 'ConditionViolationException');
@@ -247,7 +247,7 @@ buster.testCase('"object" condition', {
         function B() {}
         util.inherits(B, A);
         B.prototype.b = 'foo';
-        
+
         acceptValues(condition, [{
             a: Number,
             b: String
@@ -258,7 +258,7 @@ buster.testCase('"object" condition', {
             var args = [{
                 $k: /^[a-z]+$/
             }, { allowExtra: true }];
-            
+
             refuteValues(condition, args, [
                 { 1: true, a: 0 },
                 { a: [], B: 42 },
@@ -269,12 +269,12 @@ buster.testCase('"object" condition', {
                 { abc: null },
                 { d: 42, e: null, f: true }
             ]);
-        },        
+        },
         '{ $k: some(/^\\d$/, some("a", "b")) }': function () {
             var args = [{
                 $k: lewd.some(/^\d$/, lewd.some('a', 'b'))
             }, { allowExtra: true }];
-            
+
             refuteValues(condition, args, [
                 { 1: true, c: 0 },
                 { a: [], B: 42 },
@@ -289,7 +289,9 @@ buster.testCase('"object" condition', {
         },
         '{ $k: function } (extras allowed)': function () {
             assertExceptionWithName(function () {
-                condition({ $k: function () { x(); } }, { removeExtra: true })({ n: 0 });  // jshint ignore:line                
+                /* eslint-disable block-scoped-var, no-undef */
+                condition({ $k: function () { x(); } }, { removeExtra: true })({ n: 0 });
+                /* eslint-enable block-scoped-var, no-undef */
             }, 'ReferenceError');
         }
     },
@@ -298,7 +300,7 @@ buster.testCase('"object" condition', {
             var args = [{
                 $k: /^a/, x: undefined
             }];
-            
+
             refuteValues(condition, args, [
                 {},
                 { y: 42 },
@@ -312,9 +314,9 @@ buster.testCase('"object" condition', {
     'ignoreExtraFunctions option': {
         '{ y: Number } with ignoreExtraFunctions': function () {
             var args = [{
-                y: Number 
+                y: Number
             }, { ignoreExtraFunctions: true }];
-            
+
             refuteValues(condition, args, [
                 { y: 'foo' },
                 { y: fkt.noop },
@@ -327,9 +329,9 @@ buster.testCase('"object" condition', {
         },
         '{ y: Number } without ignoreExtraFunctions': function () {
             var args = [{
-                y: Number 
+                y: Number
             }, { ignoreExtraFunctions: false }];
-            
+
             refuteValues(condition, args, [
                 { y: 'foo' },
                 { y: fkt.noop },
@@ -344,7 +346,7 @@ buster.testCase('"object" condition', {
             var args = [{
                 y: Number, $v: String
             }, { ignoreExtraFunctions: true }];
-            
+
             refuteValues(condition, args, [
                 { y: 'foo' },
                 { y: fkt.noop },
@@ -359,7 +361,7 @@ buster.testCase('"object" condition', {
     'values': {
         '{ $v: Number }': function () {
             var args = [{ $v: Number }, { allowExtra: true }];
-            
+
             refuteValues(condition, args, [
                 { x: '' },
                 { x: false },
@@ -376,7 +378,7 @@ buster.testCase('"object" condition', {
         },
         '{ $v: some("x", 42) }': function () {
             var args = [{ $v: lewd.some('x', 42) }, { allowExtra: true }];
-            
+
             refuteValues(condition, args, [
                 { x: '' },
                 { x: 43 },
@@ -395,11 +397,11 @@ buster.testCase('"object" condition', {
     'keys and values': {
         '{ $k: /^[a-z]+$/, $v: String }': function () {
             var args = [{ $k: /^[a-z]+$/, $v: String }, { allowExtra: true }];
-            
+
             refuteValues(condition, args, [
                 { HELLO: 42 },
                 { hello: 'world', ORLY: true },
-                { hiThere: '' } 
+                { hiThere: '' }
             ]);
             acceptValues(condition, args, [
                 {},
@@ -411,7 +413,7 @@ buster.testCase('"object" condition', {
     'keys and values as options': {
         '{ $k: String } (keys: Number)': function () {
             var args = [{ $k: String }, { allowExtra: true, keys: /^[a-z]/ }];
-            
+
             refuteValues(condition, args, [
                 { $k: 42, abc: 42 },
                 { $k: '', Abc: 42 },
@@ -425,7 +427,7 @@ buster.testCase('"object" condition', {
         },
         '{ $v: String } (values: Number)': function () {
             var args = [{ $v: String }, { allowExtra: true, values: Number }];
-            
+
             refuteValues(condition, args, [
                 { $v: 42, x: 42 },
                 { $v: '', x: '42' },
@@ -482,19 +484,19 @@ buster.testCase('"object" condition', {
         '{ a: Number, b: Number } (with removeExtra}': function () {
             var o = { a: 1, b: 2, c: 3 };
             condition({ a: Number, b: Number }, { removeExtra: true })(o);
-            
+
             assert.equals({ a: 1, b: 2 }, o);
         },
         '{ $k: /^[a-z]+$/i } (with removeExtra}': function () {
             var o = { a: 1, B: 2, $foo: false, 1: 0 };
             condition({ $k: /^[a-z]+$/i }, { removeExtra: true })(o);
-            
+
             assert.equals({ a: 1, B: 2 }, o);
         },
         '{ $k: /^a/, $v: Number } (with removeExtra}': function () {
             var o = { a: 1, aa: 4, b: 2, $foo: false };
             condition({ $k: /^a/, $v: Number }, { removeExtra: true })(o);
-            
+
             assert.equals({ a: 1, aa: 4 }, o);
         }
     },
@@ -547,14 +549,14 @@ buster.testCase('"object" condition', {
         assertViolationAt(function () {
             c({ a: 42, c: 42 });
         }, []);
-        
+
         condC.optional();
         refute.exception(function () {
             c({ a: 42, b: '' });
             c({ a: 42 });
             c({ a: 42, c: 42 });
         });
-        
+
         condC.required();
         refute.exception(function () {
             c({ a: 42, b: '', c: 42 });
@@ -574,26 +576,34 @@ buster.testCase('"object" condition', {
         'value': function () {
             assertExceptionWithName(function () {
                 condition({
-                    a: function () { x(); }  // jshint ignore:line
-                })({ a: 0 }); 
+                    /* eslint-disable block-scoped-var, no-undef */
+                    a: function () { x(); }
+                    /* eslint-enable block-scoped-var, no-undef */
+                })({ a: 0 });
             }, 'ReferenceError');
 
             assertExceptionWithName(function () {
                 condition({
-                    $v: function () { x(); }  // jshint ignore:line
+                    /* eslint-disable block-scoped-var, no-undef */
+                    $v: function () { x(); }
+                    /* eslint-enable block-scoped-var, no-undef */
                 }, { allowExtra: true, removeExtra: true })({ x: 0 });
             }, 'ReferenceError');
         },
         'key': function () {
             assertExceptionWithName(function () {
                 condition({
-                    $k: function () { x(); }  // jshint ignore:line
+                    /* eslint-disable block-scoped-var, no-undef */
+                    $k: function () { x(); }
+                    /* eslint-enable block-scoped-var, no-undef */
                 })({ a: 42 });
             }, 'ReferenceError');
 
             assertExceptionWithName(function () {
                 condition({
-                    a: function () { x(); }  // jshint ignore:line
+                    /* eslint-disable block-scoped-var, no-undef */
+                    a: function () { x(); }
+                    /* eslint-enable block-scoped-var, no-undef */
                 }, { removeExtra: true })({ a: 0 });
             }, 'ReferenceError');
         }
@@ -602,31 +612,31 @@ buster.testCase('"object" condition', {
         'type': function () {
             assertViolationWithMessage(function () {
                 condition({})(42);
-            }, _.template(errorMessages.Object.type, {}));
+            }, _.template(errorMessages.Object.type)({}));
         },
         'unexpectedKey': {
             'extra': function () {
                 assertViolationWithMessage(function () {
                     condition({})({ x: null });
-                }, _.template(errorMessages.Object.unexpectedKey, { key: 'x' }));
+                }, _.template(errorMessages.Object.unexpectedKey)({ key: 'x' }));
             },
             'forbidden': function () {
                 assertViolationWithMessage(function () {
                     condition({ x: lewd.forbidden(undefined) })({ x: null });
-                }, _.template(errorMessages.Object.unexpectedKey, { key: 'x' }));
+                }, _.template(errorMessages.Object.unexpectedKey)({ key: 'x' }));
             }
         },
         'missingKey': function () {
             assertViolationWithMessage(function () {
                 condition({ x: undefined })({});
-            }, _.template(errorMessages.Object.missingKey, { key: 'x' }));
+            }, _.template(errorMessages.Object.missingKey)({ key: 'x' }));
         }
     },
     'custom error message': {
         'type': function () {
             assertViolationWithMessage(function () {
                 condition({}).because('reason: ${originalMessage}')(42);
-            }, 'reason: ' + _.template(errorMessages.Object.type, {}));
+            }, 'reason: ' + _.template(errorMessages.Object.type)({}));
         }
     },
     'invalid schema options': function () {

@@ -1,3 +1,5 @@
+'use strict';
+
 var util = require('util');
 
 var NestedCondition = require('../NestedCondition'),
@@ -29,7 +31,7 @@ NotCondition.prototype.validate = function (value, path) {
             throw e;
         }
     }
-    
+
     this.reject(value, path, errorMessages.Not);
 };
 

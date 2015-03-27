@@ -1,3 +1,5 @@
+'use strict';
+
 var util = require('util');
 
 var Condition = require('../Condition'),
@@ -23,15 +25,15 @@ IntegerCondition.prototype.validate = function (value, path) {
     if (typeof value !== 'number' || !isFinite(value)) {
         this.reject(value, path, errorMessage);
     }
-    
+
     if (this._coerce) {
         return Math.round(value);
     }
-    
+
     if (value === Math.round(value)) {
         return value;
     }
-        
+
     this.reject(value, path, errorMessage);
 };
 

@@ -48,6 +48,13 @@ module.exports = function (grunt) {
                 force: true
             }
         },
+        eslint: {
+            options: {
+                config: '.eslintrc'
+            },
+            source: ['src/**/*.js'],
+            test: ['test/**/*.js']
+        },
         jscs: {
             source: {
                 src: ['src/**/*.js'],
@@ -106,9 +113,9 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-browserify');
     grunt.loadNpmTasks('grunt-buster');
     grunt.loadNpmTasks('grunt-contrib-clean');
-    grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-coveralls');
+    grunt.loadNpmTasks('grunt-eslint');
     grunt.loadNpmTasks('grunt-istanbul-coverage');
     grunt.loadNpmTasks('grunt-jscs');
     grunt.loadNpmTasks('grunt-shell');
@@ -120,10 +127,10 @@ module.exports = function (grunt) {
         'browserify:dist', 'uglify:dist'
     ]);
     grunt.registerTask('prepush-check', [
-        'jscs', 'jshint', 'buster:tests-with-coverage', 'coverage'
+        'jscs', 'eslint', 'buster:tests-with-coverage', 'coverage'
     ]);
     grunt.registerTask('test', [
-        'clean:reports', 'jscs', 'jshint', 'buster:tests-with-coverage', 'coverage', 'nsp-audit'
+        'clean:reports', 'jscs', 'eslint', 'buster:tests-with-coverage', 'coverage', 'nsp-audit'
     ]);
     grunt.registerTask('test-prerelease', [
         'test', 'shell:check-version-strings'

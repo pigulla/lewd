@@ -1,3 +1,5 @@
+'use strict';
+
 var _ = require('lodash'),
     buster = require('buster');
 
@@ -15,7 +17,7 @@ buster.testCase('validator conditions', {
     'creditcard': {
         'values': function () {
             refuteValues(lewd.creditcard, [], [null, true, 32, 17.3, [], {}]);
-            
+
             refuteValues(lewd.creditcard, [], ['foo', '5398228707871528']);
             acceptValues(lewd.creditcard, [], ['4716461583322103', '4716-2210-5188-5662', '4929 7226 5379 7141']);
         },
@@ -23,18 +25,18 @@ buster.testCase('validator conditions', {
             'type': function () {
                 assertViolationWithMessage(function () {
                     lewd.creditcard()(null);
-                }, _.template(errorMessages.Creditcard.type, {}));
+                }, _.template(errorMessages.Creditcard.type)({}));
             },
             'invalid': function () {
                 assertViolationWithMessage(function () {
                     lewd.creditcard()('not an email');
-                }, _.template(errorMessages.Creditcard.invalid, {}));
+                }, _.template(errorMessages.Creditcard.invalid)({}));
             }
         },
         'invalid schema options': function () {
             refuteSchemaOptions(lewd.creditcard, [2]);
         }
-    },  
+    },
     'mongoId': {
         'values': function () {
             refuteValues(lewd.mongoId, [], [null, true, 32, 17.3, [], {}]);
@@ -46,12 +48,12 @@ buster.testCase('validator conditions', {
             'type': function () {
                 assertViolationWithMessage(function () {
                     lewd.mongoId()(null);
-                }, _.template(errorMessages.MongoId.type, {}));
+                }, _.template(errorMessages.MongoId.type)({}));
             },
             'invalid': function () {
                 assertViolationWithMessage(function () {
                     lewd.mongoId()('not an email');
-                }, _.template(errorMessages.MongoId.invalid, {}));
+                }, _.template(errorMessages.MongoId.invalid)({}));
             }
         },
         'invalid schema options': function () {
@@ -61,7 +63,7 @@ buster.testCase('validator conditions', {
     'email': {
         'values': function () {
             refuteValues(lewd.email, [], [null, true, 32, 17.3, [], {}]);
-            
+
             refuteValues(lewd.email, [], ['invalidemail@', 'invalid.com']);
             acceptValues(lewd.email, [], ['foo@bar.com', 'x@x.x', 'foo@bar.com.au']);
         },
@@ -69,12 +71,12 @@ buster.testCase('validator conditions', {
             'type': function () {
                 assertViolationWithMessage(function () {
                     lewd.email()(null);
-                }, _.template(errorMessages.Email.type, {}));
+                }, _.template(errorMessages.Email.type)({}));
             },
             'invalid': function () {
                 assertViolationWithMessage(function () {
                     lewd.email()('not an email');
-                }, _.template(errorMessages.Email.invalid, {}));
+                }, _.template(errorMessages.Email.invalid)({}));
             }
         },
         'invalid schema options': function () {
@@ -84,15 +86,15 @@ buster.testCase('validator conditions', {
     'ip': {
         'versions': function () {
             refuteValues(lewd.ip, [], [null, true, 32, 17.3, [], {}]);
-            
+
             refuteValues(lewd.ip, [], ['256.0.0.0', '0.0.0.256']);
             acceptValues(lewd.ip, [], ['127.0.0.1', '0.0.0.0', '255.255.255.255']);
-    
+
             refuteValues(lewd.ip, [4], ['::1', '2001:db8:0000:1:1:1:1:1']);
             refuteValues(lewd.ip, ['4'], ['::1', '2001:db8:0000:1:1:1:1:1']);
             acceptValues(lewd.ip, [4], ['127.0.0.1', '0.0.0.0']);
             acceptValues(lewd.ip, ['4'], ['127.0.0.1', '0.0.0.0']);
-    
+
             refuteValues(lewd.ip, [6], ['127.0.0.1', '0.0.0.0']);
             refuteValues(lewd.ip, ['6'], ['127.0.0.1', '0.0.0.0']);
             acceptValues(lewd.ip, [6], ['::1', '2001:db8:0000:1:1:1:1:1']);
@@ -102,12 +104,12 @@ buster.testCase('validator conditions', {
             'type': function () {
                 assertViolationWithMessage(function () {
                     lewd.ip()(null);
-                }, _.template(errorMessages.Ip.type, {}));
+                }, _.template(errorMessages.Ip.type)({}));
             },
             'invalid': function () {
                 assertViolationWithMessage(function () {
                     lewd.ip()('not an ip');
-                }, _.template(errorMessages.Ip.invalid, {}));
+                }, _.template(errorMessages.Ip.invalid)({}));
             }
         },
         'invalid schema options': function () {
@@ -117,15 +119,15 @@ buster.testCase('validator conditions', {
     'isbn': {
         'versions': function () {
             refuteValues(lewd.isbn, [], [null, true, 32, 17.3, [], {}]);
-            
+
             refuteValues(lewd.isbn, [], ['9783836221190']);
             acceptValues(lewd.isbn, [], ['9784873113685']);
-    
+
             refuteValues(lewd.isbn, [10], ['978-3836221191']);
             refuteValues(lewd.isbn, ['10'], ['978-3836221191']);
             acceptValues(lewd.isbn, [10], ['3-401-01319-X']);
             acceptValues(lewd.isbn, ['10'], ['3-401-01319-X']);
-    
+
             refuteValues(lewd.isbn, [13], ['3-8362-2119-5']);
             refuteValues(lewd.isbn, ['13'], ['3-8362-2119-5']);
             acceptValues(lewd.isbn, [13], ['978-4-87311-368-5']);
@@ -135,16 +137,39 @@ buster.testCase('validator conditions', {
             'type': function () {
                 assertViolationWithMessage(function () {
                     lewd.isbn()(null);
-                }, _.template(errorMessages.Isbn.type, {}));
+                }, _.template(errorMessages.Isbn.type)({}));
             },
             'invalid': function () {
                 assertViolationWithMessage(function () {
                     lewd.isbn()('not an isbn');
-                }, _.template(errorMessages.Isbn.invalid, {}));
+                }, _.template(errorMessages.Isbn.invalid)({}));
             }
         },
         'invalid schema options': function () {
             refuteSchemaOptions(lewd.isbn, [2]);
+        }
+    },
+    'isin': {
+        'versions': function () {
+            refuteValues(lewd.isin, [], [null, true, 32, 17.3, [], {}]);
+
+            refuteValues(lewd.isin, [], ['DE000BAY0018', '5398228707871528']);
+            acceptValues(lewd.isin, [], ['AU0000XVGZA3', 'DE000BAY0017']);
+        },
+        'error message': {
+            'type': function () {
+                assertViolationWithMessage(function () {
+                    lewd.isin()(null);
+                }, _.template(errorMessages.Isin.type)({}));
+            },
+            'invalid': function () {
+                assertViolationWithMessage(function () {
+                    lewd.isin()('not an isin');
+                }, _.template(errorMessages.Isin.invalid)({}));
+            }
+        },
+        'invalid schema options': function () {
+            refuteSchemaOptions(lewd.isin, [2]);
         }
     },
     'url': {
@@ -153,7 +178,7 @@ buster.testCase('validator conditions', {
 
             refuteValues(lewd.url, [], ['xyz://foobar.com', 'http://www.foobar.com:70000/']);
             acceptValues(lewd.url, [], ['http://user:pass@www.foobar.com/', 'valid.au']);
-    
+
             refuteValues(lewd.url, [{ protocols: ['rtmp'] }], ['http://foobar.com']);
             acceptValues(lewd.url, [{ protocols: ['rtmp'] }], ['rtmp://foobar.com']);
         },
@@ -161,12 +186,12 @@ buster.testCase('validator conditions', {
             'type': function () {
                 assertViolationWithMessage(function () {
                     lewd.url()(null);
-                }, _.template(errorMessages.Url.type, {}));
+                }, _.template(errorMessages.Url.type)({}));
             },
             'invalid': function () {
                 assertViolationWithMessage(function () {
                     lewd.url()('not a url');
-                }, _.template(errorMessages.Url.invalid, {}));
+                }, _.template(errorMessages.Url.invalid)({}));
             }
         },
         'invalid schema options': function () {
@@ -188,12 +213,12 @@ buster.testCase('validator conditions', {
             'type': function () {
                 assertViolationWithMessage(function () {
                     lewd.fqdn()(null);
-                }, _.template(errorMessages.Fqdn.type, {}));
+                }, _.template(errorMessages.Fqdn.type)({}));
             },
             'invalid': function () {
                 assertViolationWithMessage(function () {
                     lewd.fqdn()('not a fqdn');
-                }, _.template(errorMessages.Fqdn.invalid, {}));
+                }, _.template(errorMessages.Fqdn.invalid)({}));
             }
         },
         'invalid schema options': function () {
@@ -226,12 +251,12 @@ buster.testCase('validator conditions', {
             'type': function () {
                 assertViolationWithMessage(function () {
                     lewd.uuid()(null);
-                }, _.template(errorMessages.Uuid.type, {}));
+                }, _.template(errorMessages.Uuid.type)({}));
             },
             'invalid': function () {
                 assertViolationWithMessage(function () {
                     lewd.uuid()('not an uuid');
-                }, _.template(errorMessages.Uuid.invalid, {}));
+                }, _.template(errorMessages.Uuid.invalid)({}));
             }
         },
         'invalid schema options': function () {

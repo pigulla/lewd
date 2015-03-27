@@ -1,3 +1,5 @@
+'use strict';
+
 var _ = require('lodash'),
     buster = require('buster');
 
@@ -29,7 +31,7 @@ buster.testCase('"literal" condition', {
     'error message': function () {
         assertViolationWithMessage(function () {
             condition('x')({});
-        }, _.template(errorMessages.Literal, { literal: 'x', literalStr: utils.smartFormat('x') }));
+        }, _.template(errorMessages.Literal)({ literal: 'x', literalStr: utils.smartFormat('x') }));
     },
     'invalid schema options': function () {
         refuteSchemaOptions(condition, [[]]);

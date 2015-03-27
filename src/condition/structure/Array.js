@@ -1,3 +1,5 @@
+'use strict';
+
 var util = require('util');
 
 var NestedCondition = require('../NestedCondition'),
@@ -12,8 +14,8 @@ var NestedCondition = require('../NestedCondition'),
  * @param {Array.<*>} conditions
  */
 function ArrayCondition(conditions) {
-    var lewd = require('../../lewd'),
-        condition;
+    var lewd = require('../../lewd');
+    var condition;
 
     if (!Array.isArray(conditions)) {
         throw new IllegalParameterException('Parameter must be an array');

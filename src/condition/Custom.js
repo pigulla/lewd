@@ -1,3 +1,5 @@
+'use strict';
+
 var util = require('util');
 
 var Condition = require('./Condition'),
@@ -13,30 +15,30 @@ var Condition = require('./Condition'),
  */
 function CustomCondition(fn) {
     Condition.call(this, 'Custom');
-    
+
     if (typeof fn !== 'function') {
-        throw new IllegalParameterException('Parameter must be a function');        
+        throw new IllegalParameterException('Parameter must be a function');
     }
-    
+
     this._fn = fn;
 }
 
 util.inherits(CustomCondition, Condition);
 
-/* jshint -W030 */
+/* eslint-disable no-unused-expressions */
 /**
  * @private
  * @type {function}
  */
 CustomCondition.prototype._fn;
-/* jshint +W030 */
+/* eslint-enable no-unused-expressions */
 
 /**
  * @inheritdoc
  */
 CustomCondition.prototype.validate = function (value, path) {
     var result;
- 
+
     try {
         result = this._fn(value, path);
     } catch (e) {
@@ -46,13 +48,13 @@ CustomCondition.prototype.validate = function (value, path) {
             throw e;
         }
     }
-    
+
     if (typeof result === 'string') {
         this.reject(value, path, result);
     } else if (result === false) {
         this.reject(value, path, errorMessages.Custom);
     }
-    
+
     return value;
 };
 

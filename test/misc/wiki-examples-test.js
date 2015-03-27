@@ -1,3 +1,5 @@
+'use strict';
+
 var util = require('util');
 
 var _ = require('lodash'),
@@ -42,7 +44,7 @@ buster.testCase('wiki examples', {
     'removeExtra': function () {
         var condition = lewd.object({ a: Number, b: String }, { removeExtra: true }),
             data = { a: 1, b: '2', c: 3 };
-        
+
         refute.exception(function () {
             condition(data);
         });
@@ -58,11 +60,11 @@ buster.testCase('wiki examples', {
                 { 'timestamp': '2014-05-27T20:37:52.630Z', 'level': 'warn', 'message': 'Disk is full' },
                 { 'timestamp': '2014-05-27T20:37:32.190Z', 'level': 'info', 'message': 'System is online' }
             ];
-        
+
         refute.exception(function () {
             condition(data);
         });
-        
+
         data.push({ timestamp: '2014-05-27T21:37:52.630Z', 'level': 'foo', 'message': 'hackz0rs' });
         assertViolationAt(function () {
             condition(data);
@@ -91,7 +93,7 @@ buster.testCase('wiki examples', {
             condition(data);
         });
         assert.equals(data.dob.getTime(), Date.parse('1977-06-25T00:00:00.000Z'));
-        
+
         data.zip = 200;
         data.dob = '1977-06-25T00:00:00.000Z';
         assertViolationAt(function () {
@@ -155,16 +157,16 @@ buster.testCase('wiki examples', {
             if (typeof value === 'boolean') {
                 return value;
             }
-            
+
             if (typeof value === 'string' && this.isCoercionEnabled()) {
                 if (value === 'true' || value === 'false') {
                     return value === 'true';
                 }
             }
-            
+
             this.reject(value, path, 'No can do, sir.');
         };
-        
+
         var defaultCondition = (new MyCoercableCondition()).consumer(),
             coercingCondition = (new MyCoercableCondition()).consumer().coerce();
 

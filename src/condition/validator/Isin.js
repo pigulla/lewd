@@ -6,32 +6,32 @@ var validator = require('validator');
 
 var Condition = require('../Condition'),
     IllegalParameterException = require('../../exception/IllegalParameterException'),
-    errorMessages = require('../../messages').Creditcard;
+    errorMessages = require('../../messages').Isin;
 
 /**
- * @class lewd.condition.validator.Creditcard
+ * @class lewd.condition.validator.Isin
  * @extends {lewd.condition.Condition}
  * @constructor
  */
-function CreditcardCondition() {
-    Condition.call(this, 'Creditcard');
+function IsinCondition() {
+    Condition.call(this, 'Isin');
 }
 
-util.inherits(CreditcardCondition, Condition);
+util.inherits(IsinCondition, Condition);
 
 /**
  * @inheritdoc
  */
-CreditcardCondition.prototype.validate = function (value, path) {
+IsinCondition.prototype.validate = function (value, path) {
     if (typeof value !== 'string') {
         this.reject(value, path, errorMessages.type);
     }
 
-    if (!validator.isCreditCard(value)) {
+    if (!validator.isISIN(value)) {
         this.reject(value, path, errorMessages.invalid);
     }
 
     return value;
 };
 
-module.exports = CreditcardCondition;
+module.exports = IsinCondition;

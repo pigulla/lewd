@@ -1,3 +1,5 @@
+'use strict';
+
 var buster = require('buster');
 
 var lewd = require('../../src/lewd'),
@@ -48,7 +50,7 @@ buster.testCase('paths in exceptions', {
         '{ a: { b: { c: null } } }': function () {
             assertViolationAt(function () {
                 lewd.object({ a: { b: { c: null } } })({ a: { b: { c: 42 } } });
-            }, ['a', 'b', 'c']); 
+            }, ['a', 'b', 'c']);
         },
         'invalid keys': function () {
             assertViolationAt(function () {
@@ -83,7 +85,7 @@ buster.testCase('paths in exceptions', {
     },
     'are valid JSON pointer references': function () {
         var exception;
-        
+
         try {
             lewd.object({
                 'a/b': {

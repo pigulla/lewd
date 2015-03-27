@@ -1,3 +1,5 @@
+'use strict';
+
 module.exports = {
     'Array': 'must be an array',
     'Custom': 'custom condition failed',
@@ -5,14 +7,18 @@ module.exports = {
     'Email': {
         'type': 'must be a string',
         'invalid': 'not a valid email'
-    },  
+    },
     'Creditcard': {
         'type': 'must be a string',
         'invalid': 'not a valid credit card number'
-    },  
+    },
     'Isbn': {
         'type': 'must be a string',
         'invalid': 'not a valid ISBN'
+    },
+    'Isin': {
+        'type': 'must be a string',
+        'invalid': 'not a valid ISIN'
     },
     'Ip': {
         'type': 'must be a string',
@@ -49,7 +55,7 @@ module.exports = {
     'Some': 'did not satisfy any of the given conditions',
     'Type': 'must be of type ${type}',
     'Unique': {
-        'type': 'must be an array', 
+        'type': 'must be an array',
         'duplicateFound': 'values must be unique'
     },
     'Url': {

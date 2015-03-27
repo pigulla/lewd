@@ -1,3 +1,5 @@
+'use strict';
+
 var util = require('util');
 
 /**
@@ -7,7 +9,7 @@ var util = require('util');
  */
 function IllegalParameterException(message) {
     Error.call(this);
-    
+
     this.name = 'IllegalParameterException';
     this.message = message;
 }

@@ -1,3 +1,5 @@
+'use strict';
+
 var _ = require('lodash'),
     buster = require('buster');
 
@@ -23,7 +25,7 @@ buster.testCase('"regex" condition', {
         var regex = /x/;
         assertViolationWithMessage(function () {
             condition(regex)(42);
-        }, _.template(errorMessages.Regex, { regex: regex }));
+        }, _.template(errorMessages.Regex)({ regex: regex }));
     },
     'invalid schema options': function () {
         refuteSchemaOptions(condition, [42]);

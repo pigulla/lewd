@@ -1,3 +1,5 @@
+'use strict';
+
 var _ = require('lodash'),
     buster = require('buster');
 
@@ -15,19 +17,19 @@ var condition = lewd.range;
 buster.testCase('"range" condition', {
     'minimum': function () {
         var args = [{ min: 0 }];
-        
+
         refuteValues(condition, args, [-1]);
         acceptValues(condition, args, [1, 0]);
     },
     'maximum': function () {
         var args = [{ max: 50 }];
-        
+
         refuteValues(condition, args, [100]);
         acceptValues(condition, args, [30, 50]);
     },
     'minimum exclusive': function () {
         var args = [{ min: 0, minInclusive: false }];
-        
+
         refuteValues(condition, args, [0]);
         acceptValues(condition, args, [0.001]);
     },
@@ -53,25 +55,25 @@ buster.testCase('"range" condition', {
             var opts = { min: 5, minInclusive: false };
             assertViolationWithMessage(function () {
                 condition(opts)(4);
-            }, _.template(errorMessages.Range.min, opts));
+            }, _.template(errorMessages.Range.min)(opts));
         },
         'maximumExclusive': function () {
             var opts = { max: 3, maxInclusive: false };
             assertViolationWithMessage(function () {
                 condition(opts)(4);
-            }, _.template(errorMessages.Range.max, opts));
+            }, _.template(errorMessages.Range.max)(opts));
         },
         'minimumInclusive': function () {
             var opts = { min: 5, minInclusive: true };
             assertViolationWithMessage(function () {
                 condition(opts)(4);
-            }, _.template(errorMessages.Range.minInclusive, opts));
+            }, _.template(errorMessages.Range.minInclusive)(opts));
         },
         'maximumInclusive': function () {
             var opts = { max: 3, maxInclusive: true };
             assertViolationWithMessage(function () {
                 condition(opts)(4);
-            }, _.template(errorMessages.Range.maxInclusive, opts));
+            }, _.template(errorMessages.Range.maxInclusive)(opts));
         }
     },
     'invalid schema options': function () {

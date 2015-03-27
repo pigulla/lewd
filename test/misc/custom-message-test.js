@@ -1,3 +1,5 @@
+'use strict';
+
 var _ = require('lodash'),
     buster = require('buster');
 
@@ -30,13 +32,13 @@ buster.testCase('custom messages', {
     'reset': function () {
         var condition = lewd.Boolean().because('X');
         assertFailedWithMessage(condition, ['x'], 'X');
-        
+
         condition.because();
-        assertFailedWithMessage(condition, ['x'], _.template(errorMessages.Type, { type: 'boolean' }));
+        assertFailedWithMessage(condition, ['x'], _.template(errorMessages.Type)({ type: 'boolean' }));
     },
     'with params': function () {
         var condition;
-        
+
         condition = lewd.Boolean().because('The problem was at "${pathStr}"');
         assertFailedWithMessage(condition, 'x', 'The problem was at ""');
 
@@ -50,16 +52,16 @@ buster.testCase('custom messages', {
     },
     'for object keys and values': function () {
         var condition;
-        
+
         condition = lewd.object({ $k: lewd.regex(/^a/).because('i say so') });
         assertFailedWithMessage(condition, { x: null }, 'i say so');
-        
+
         condition = lewd.object({ $v: lewd.regex(/^a/).because('i say so') });
         assertFailedWithMessage(condition, { x: 'b' }, 'i say so');
     },
     'for some condition': function () {
         var condition;
-        
+
         condition = lewd.some(String, Number, null).because('Must be either a string, number or null');
         assertFailedWithMessage(condition, false, 'Must be either a string, number or null');
 

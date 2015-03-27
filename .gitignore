@@ -1,7 +1,5 @@
 .idea/
 npm-shrinkwrap.json
-index.js
 npm-debug.log
 node_modules/
 reports/
-dist/test.html
