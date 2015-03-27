@@ -3,6 +3,7 @@
 ###### New features:
 
  - Added `lewd.any` (fixes #7).
+ - Added `condition.verify(value, callback)` for "async" use (fixes #4).
  - Added condition wrapper for validator.js' `isISIN`.
 
 ###### Improvements:
