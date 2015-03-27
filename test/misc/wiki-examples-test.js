@@ -197,5 +197,25 @@ buster.testCase('wiki examples', {
 
         var value2 = condition({});
         assert.equals(value2, { x: [42] });
+    },
+    'successful async validation': function (done) {
+        var condition = lewd(Object),
+            input = { foo: 42 };
+
+        condition.verify(input, function (error, result) {
+            assert.same(null, error);
+            assert.same(result, input);
+            done();
+        });
+    },
+    'failed async validation': function (done) {
+        var condition = lewd(Object),
+            input = 'foo';
+
+        condition.verify(input, function (error, result) {
+            refute.same(null, error);
+            assert.same(result, undefined);
+            done();
+        });
     }
 });

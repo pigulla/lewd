@@ -2,9 +2,8 @@
 
 var _ = require('lodash');
 
-var assertParameterCount = require('../utils').assertParameterCount;
-
-var Condition = require('./Condition');
+var assertParameterCount = require('../utils').assertParameterCount,
+    Condition = require('./Condition');
 
 var MARKER_PROPERTY = '__lewd__invokable__';
 
@@ -57,6 +56,25 @@ ConsumerWrapper.isWrapper = function (value) {
 };
 
 /**
+ * An "asynchronous" version of `validate` to make lewd feel more natural in Node.js environments.
+ *
+ * @param {*} value
+ * @param {function} callback
+ */
+ConsumerWrapper.prototype.verify = function (value, callback) {
+    process.nextTick(function () {
+        var result;
+
+        try {
+            result = this.invokable(value);
+            callback(null, result);
+        } catch (e) {
+            callback(e);
+        }
+    }.bind(this));
+};
+
+/**
  * @since 0.8.0
  * @static
  * @param {lewd.condition.Condition} condition
@@ -66,6 +84,7 @@ ConsumerWrapper.wrapInvokable = function (condition) {
     function invokableWrapper(value, path) {
         return condition.validate(value, path || []);
     }
+
     invokableWrapper[MARKER_PROPERTY] = true;
     invokableWrapper.wrapped = condition.getType();
 
