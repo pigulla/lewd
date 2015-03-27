@@ -64,7 +64,6 @@ var conditions = {
  * @param {...*} var_args
  * @return {lewd.condition.ConsumerWrapper}
  * @throws IllegalParameterException
- * @throws IllegalParameterException
  */
 var lewd = function () {
     utils.assertParameterCount(arguments, 1, Infinity);
