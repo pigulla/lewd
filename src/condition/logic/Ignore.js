@@ -6,21 +6,21 @@ var Condition = require('../Condition'),
     errorMessages = require('../../messages');
 
 /**
- * @class lewd.condition.logic.Any
+ * @class lewd.condition.logic.Ignore
  * @extends {lewd.condition.Condition}
  * @constructor
  */
-function AnyCondition() {
-    Condition.call(this, 'Any');
+function IgnoreCondition() {
+    Condition.call(this, 'Ignore');
 }
 
-util.inherits(AnyCondition, Condition);
+util.inherits(IgnoreCondition, Condition);
 
 /**
  * @inheritdoc
  */
-AnyCondition.prototype.validate = function (value, path) {
+IgnoreCondition.prototype.validate = function (value, path) {
     return value;
 };
 
-module.exports = AnyCondition;
+module.exports = IgnoreCondition;

@@ -37,7 +37,13 @@ buster.testCase('internals', {
                     assert.equals(lewd._wrap(lewd.String).wrapped, 'StringType');
                 },
                 'undefined': function () {
-                    assert.equals(lewd._wrap(lewd.undefined).wrapped, 'Any');
+                    assert.equals(lewd._wrap(lewd.undefined).wrapped, 'Ignore');
+                },
+                'ignore': function () {
+                    assert.equals(lewd._wrap(lewd.undefined).wrapped, 'Ignore');
+                },
+                'any': function () {
+                    assert.equals(lewd._wrap(lewd.any).wrapped, 'JsonType');
                 },
                 'creditcard': function () {
                     assert.equals(lewd._wrap(lewd.creditcard).wrapped, 'Creditcard');

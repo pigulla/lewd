@@ -29,6 +29,9 @@ module.exports = {
         'invalid': 'not a valid fully qualified domain name'
     },
     'IsoDateTime': 'not a valid ISO 8601 datetime string',
+    'Json': {
+        'invalid': 'not a valid JSON data type'
+    },
     'Len': {
         'max': 'must not be longer than ${max}',
         'maxInclusive': 'must not be longer than or equal to ${max}',

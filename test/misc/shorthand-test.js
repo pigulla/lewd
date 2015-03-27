@@ -30,7 +30,10 @@ buster.testCase('shorthand syntax', {
         assert.equals(lewd(null).wrapped, 'NullType');
     },
     'undefined': function () {
-        assert.equals(lewd(undefined).wrapped, 'Any');
+        assert.equals(lewd(undefined).wrapped, 'Ignore');
+    },
+    'ignore': function () {
+        assert.equals(lewd(undefined).wrapped, 'Ignore');
     },
     '[1, 2, 3]': function () {
         assert.equals(lewd([1, 2, 3]).wrapped, 'Array');

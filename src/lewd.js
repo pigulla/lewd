@@ -46,11 +46,12 @@ var conditions = {
         Regex: require('./condition/content/Regex'),
 
         All: require('./condition/logic/All'),
-        Any: require('./condition/logic/Any'),
+        Ignore: require('./condition/logic/Ignore'),
         None: require('./condition/logic/None'),
         Not: require('./condition/logic/Not'),
         Some: require('./condition/logic/Some'),
 
+        JsonType: require('./condition/type/Json'),
         ArrayType: require('./condition/type/Array'),
         BooleanType: require('./condition/type/Boolean'),
         NullType: require('./condition/type/Null'),
@@ -95,13 +96,11 @@ lewd.version = '0.9.0';
  */
 lewd._wrap = function (spec) {
     var shorthands = [
-        lewd.Array, lewd.Boolean, lewd.null, lewd.Number, lewd.Object, lewd.String, lewd.undefined,
-        lewd.unique, lewd.isoDateTime, lewd.integer, lewd.ip, lewd.email, lewd.uuid, lewd.url, lewd.fqdn, lewd.isbn,
-        lewd.isin,
-        lewd.creditcard, lewd.mongoId
+        lewd.Array, lewd.Boolean, lewd.null, lewd.Number, lewd.Object, lewd.String, lewd.undefined, lewd.ignore,
+        lewd.any, lewd.unique, lewd.isoDateTime, lewd.integer,
+        lewd.ip, lewd.email, lewd.uuid, lewd.url, lewd.fqdn, lewd.isbn, lewd.isin, lewd.creditcard, lewd.mongoId
     ];
 
-    /* jshint maxcomplexity:false */
     if (spec === Array) {
         return (new conditions.ArrayType()).consumer();
     } else if (spec === Boolean) {
@@ -115,7 +114,7 @@ lewd._wrap = function (spec) {
     } else if (spec === String) {
         return (new conditions.StringType()).consumer();
     } else if (spec === undefined) {
-        return (new conditions.Any()).consumer();
+        return (new conditions.Ignore()).consumer();
     } else if (utils.isLiteral(spec)) {
         return (new conditions.Literal(spec)).consumer();
     } else if (spec instanceof RegExp) {
@@ -132,44 +131,6 @@ lewd._wrap = function (spec) {
         return ConsumerWrapper.isWrapper(spec) ? spec : lewd.custom(spec);
     } else {
         throw new IllegalParameterException('Invalid specification');
-    }
-};
-
-/* istanbul ignore next */
-/**
- * Exposes the condition functions into the global namespace. Throws an error if a collision occurs.
- *
- * @experimental 0.1.0
- * @param {string=} prefix
- * @throws Error
- */
-lewd.expose = function (prefix) {
-    var p = prefix || '',
-        exposedFunctions = [
-            'creditcard', 'email', 'ip', 'isbn', 'isin', 'mongoId', 'url', 'fqdn', 'uuid',
-            'optional', 'required', 'forbidden',
-            'integer', 'isoDateTime',
-            'array', 'len', 'literal', 'object', 'range', 'regex',
-            'all', 'any', 'none', 'not', 'some'
-        ],
-        additionalFunctions = ['Array', 'Boolean', 'null', 'Number', 'Object', 'String', 'undefined'];
-
-    var expose = function (name) {
-        var exposedName = p + name;
-
-        if (this[exposedName] !== undefined) {
-            throw new Error(util.format(
-                'Cannot expose function "%s" because "%s" is already defined in the global scope',
-                name, exposedName
-            ));
-        }
-        this[exposedName] = lewd[name];
-    }.bind(this);
-
-    exposedFunctions.forEach(expose);
-
-    if (p.length > 0) {
-        additionalFunctions.forEach(expose);
     }
 };
 
@@ -474,7 +435,24 @@ lewd.String = function () {
  */
 lewd.undefined = function () {
     utils.assertParameterCount(arguments, 0);
-    return (new conditions.Any()).consumer();
+    return (new conditions.Ignore()).consumer();
+};
+
+/**
+ * @since 0.9.0
+ * @return {lewd.condition.ConsumerWrapper}
+ */
+lewd.ignore = function () {
+    return lewd.undefined.apply(lewd, arguments);
+};
+
+/**
+ * @since 0.9.0
+ * @return {lewd.condition.ConsumerWrapper}
+ */
+lewd.any = function () {
+    utils.assertParameterCount(arguments, 0);
+    return (new conditions.JsonType()).consumer();
 };
 
 /**

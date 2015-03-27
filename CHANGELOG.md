@@ -2,7 +2,11 @@
 
 ###### New features:
 
+ - Added `lewd.any`. 
  - Added condition wrapper for validator.js' `isISIN`.
+
+###### Improvements:
+ - Added `lewd.ignore` as an alias to `lewd.undefined`.
 
 ###### Misc:
 
@@ -12,8 +16,6 @@
 ## 0.8.3 (2015-01-17)
 
  - Updated dependencies and year.
-
-###### New features:
 
 ## 0.8.2 (2014-11-28)
 
