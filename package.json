@@ -1,12 +1,7 @@
 {
   "name": "lewd",
   "version": "0.9.0",
-  "license": [
-    {
-      "type": "BSD-2-Clause",
-      "url": "https://github.com/pigulla/lewd/raw/master/LICENSE"
-    }
-  ],
+  "license": "BSD-2-Clause",
   "author": {
     "name": "Raphael Pigulla",
     "email": "pigulla@four66.com",
