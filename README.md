@@ -1,3 +1,5 @@
+![no maintenance intended](https://img.shields.io/badge/%E2%A8%89-no%20maintenance%20intended-red.svg?style=flat-square)
+
 [![Build Status](http://img.shields.io/travis/pigulla/lewd.svg?style=flat-square)](https://travis-ci.org/pigulla/lewd)
 [![NPM version](http://img.shields.io/npm/v/lewd.svg?style=flat-square)](http://badge.fury.io/js/lewd)
 [![Coverage Status](https://img.shields.io/coveralls/pigulla/lewd.svg?style=flat-square)](https://coveralls.io/r/pigulla/lewd)
